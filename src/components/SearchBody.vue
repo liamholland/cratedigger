@@ -43,7 +43,6 @@ export default {
         
         //send request (will return limit number of results)
         searchArtist({ token: this.token, term: term, limit: 10 }).then((res) => {
-          console.log(res.data);
           this.results = res.data.artists.items;  //an array of results
         }).catch((error) => {
           console.log(error);
