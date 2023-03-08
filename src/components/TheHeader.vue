@@ -23,15 +23,21 @@ export default {
     }
   },
   created() {
-    onAuthStateChanged(auth, (user) => {
+    let listener = onAuthStateChanged(auth, (user) => {
       this.isLoggedIn = user ? true : false;
     });
+    
+    //unhook listener
+    listener();
   },
   computed: {
     checkLogin() {
-      onAuthStateChanged(auth, (user) => {
+      let listener = onAuthStateChanged(auth, (user) => {
         this.isLoggedIn = user ? true : false;
       });
+
+      //unhook listener
+      listener();
     }
   },
   methods: {
