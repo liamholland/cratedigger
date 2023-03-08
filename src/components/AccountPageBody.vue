@@ -11,7 +11,7 @@ const functions = getFunctions(app);
 const auth = getAuth(app);
 
 //connect emulator
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {
@@ -87,8 +87,6 @@ export default {
 
     //refresh the data contained on the page
     refresh() {
-      this.loadingBar = this.$loading.show();
-
       console.log(this.uid);
 
       //onAuthStateChanged returns a function which unhooks the event listener
@@ -120,7 +118,9 @@ export default {
       });
       //unhook the listener
       listener();
-      this.loadingBar.hide();
+      if(this.loadingBar != ""){
+        this.loadingBar.hide();
+      }
     },
 
     logout() {
@@ -133,7 +133,7 @@ export default {
 
     updateProfile() {
       this.loadingBar = this.$loading.show();
-      
+
       //update both
       if (this.newBio.length > 0 && this.newURL.length > 0) {
         this.updateBio();

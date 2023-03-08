@@ -6,7 +6,7 @@ import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/
 const functions = getFunctions(app);
 
 //TODO: remove emulator connection on prod
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {
