@@ -2,7 +2,7 @@
 import app from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-// import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions.js"
+import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions.js"
 
 //get components
 const auth = getAuth(app);
@@ -18,7 +18,6 @@ export default {
       username: "",
       password: "",
       uid: "",
-      loader: "",
       isLoggedIn: false,
     }
   },
@@ -37,34 +36,19 @@ export default {
   methods: {
 
     opensignin() {
-      // openModal(0);
-      //gets an array of all the popups in the order they are defined on the page
-      let elms = document.querySelectorAll('.modal');
-      //shows the one you want to show
-      elms[0].style.display = "flex";
+      openModal(0);
     },
 
     closesignin() {
-      // closeModal(0);
-      //gets an array of all the popups in the order they are defined on the page
-      let elms = document.querySelectorAll('.modal');
-      //hides the one you want to hide
-      elms[modal].style.display = "none";
+      closeModal(0);
     },
 
-    opensignup() {
-      //gets an array of all the popups in the order they are defined on the page
-      let elms = document.querySelectorAll('.modal');
-      //shows the one you want to show
-      elms[1].style.display = "flex";
+    opensignup(){
+      openModal(1);
     },
 
-    closesignup() {
-      // closeModal(1);
-      //gets an array of all the popups in the order they are defined on the page
-      let elms = document.querySelectorAll('.modal');
-      //hides the one you want to hide
-      elms[modal].style.display = "none";
+    closesignup(){
+      closeModal(1);
     },
 
     isEmail(e) {
@@ -75,7 +59,7 @@ export default {
     //otherwise just calls login
     //necessary to allow the promise to resolve from getEmail before trying to sign in to firebase
     beforeLogin() {
-      this.loader = this.$loading.show();
+      startLoad(this.$loading);
 
       //regex test
       if (!this.isEmail(this.email)) {
@@ -93,11 +77,11 @@ export default {
               break;
             case 1:
               console.log("User Does Not Exist");
-              this.loader.hide();
+              endLoad();
               break;
             default:
               console.log("Unknown Code Returned From Server");
-              this.loader.hide();
+              endLoad();
               break;
           }
         });
@@ -115,9 +99,9 @@ export default {
         const user = userCred.user;
         this.uid = user.uid;
         this.closesignin(0); //close the sign in popup
-        this.$router.push({ name: 'AccountPage', params: { uid: user.uid } });
+        this.$router.push({ name: 'AccountPage', params: {uid: user.uid}});
         this.isLoggedIn = true;
-        this.loader.hide();
+        endLoad();
       }).catch((error) => {
         //handle the firebase errors
         switch (error.code) {
@@ -136,14 +120,14 @@ export default {
             break;
         }
 
-        this.loader.hide();
+        endLoad();
       });
     },
 
     //register an account
     //calls login after successful execution
     register() {
-      this.loader = this.$loading.show();
+      startLoad(this.$loading);
 
       //dont run if the email is invalid
       if (!this.isEmail(this.email)) {
@@ -152,7 +136,7 @@ export default {
         return;
       }
 
-      if (this.username == "") {
+      if(this.username == ""){
         console.log("Enter a Username");
         this.hideLoad();
         return;
@@ -197,21 +181,21 @@ export default {
             console.log(error.message);
           }
 
-          this.loader.hide();
+          endLoad();
         });
       }).catch((error) => {
         console.log(error);
-        this.loader.hide();
+        endLoad();
       });
     },
 
     logout() {
-      this.loader = this.$loading.show();
+      startLoad(this.$loading);
       auth.signOut();
-      this.$router.push({ path: '/AccountPage/' });
+      this.$router.push({path: '/AccountPage/'});
       this.uid = "";
       this.isLoggedIn = false;
-      this.loader.hide();
+      endLoad();
     }
   }
 }
@@ -282,7 +266,7 @@ export default {
           </li>
 
           <li class="nav-item">
-            <router-link :to="{ path: '/AccountPage/' }">Account</router-link>
+            <router-link :to="{ path: '/AccountPage/'}">Account</router-link>
           </li>
 
         </ul>

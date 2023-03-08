@@ -33,9 +33,6 @@ export default {
       //updated profile temp variables
       newBio: "",
       newURL: "",
-
-      //laoder
-      loader: "",
     }
   },
   created() {
@@ -67,7 +64,7 @@ export default {
 
     //refresh the data contained on the page
     refresh() {
-      this.loader = this.$loading.show();
+      startLoad(this.$loading);
 
       console.log(this.uid);
 
@@ -100,15 +97,15 @@ export default {
       });
       //unhook the listener
       listener();
-      this.loader.hide();
+      endLoad();
     },
 
     logout() {
-      this.loader = this.$loading.show();
+      startLoad(this.$loading);
       auth.signOut();
       this.uid = "";
       this.isLoggedIn = false;
-      this.loader.hide();
+      endLoad();
     },
 
     updateProfile() {
