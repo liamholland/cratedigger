@@ -159,6 +159,10 @@ exports.getProfileInfo = functions.https.onRequest( (req, res) => {
   });
 });
 
+/*
+--SPOTIFY API FUNCTIONS--
+*/
+
 //gets a new token
 //the token will be in the response.data.access_token json header
 exports.getSpotifyToken = functions.https.onRequest( (req, res) => {
