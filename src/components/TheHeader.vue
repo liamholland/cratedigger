@@ -170,7 +170,6 @@ export default {
       checkUname({ "username": this.username }).then((res) => {
         if (res.data.isTaken) {
           console.log(res.data.message);
-          this.hideLoad();
           return;
         }
         else {
@@ -201,8 +200,6 @@ export default {
             console.log(error.code);
             console.log(error.message);
           }
-
-          this.loadingBar.hide();
         });
       }).catch((error) => {
         console.log(error);
