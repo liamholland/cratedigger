@@ -4,7 +4,7 @@
 import app from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
-import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions.js"
+// import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions.js"
 
 //get componenets
 const functions = getFunctions(app);
@@ -33,6 +33,9 @@ export default {
       //updated profile temp variables
       newBio: "",
       newURL: "",
+
+      //loading bar
+      loadingBar: "",
     }
   },
   created() {
@@ -46,25 +49,45 @@ export default {
     }
   },
   methods: {
-    opensignin(){
-      openModal(0);
+    opensignin() {
+      // openModal(0);
+
+      //gets an array of all the popups in the order they are defined on the page
+      let elms = document.querySelectorAll('.modal');
+      //shows the one you want to show
+      elms[0].style.display = "flex";
     },
 
-    opensignup(){
-      openModal(1);
-    },
-    
-    closeProfileEdit() { 
-      closeModal(2)
+    opensignup() {
+      // openModal(1);
+
+      //gets an array of all the popups in the order they are defined on the page
+      let elms = document.querySelectorAll('.modal');
+      //shows the one you want to show
+      elms[1].style.display = "flex";
     },
 
     openProfileEdit() {
-      openModal(2);
+      // openModal(2);
+
+      //gets an array of all the popups in the order they are defined on the page
+      let elms = document.querySelectorAll('.modal');
+      //shows the one you want to show
+      elms[2].style.display = "flex";
+    },
+
+    closeProfileEdit() {
+      // closeModal(2);
+
+      //gets an array of all the popups in the order they are defined on the page
+      let elms = document.querySelectorAll('.modal');
+      //hides the one you want to hide
+      elms[2].style.display = "none";
     },
 
     //refresh the data contained on the page
     refresh() {
-      startLoad(this.$loading);
+      this.loadingBar = this.$loading.show();
 
       console.log(this.uid);
 
@@ -97,15 +120,15 @@ export default {
       });
       //unhook the listener
       listener();
-      endLoad();
+      this.loadingBar.hide();
     },
 
     logout() {
-      startLoad(this.$loading);
+      this.loadingBar = this.$loading.show();
       auth.signOut();
       this.uid = "";
       this.isLoggedIn = false;
-      endLoad();
+      this.loadingBar.hide();
     },
 
     updateProfile() {
