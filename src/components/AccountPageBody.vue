@@ -132,7 +132,8 @@ export default {
     },
 
     updateProfile() {
-
+      this.loadingBar = this.$loading.show();
+      
       //update both
       if (this.newBio.length > 0 && this.newURL.length > 0) {
         this.updateBio();
