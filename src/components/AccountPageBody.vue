@@ -4,6 +4,14 @@
 import app from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
+import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions.js"
+
+//get componenets
+const functions = getFunctions(app);
+const auth = getAuth(app);
+
+//connect emulator
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {
@@ -25,6 +33,9 @@ export default {
       //updated profile temp variables
       newBio: "",
       newURL: "",
+
+      //laoder
+      loader: "",
     }
   },
   created() {
@@ -38,13 +49,27 @@ export default {
     }
   },
   methods: {
+    opensignin(){
+      openModal(0);
+    },
+
+    opensignup(){
+      openModal(1);
+    },
+    
+    closeProfileEdit() { 
+      closeModal(2)
+    },
+
+    openProfileEdit() {
+      openModal(2);
+    },
+
     //refresh the data contained on the page
     refresh() {
-      console.log(this.uid);
+      this.loader = this.$loading.show();
 
-      //get comonenets
-      const auth = getAuth(app);
-      const functions = getFunctions(app);
+      console.log(this.uid);
 
       //onAuthStateChanged returns a function which unhooks the event listener
       let listener = onAuthStateChanged(auth, (user) => {
@@ -55,7 +80,6 @@ export default {
         //if logged in and there is a valid user
         if (this.isLoggedIn && this.uid != undefined) {
           console.log(this.uid);
-          connectFunctionsEmulator(functions, "localhost", 5001);
           //define functions
           const getProfileInfo = httpsCallable(functions, "getProfileInfo");
           //get the profile information of the user once their are signed in
@@ -76,21 +100,17 @@ export default {
       });
       //unhook the listener
       listener();
+      this.loader.hide();
     },
-    closesignin(i) {
-      let elms = document.querySelectorAll('.modal');
-      elms[i].style.display = "none";
-    },
-    opensignin(i) {
-      let elms = document.querySelectorAll('.modal');
-      elms[i].style.display = "flex";
-    },
+
     logout() {
-      const auth = getAuth(app);
+      this.loader = this.$loading.show();
       auth.signOut();
       this.uid = "";
       this.isLoggedIn = false;
+      this.loader.hide();
     },
+
     updateProfile() {
 
       //update both
@@ -107,13 +127,11 @@ export default {
         this.updatePFP();
       }
 
-      this.closesignin(2);
+      this.closeProfileEdit();
     },
+
     //update bio
     updateBio() {
-      const functions = getFunctions(app);
-      connectFunctionsEmulator(functions, "localhost", 5001);
-
       //define function
       const update = httpsCallable(functions, "updateProfile");
 
@@ -126,11 +144,9 @@ export default {
         console.log(error.code, error.message);
       });
     },
+
     //update pfp
     updatePFP() {
-      const functions = getFunctions(app);
-      connectFunctionsEmulator(functions, "localhost", 5001);
-
       //define function
       const update = httpsCallable(functions, "updateProfile");
       console.log(this.uid);
@@ -141,7 +157,7 @@ export default {
       }).catch((error) => {
         console.log(error.code, error.message);
       });
-    }
+    },
   },
   computed: {
     pfpURL() {
@@ -156,7 +172,7 @@ export default {
     <div id="myModal1" class="modal"> <!-- edit profile popup  -->
       <!-- Modal content -->
       <div style="align-items: center" class="modal-content">
-        <span class="close" @click="closesignin(2)">&times;</span>
+        <span class="close" @click="closeProfileEdit()">&times;</span>
         <h1 class="h3 mb-3 fw-normal" style="color:white; font-size:40px">Edit Profile</h1>
         <div class="form-floating">
           <input class="form-control" id="floatingInput" required v-model="newBio">
@@ -204,7 +220,7 @@ export default {
                       class="img-fluid img-thumbnail mt-4 mb-2" style="width: 150px; z-index: 1">
                     <button type="button"
                       style="z-index: 1; background-color:white; border-radius:4px; border:none; width: 150px; "
-                      @click="opensignin(2)">
+                      @click="openProfileEdit()">
                       Edit profile
                     </button>
 
@@ -266,8 +282,8 @@ export default {
     </body>
   </div>
   <div v-else>
-    <a @click="opensignin(0)" class="btn-get-started" style="color: black;">Log In</a>
-    <a @click="opensignin(1)" class="btn-get-started" style="color: black;">Create</a>
+    <a @click="opensignin()" class="btn-get-started" style="color: black;">Log In</a>
+    <a @click="opensignup()" class="btn-get-started" style="color: black;">Create</a>
   </div>
 </template>
 

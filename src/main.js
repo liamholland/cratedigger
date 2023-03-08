@@ -6,13 +6,17 @@ import { LoadingPlugin } from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 import routes from './router/routes';
 import "bootstrap/dist/css/bootstrap.min.css"
+
 let router = createRouter({
     history: createWebHistory(),
     routes: routes
 });
 
 const app = createApp(App)
+
 app.use(router);
+
+//define the loading bar
 app.use(LoadingPlugin, {
     container : null,
     canCancel: false,
@@ -20,8 +24,9 @@ app.use(LoadingPlugin, {
     height: 40,
     width: 40,
     loader: 'bars',
-    opacity: 0.5,
+    opacity: 0.3,
     enforceFocus: true
   });
+
 app.mount('#app');
 

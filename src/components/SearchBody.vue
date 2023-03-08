@@ -2,6 +2,12 @@
 import app from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
+//get componenets
+const functions = getFunctions(app);
+
+//TODO: remove emulator connection on prod
+// connectFunctionsEmulator(functions, "localhost", 5001);
+
 export default {
   data() {
     return {
@@ -13,10 +19,7 @@ export default {
   },
   created() {
     //get a new token for spotify requests
-    const functions = getFunctions(app);
 
-    //TODO: remove emulator connection on prod
-    connectFunctionsEmulator(functions, "localhost", 5001);
     //define function
     const getToken = httpsCallable(functions, "getSpotifyToken");
 
@@ -33,10 +36,7 @@ export default {
     //search for artists on spotify given a search term
     search(term) {
       if (term.length > 0) {
-        const functions = getFunctions(app);
         console.log(term);
-        //TODO: remove emulator connection on prod
-        connectFunctionsEmulator(functions, "localhost", 5001);
 
         //define function
         const searchArtist = httpsCallable(functions, "searchArtist");
