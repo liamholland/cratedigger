@@ -4,7 +4,7 @@
 import app from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
-// import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions.js"
+import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
 
 //get componenets
 const functions = getFunctions(app);
@@ -119,20 +119,20 @@ export default {
       //unhook the listener
       listener();
       if(this.loadingBar != ""){
-        this.loadingBar.hide();
+        endLoad();
       }
     },
 
     logout() {
-      this.loadingBar = this.$loading.show();
+      endLoad();
       auth.signOut();
       this.uid = "";
       this.isLoggedIn = false;
-      this.loadingBar.hide();
+      endLoad();
     },
 
     updateProfile() {
-      this.loadingBar = this.$loading.show();
+      endLoad();
 
       //update both
       if (this.newBio.length > 0 && this.newURL.length > 0) {

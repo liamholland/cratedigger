@@ -1,7 +1,7 @@
 let loadingBar = "";
 
-export function startLoad(loader){
-    loadingBar = loader.show();
+export function startLoad(component){
+    loadingBar = component.$loading.show();
 }
 
 export function endLoad(){
