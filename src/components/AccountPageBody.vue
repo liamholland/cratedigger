@@ -11,7 +11,7 @@ const functions = getFunctions(app);
 const auth = getAuth(app);
 
 //connect emulator
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {
