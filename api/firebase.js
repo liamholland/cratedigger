@@ -14,6 +14,24 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
-export default app;
+//global variables
+let profileInfo = {};
+let uid = "";
+
+export function getProfileInfo(){
+  return profileInfo;
+}
+
+export function setProfileInfo(info){
+  profileInfo = info;
+}
+
+export function getUID(){
+  return uid;
+}
+
+export function setUID(id){
+  uid = id;
+}

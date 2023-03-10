@@ -5,7 +5,9 @@ export function startLoad(component){
 }
 
 export function endLoad(){
-    loadingBar.hide();
+    if(loadingBar != ""){
+        loadingBar.hide();
+    }
 }
 
 

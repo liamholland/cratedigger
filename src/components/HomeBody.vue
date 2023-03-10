@@ -5,7 +5,7 @@
               <h2 class="animated bounce infinite" style="font-size: 57px; color: white;" >Welcome to Crate Digger</h2><br>
               <p style="font-size: 20px; color: #949494;">We recommend you artists, you write reviews and rate them</p>
 
-              <router-link class="btn-get-started" to="/SearchPage">Search</router-link>
+              <router-link class="btn-get-started" to="/Search">Search</router-link>
               <br><br><br><br><br><br><br><br>
  
   </section>

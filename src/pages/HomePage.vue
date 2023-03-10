@@ -8,8 +8,8 @@ import TheFooter from '../components/TheFooter.vue'
 export default {
   name: 'HomeOne',
   components: {
-  TheHeader, HomeBody,TheFooter,
-   }
+    TheHeader, HomeBody, TheFooter,
+  },
 }
 
 </script>
@@ -19,16 +19,14 @@ export default {
 
 
 <template>
-
-<header>
+  <header>
     <TheHeader />
-<div class="wrapper">
-<HomeBody/>
-</div>
-</header>
-<main>
-<TheFooter />
-</main>
+    <div class="wrapper">
+      <HomeBody />
+    </div>
+  </header>
+  <main>
+    <TheFooter />
+  </main>
 </template>
-<style scoped>
-</style>
+<style scoped></style>

@@ -1,9 +1,11 @@
 <script>
-import app from "../../api/firebase";
+import { app } from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 //get componenets
 const functions = getFunctions(app);
+//define functions
+const searchArtist = httpsCallable(functions, "searchArtist");
 
 //TODO: remove emulator connection on prod
 // connectFunctionsEmulator(functions, "localhost", 5001);
@@ -25,7 +27,6 @@ export default {
 
     //send request
     getToken().then((res) => {
-      console.log(res);
       this.token = res.data.access_token;
       console.log(this.token);
     }).catch((error) => {
@@ -36,11 +37,6 @@ export default {
     //search for artists on spotify given a search term
     search(term) {
       if (term.length > 0) {
-        console.log(term);
-
-        //define function
-        const searchArtist = httpsCallable(functions, "searchArtist");
-        
         //send request (will return limit number of results)
         searchArtist({ token: this.token, term: term, limit: 10 }).then((res) => {
           this.results = res.data.artists.items;  //an array of results
@@ -48,13 +44,13 @@ export default {
           console.log(error);
         });
       }
-      else{
+      else {
         this.results = [];
       }
     },
 
     //return the image to use for the artist given an array of their images
-    setImage(images){
+    setImage(images) {
       return images.length > 0 ? images[0].url : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
     },
   },
@@ -71,15 +67,15 @@ export default {
 
     <ul id="results">
       <li v-for="artist in results">
-        <div class="artistResult">
-          <img :src="this.setImage(artist.images)" :alt="artist.name" >
+        <div class="artistResult" @click="this.$router.push({name: 'ArtistPage', params: { aid: artist.id}})">
+          <img :src="this.setImage(artist.images)" :alt="artist.name">
           <h1>{{ artist.name }}</h1>
         </div>
       </li>
     </ul>
-    
+
     <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    
+
   </section>
   <section>
   </section>
@@ -101,17 +97,17 @@ export default {
   font-size: 18px;
 }
 
-.artistResult{
+.artistResult {
   display: inline-flex;
   width: 50%;
 }
 
-ul{
+ul {
   list-style-type: none;
   text-align: center;
 }
 
-img{
+img {
   position: relative;
   padding: 5px;
   height: 250px;

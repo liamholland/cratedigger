@@ -1,5 +1,5 @@
 <script>
-import app from "../../api/firebase";
+import { app, setProfileInfo, getUID, setUID } from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -7,6 +7,12 @@ import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontend
 //get components
 const auth = getAuth(app);
 const functions = getFunctions(app);
+
+//define the functions
+const checkUname = httpsCallable(functions, "checkUniqueUsername");
+const getEmail = httpsCallable(functions, "getEmail");
+const register = httpsCallable(functions, "registerAccount");
+
 
 //TODO: remove emulator line when deploying
 // connectFunctionsEmulator(functions, "localhost", 5001);
@@ -17,7 +23,6 @@ export default {
       email: "",
       username: "",
       password: "",
-      uid: "",
       isLoggedIn: false,
       loadingBar: "",
     }
@@ -26,7 +31,7 @@ export default {
     let listener = onAuthStateChanged(auth, (user) => {
       this.isLoggedIn = user ? true : false;
     });
-    
+
     //unhook listener
     listener();
   },
@@ -44,38 +49,18 @@ export default {
 
     opensignin() {
       openModal(0);
-
-      // //gets an array of all the popups in the order they are defined on the page
-      // let elms = document.querySelectorAll('.modal');
-      // //shows the one you want to show
-      // elms[0].style.display = "flex";
     },
 
     closesignin() {
       closeModal(0);
-
-      // //gets an array of all the popups in the order they are defined on the page
-      // let elms = document.querySelectorAll('.modal');
-      // //hides the one you want to hide
-      // elms[0].style.display = "none";
     },
 
     opensignup() {
       openModal(1);
-
-      // //gets an array of all the popups in the order they are defined on the page
-      // let elms = document.querySelectorAll('.modal');
-      // //shows the one you want to show
-      // elms[1].style.display = "flex";
     },
 
     closesignup() {
       closeModal(1);
-
-      // //gets an array of all the popups in the order they are defined on the page
-      // let elms = document.querySelectorAll('.modal');
-      // //hides the one you want to hide
-      // elms[1].style.display = "none";
     },
 
     isEmail(e) {
@@ -86,15 +71,13 @@ export default {
     //otherwise just calls login
     //necessary to allow the promise to resolve from getEmail before trying to sign in to firebase
     beforeLogin() {
-      // this.loadingBar = this.$loading.show();
       startLoad(this);
 
       //regex test
       if (!this.isEmail(this.email)) {
         console.log("Not Email; Getting ID from Username");
 
-        //define the function
-        const getEmail = httpsCallable(functions, "getEmail");
+
         getEmail({ username: this.email }).then((res) => {
           console.log(res.data.body);
           switch (res.data.code) {
@@ -125,10 +108,10 @@ export default {
       //sign in with firebase auth using email and password
       signInWithEmailAndPassword(auth, this.email, this.password).then((userCred) => {
         const user = userCred.user;
-        this.uid = user.uid;
-        this.closesignin(0); //close the sign in popup
-        this.$router.push({ name: 'AccountPage', params: { uid: user.uid } });
+        setUID(user.uid);
         this.isLoggedIn = true;
+        this.routeToAccount();
+        this.closesignin(0); //close the sign in popup
         endLoad();
       }).catch((error) => {
         //handle the firebase errors
@@ -170,9 +153,6 @@ export default {
         return;
       }
 
-      //define the function
-      const checkUname = httpsCallable(functions, "checkUniqueUsername");
-
       //check if the username is taken
       checkUname({ "username": this.username }).then((res) => {
         if (res.data.isTaken) {
@@ -185,9 +165,6 @@ export default {
         //create a user in firebaser
         createUserWithEmailAndPassword(auth, this.email, this.password).then((userCred) => {
           const user = userCred.user;
-
-          //define the register function
-          const register = httpsCallable(functions, "registerAccount");
 
           //register function sets up the database for this users data
           register({ "id": user.uid, "username": this.username, "email": this.email }).then((res) => {
@@ -214,12 +191,23 @@ export default {
       });
     },
 
+    routeToAccount() {
+      console.log("Routing to", getUID() != "" ? getUID() : "Account Page");
+      if (this.isLoggedIn && getUID() != "") {
+        this.$router.push({ name: 'AccountPage', params: { uid: getUID() } });
+      }
+      else {
+        this.$router.push({ path: '/Account/' });
+      }
+    },
+
     logout() {
-      endLoad();
+      startLoad(this);
       auth.signOut();
-      this.$router.push({ path: '/AccountPage/' });
-      this.uid = "";
+      setUID("");
       this.isLoggedIn = false;
+      setProfileInfo({});
+      this.routeToAccount();
       endLoad();
     }
   }
@@ -287,11 +275,11 @@ export default {
             <router-link to="/AboutUs">About Us</router-link>
           </li>
           <li class="nav-item" style="margin-right: 30px;">
-            <router-link to="/SearchPage">Search</router-link>
+            <router-link to="/Search">Search</router-link>
           </li>
 
-          <li class="nav-item">
-            <router-link :to="{ path: '/AccountPage/' }">Account</router-link>
+          <li class="nav-item" @click="routeToAccount">
+            <router-link to="">Account</router-link>
           </li>
 
         </ul>

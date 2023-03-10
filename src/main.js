@@ -7,6 +7,7 @@ import 'vue-loading-overlay/dist/css/index.css';
 import routes from './router/routes';
 import "bootstrap/dist/css/bootstrap.min.css"
 
+//router
 let router = createRouter({
     history: createWebHistory(),
     routes: routes

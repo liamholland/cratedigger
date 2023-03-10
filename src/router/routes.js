@@ -5,8 +5,9 @@ function loadPage(component) {
 }
 export default [
     { path: '/', component: loadPage('HomePage') },
-    { path: '/SearchPage', component: loadPage('SearchPage') },
+    { path: '/Search', component: loadPage('SearchPage') },
     { path: '/AboutUs', component: loadPage('AboutUs') },
-    { path: '/AccountPage/:uid/', name: "AccountPage", component: loadPage('AccountPage'), props: (route) => {uid: route.params.uid}},
-    { path: '/AccountPage/', component: loadPage('AccountPage')},
+    { path: '/Account/:uid/', name: "AccountPage", component: loadPage('AccountPage'), props: (route) => {uid: route.params.uid}},
+    { path: '/Account/', component: loadPage('AccountPage')},
+    { path: '/Artist/:aid/', name: "ArtistPage", component: loadPage('ArtistPage'), props: (route) => {aid: route.params.aid}},
 ]
