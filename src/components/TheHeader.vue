@@ -25,6 +25,12 @@ export default {
       password: "",
       isLoggedIn: false,
       loadingBar: "",
+      errorMessage1: "",
+      errorMessage2: "",
+      errorMessage3: "",
+      errorMessage4: "",
+      errorMessage5: "",
+      errorMessage6: "",
     }
   },
   created() {
@@ -87,6 +93,7 @@ export default {
               this.login();
               break;
             case 1:
+              this.errorMessage1 = "Email or username does not exist";
               console.log("User Does Not Exist");
               endLoad();
               break;
@@ -117,6 +124,7 @@ export default {
         //handle the firebase errors
         switch (error.code) {
           case "auth/wrong-password":
+            this.errorMessage2 = "Incorrect Password"
             console.log("Incorrect Password");
             break;
           case "auth/user-not-found":
@@ -142,12 +150,14 @@ export default {
 
       //dont run if the email is invalid
       if (!this.isEmail(this.email)) {
+        this.errorMessage3 = "invalid email"
         console.log("invalid email");
         this.hideLoad();
         return;
       }
 
       if (this.username == "") {
+        this.errorMessage4 = "Enter a username"
         console.log("Enter a Username");
         this.hideLoad();
         return;
@@ -175,9 +185,11 @@ export default {
         }).catch((error) => {
           //handle firebase errors
           if (error.code == "auth/email-already-in-use") {
+            this.errorMessage5 = "Email taken"
             console.log("Email Taken");
           }
           else if (error.code == "auth/weak-password") {
+            this.errorMessage6 = "Weak Password";
             console.log("Weak Password");
           }
           else {
@@ -215,15 +227,24 @@ export default {
 </script>
 
 <template>
-  <div id="myModal" class="modal"> <!-- Sign in popup  -->
+<div id="myModal" class="modal"> <!-- Sign in popup  -->
     <!-- Modal content -->
     <div style="align-items: center" class="modal-content">
       <span class="close" @click="closesignin()">&times;</span>
       <p style="font-size: 40px; color: white">Sign in</p>
-      <label style="color: #949494;">Email or Username</label>
-      <input style="height: 40px; border-radius: 7.5px;" required v-model="email"><br>
-      <label style="color: #949494;"> Password</label>
-      <input style="height: 40px; border-radius: 7.5px;" required v-model="password"><br>
+
+      <p style="color:red">{{errorMessage1}}</p>
+      <div class="form-floating">
+          <input class="form-control" id="floatingInput" required v-model="email">>
+          <label for="floatingInput">Email or Username</label>
+        </div>
+  
+      <p style="color:red">{{errorMessage2}}</p>
+      <div class="form-floating">
+          <input class="form-control" id="floatingInput" required v-model="password">>
+          <label for="floatingInput">Password</label>
+        </div>
+
       <a @click="beforeLogin()" class="btn-get-started">Sign in</a>
     </div>
   </div>
@@ -233,16 +254,27 @@ export default {
     <div style="align-items: center" class="modal-content">
       <span class="close" @click="closesignup()">&times;</span>
       <p style="font-size: 40px; text-align: center; color: white">Create account</p>
-      <label style="color: #949494;">Email</label>
-      <input style="height: 40px; border-radius: 7.5px;" required v-model="email"><br>
-      <label style="color: #949494;">Username</label>
-      <input style="height: 40px; border-radius: 7.5px;" required v-model="username"><br>
-      <label style="color: #949494;">Password</label>
-      <input style="height: 40px; border-radius: 7.5px;" required v-model="password"><br>
+
+      <p style="color:red">{{errorMessage3}}{{errorMessage5}}</p>
+      <div class="form-floating">
+          <input class="form-control" id="floatingInput" required v-model="email">>
+          <label for="floatingInput">Email</label>
+        </div>
+      
+      <p style="color:red">{{errorMessage4}}</p>
+      <div class="form-floating">
+          <input class="form-control" id="floatingInput" required v-model="username">>
+          <label for="floatingInput">Username</label>
+        </div>
+
+    <p style="color:red">{{errorMessage6}}</p>
+      <div class="form-floating">
+          <input class="form-control" id="floatingInput" required v-model="password">>
+          <label for="floatingInput">Password</label>
+        </div>
       <a @click="register" class="btn-get-started">Create</a>
     </div>
   </div>
-
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
@@ -414,7 +446,7 @@ export default {
 .modal-content {
   align-items: left;
   width: 350px;
-  height: 500px;
+  height: 600px;
   background-color: #1a1a1a;
   margin: auto;
   padding: 5px;
