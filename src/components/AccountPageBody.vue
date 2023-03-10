@@ -275,12 +275,23 @@ export default {
     </body>
   </div>
   <div v-else>
-    <a @click="opensignin()" class="btn-get-started" style="color: black;">Log In</a>
-    <a @click="opensignup()" class="btn-get-started" style="color: black;">Create</a>
+    <section id="hero" class="hero" style="height:100%">
+              <br><br><br><br><br><br><br><br><br>
+              <h5 style="color:white">You are not logged into your account. To login click <h4 style="display:inline"><strong><a @click="opensignin()">here</a></strong></h4> or to create an account click <h4 style="display:inline"><strong><a @click="opensignup()">here</a></strong></h4></h5>
+
+              <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+ 
+ 
+    
+     </section>
   </div>
 </template>
 
 <style scoped>
+.hero{
+  background-color:black;
+  text-align: center;
+}
 /* The Modal for edit profile (background) */
 .btn-get-started {
   font-weight: 500;
