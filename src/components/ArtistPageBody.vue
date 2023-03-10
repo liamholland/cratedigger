@@ -12,7 +12,7 @@ const getAlbums = httpsCallable(functions, "getAlbums");
 const getRelated = httpsCallable(functions, "getRelatedArtists");
 
 //TODO: remove emulator connection on prod
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
