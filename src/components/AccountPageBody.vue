@@ -93,7 +93,7 @@ export default {
       //unhook the listener
       listener();
 
-      // endLoad();
+      endLoad();
     },
 
     logout() {
@@ -102,8 +102,8 @@ export default {
       setUID("");
       setProfileInfo({});
       this.isLoggedIn = false;
-      this.$router.push({ path: '/AccountPage/' });
       endLoad();
+      this.$router.push({ path: '/AccountPage/' });
     },
 
     updateProfile() {
@@ -125,7 +125,6 @@ export default {
 
       this.closeProfileEdit();
       this.refresh();
-      this.endLoad();
     },
 
     //update bio
@@ -144,7 +143,7 @@ export default {
     updatePFP() {
       update({ "id": this.uid, "field": 'pfpURL', "value": this.newURL }).then((res) => {
         console.log(res.data.body);
-        this.accountInfo.bio = this.pfpURL;
+        this.accountInfo.pfpURL = this.newURL;
         setProfileInfo(this.accountInfo);
         this.newURL = "";
       }).catch((error) => {

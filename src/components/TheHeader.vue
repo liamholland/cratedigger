@@ -146,7 +146,7 @@ export default {
     //register an account
     //calls login after successful execution
     register() {
-      endLoad();
+      startLoad(this);
 
       //dont run if the email is invalid
       if (!this.isEmail(this.email)) {
@@ -219,8 +219,8 @@ export default {
       setUID("");
       this.isLoggedIn = false;
       setProfileInfo({});
-      this.routeToAccount();
       endLoad();
+      this.routeToAccount();
     }
   }
 }

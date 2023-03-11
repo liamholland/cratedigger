@@ -1,15 +1,17 @@
 let loadingBar = "";
+let loadingInstances = -1;
 
 export function startLoad(component){
+    loadingInstances++;
     loadingBar = component.$loading.show();
 }
 
 export function endLoad(){
-    if(loadingBar != ""){
+    if(loadingInstances >= 0){
         loadingBar.hide();
+        loadingInstances--;
     }
 }
-
 
 //these functions still have to have a method to call them in the methods section
 //opens the popup windows on the page
