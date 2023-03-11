@@ -99,85 +99,87 @@ export default {
 </script>
 
 <template class="body">
-
     <section class="body">
         <br>
         <p class="artistName">{{ this.artistName }}</p>
-        <button class="btn-get-started"  @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name }}</button>
+        <button class="btn-get-started" @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name }}</button>
         <br><br><br><br>
 
         <ul style="background-color:black">
-            <li  v-for="album in this.albums">
-                <div  v-if="!this.isRepeat(album)" class="albumResult">
+            <li v-for="album in this.albums">
+                <div v-if="!this.isRepeat(album)" class="albumResult">
                     <img :src="album.images[0].url" alt="Album Cover">
                     <div class="albumInfo">
                         <button type="button" class="btn btn-outline-danger" style="position:absolute; left: 72.5%">
-                               
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-</svg></button>
 
-                     
-                        <h1 >  {{ album.name }} </h1>
-                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                            </svg></button>
 
-              
+
+                        <h1> {{ album.name }} </h1>
+
+
+
                         <h3>{{ album.release_date }}</h3>
-                         
-                        
+
+
                     </div>
 
                 </div>
             </li>
-            
+
         </ul>
-        
+
     </section>
 </template>
   
 <style scoped>
-
-.albumResult{
+.albumResult {
     background-color: #151515;
     text-align: left;
 }
 
-.albumInfo{
+.albumInfo {
     color: whitesmoke;
 }
-.artistName{
+
+.artistName {
     color: white;
 }
 
-.body{
-   background-color: black;
+.body {
+    background-color: black;
     text-align: center;
 }
 
 .btn-get-started {
-  background-color: black;
-  font-weight: 500;
-  font-size: 16px;
-  letter-spacing: 1px;
-  display: inline-block;
-  padding: 12px 40px;
-  border-radius: 50px;
-  transition: 0.5s;
-  margin: 10px;
-  color: white;
-  text-decoration: none;
-  border: 2px solid #1DB954;
+    background-color: black;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 12px 40px;
+    border-radius: 50px;
+    transition: 0.5s;
+    margin: 10px;
+    color: white;
+    text-decoration: none;
+    border: 2px solid #1DB954;
 }
 
 .btn-get-started:hover {
-  background: #1DB954;
-  color: black
+    background: #1DB954;
+    color: black
 }
 
-.artistName{
-    font-size:100px;
+.artistName {
+    font-size: 100px;
     text-align: center;
 }
+
 .albumResult {
     display: inline-flex;
     width: 50%;
@@ -193,5 +195,4 @@ img {
     padding: 5px;
     height: 250px;
     width: 250px;
-}
-</style>
+}</style>
