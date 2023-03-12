@@ -92,8 +92,6 @@ export default {
       });
       //unhook the listener
       listener();
-
-      endLoad();
     },
 
     logout() {
@@ -134,6 +132,7 @@ export default {
         this.accountInfo.bio = this.newBio;
         setProfileInfo(this.accountInfo);
         this.newBio = "";
+        endLoad();
       }).catch((error) => {
         console.log(error.code, error.message);
       });
@@ -146,6 +145,7 @@ export default {
         this.accountInfo.pfpURL = this.newURL;
         setProfileInfo(this.accountInfo);
         this.newURL = "";
+        endLoad();
       }).catch((error) => {
         console.log(error.code, error.message);
       });

@@ -83,26 +83,31 @@ export default {
       if (!this.isEmail(this.email)) {
         console.log("Not Email; Getting ID from Username");
 
-
-        getEmail({ username: this.email }).then((res) => {
-          console.log(res.data.body);
-          switch (res.data.code) {
-            case 0:
-              this.username = this.email;
-              this.email = res.data.body;
-              this.login();
-              break;
-            case 1:
-              this.errorMessage1 = "Email or username does not exist";
-              console.log("User Does Not Exist");
-              endLoad();
-              break;
-            default:
-              console.log("Unknown Code Returned From Server");
-              endLoad();
-              break;
-          }
-        });
+        if(this.email.length > 0){
+          getEmail({ username: this.email }).then((res) => {
+            console.log(res.data.body);
+            switch (res.data.code) {
+              case 0:
+                this.username = this.email;
+                this.email = res.data.body;
+                this.login();
+                break;
+              case 1:
+                this.errorMessage1 = "Email or username does not exist";
+                console.log("User Does Not Exist");
+                endLoad();
+                break;
+              default:
+                console.log("Unknown Code Returned From Server");
+                endLoad();
+                break;
+            }
+          });
+        }
+        else {
+          this.errorMessage1 = "Enter a username or password";
+          endLoad();
+        }
       }
       else {
         this.login();
@@ -152,14 +157,14 @@ export default {
       if (!this.isEmail(this.email)) {
         this.errorMessage3 = "invalid email"
         console.log("invalid email");
-        this.hideLoad();
+        endLoad();
         return;
       }
 
       if (this.username == "") {
         this.errorMessage4 = "Enter a username"
         console.log("Enter a Username");
-        this.hideLoad();
+        endLoad();
         return;
       }
 
@@ -179,7 +184,7 @@ export default {
           //register function sets up the database for this users data
           register({ "id": user.uid, "username": this.username, "email": this.email }).then((res) => {
             console.log(res.data);
-            this.closesignin(1);  //close the register popup
+            this.closesignup();  //close the register popup
             this.login(); //log the user in
           });
         }).catch((error) => {

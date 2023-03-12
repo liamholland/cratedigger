@@ -1,15 +1,15 @@
 let loadingBar = "";
-let loadingInstances = -1;
+let loading = false;
 
 export function startLoad(component){
-    loadingInstances++;
+    loading = true;
     loadingBar = component.$loading.show();
 }
 
 export function endLoad(){
-    if(loadingInstances >= 0){
+    if(loading == true){
         loadingBar.hide();
-        loadingInstances--;
+        loading = false;
     }
 }
 
