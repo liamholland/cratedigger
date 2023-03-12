@@ -251,8 +251,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
     const token = req.body.data.token;
     const limit = req.body.data.limit;
     const genres = req.body.data.genres;  //should be an array
-
-    console.log(genres);
+    const backupGenre = req.body.data.backup; //the last successful genre
 
     //genres sorted by their similarity to each other
     //Thanks to ChatGPT for this
@@ -273,20 +272,24 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       "anime", "children", "disney", "holidays", "kids", "movies", "show-tunes",
       "dance", "club", "dancehall", "disco", "dub", "dubstep", "funk", "groove", "hardcore", "hardstyle", "house", "j-dance", "j-idol", "j-pop", "j-rock", "k-pop", "party", "road-trip", "summer", "work-out",
       "alternative", "cantopop", "british", "indie",
-      "bossanova", "forro", "gospel", "honky-tonk", "pagode"
+      "bossanova", "forro", "gospel", "honky-tonk", "pagode",
     ];    
 
-    let searchGenre = "";
+    let searchGenre = ""; //the genre search filter
     genres.forEach(genre => {
       genre = genre.toLowerCase();
       if(similarGenres.includes(genre)){
         do {
           let index = Math.floor(Math.random() * 125);
           searchGenre = similarGenres[index];
-          console.log(genre, searchGenre, index);
-        } while(Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(genre)) < 20);
+        } while(Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(genre)) < 30);  //the higher the number the more "different" the result will be but also the longer it could potentially take to find a result
       }
     });
+
+    //avoids a case of returning an empty array
+    if(searchGenre.length < 1){
+      searchGenre = backupGenre;
+    }
 
     //specify request options
     let options = {
@@ -296,7 +299,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
     };
 
     axios(options).then((result) => {
-      res.send({data: result.data.artists.items});
+      res.send({data: {genre: searchGenre, artists: result.data.artists.items}});
     }).catch((error) => {
       res.send({data: error});
     });

@@ -13,7 +13,7 @@ const getRelated = httpsCallable(functions, "getRelatedArtists");
 const getUnrelated = httpsCallable(functions, "getUnrelatedArtists");
 
 //TODO: remove emulator connection on prod
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -24,6 +24,7 @@ export default {
             albums: [],
             mostRelated: "",
             leastRelated: "",
+            lastSuggestedGenre: "",
         }
     },
     created() {
@@ -57,26 +58,26 @@ export default {
                                     this.refresh(relatedArtist.data.artists[19].id);
                                     return;
                                 }
-                            } while(recentlySuggested(this.mostRelated.name))
+                            } while(recentlySuggested(this.mostRelated.id))
 
-                            updateSuggestedArtists(this.mostRelated.name);
+                            //get artists different to the current artist
+                            getUnrelated({ token: res.data.access_token, limit: 20, genres: artist.data.genres, backup: this.lastSuggestedGenre }).then((unrelatedArtist) => {                            
+                                console.log(unrelatedArtist.data);
+                                
+                                this.lastSuggestedGenre = unrelatedArtist.data.genre;
+                                
+                                let i = 0;
+                                do {
+                                    this.leastRelated = unrelatedArtist.data.artists[i];
+                                    i++;
+                                } while(recentlySuggested(this.leastRelated.id));
+                            }).catch((error) => {
+                                console.log(error);
+                            });
                         }).catch((error) => {
                             console.log(error);
                         });
-
-                        //get artists unrelated to the current artist
-                        getUnrelated({token: res.data.access_token, limit: 5, genres: artist.data.genres}).then((artist) => {
-                            console.log(artist.data);
-                            let i = 0;
-                            do {
-                                this.leastRelated = artist.data[i];
-                                i++;
-                            } while(recentlySuggested(this.leastRelated.name));
-
-                            updateSuggestedArtists(this.leastRelated.name);
-                        }).catch((error) => {
-                            console.log(error);
-                        });
+                        
 
                     }).catch((error) => {
                         console.log(error);
@@ -123,6 +124,7 @@ export default {
         },
 
         goToNewArtist(id) {
+            updateSuggestedArtists(id);
             this.$router.push({ name: "ArtistPage", params: { aid: id } });
             this.refresh(id);
         }
