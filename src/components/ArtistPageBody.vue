@@ -10,17 +10,20 @@ const getToken = httpsCallable(functions, "getSpotifyToken");
 const getArtist = httpsCallable(functions, "getArtist");
 const getAlbums = httpsCallable(functions, "getAlbums");
 const getRelated = httpsCallable(functions, "getRelatedArtists");
+const getUnrelated = httpsCallable(functions, "getUnrelatedArtists");
 
 //TODO: remove emulator connection on prod
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
         return {
             //spotify search artists
             artistName: "",
+            genres: "",
             albums: [],
             mostRelated: "",
+            leastRelated: "",
         }
     },
     created() {
@@ -34,6 +37,10 @@ export default {
                 //get the artist
                 getArtist({ token: res.data.access_token, id: artistID }).then((artist) => {
                     this.artistName = artist.data.name;
+                    this.genres = ""; //reset the genre
+                    artist.data.genres.forEach(genre => {
+                        this.genres += genre + '   ';
+                    });
 
                     //get artist albums
                     getAlbums({ token: res.data.access_token, id: artistID }).then((albums) => {
@@ -56,6 +63,21 @@ export default {
                         }).catch((error) => {
                             console.log(error);
                         });
+
+                        //get artists unrelated to the current artist
+                        getUnrelated({token: res.data.access_token, limit: 5, genres: artist.data.genres}).then((artist) => {
+                            console.log(artist.data);
+                            let i = 0;
+                            do {
+                                this.leastRelated = artist.data[i];
+                                i++;
+                            } while(recentlySuggested(this.leastRelated.name));
+
+                            updateSuggestedArtists(this.leastRelated.name);
+                        }).catch((error) => {
+                            console.log(error);
+                        });
+
                     }).catch((error) => {
                         console.log(error);
                     });
@@ -112,7 +134,9 @@ export default {
     <section class="body">
         <br>
         <p class="artistName">{{ this.artistName }}</p>
+        <p class="artistGenre">{{ this.genres }}</p>
         <button class="btn-get-started" @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name }}</button>
+        <button class="btn-get-started" @click="goToNewArtist(this.leastRelated.id)">Unrelated Artist: {{ this.leastRelated.name }}</button>
         <br><br><br><br>
 
         <ul style="background-color:black">
@@ -187,6 +211,12 @@ export default {
 
 .artistName {
     font-size: 100px;
+    text-align: center;
+}
+
+.artistGenre {
+    color: white;
+    font-size: 20px;
     text-align: center;
 }
 

@@ -244,6 +244,65 @@ exports.getRelatedArtists = functions.https.onRequest((req, res) => {
   });
 });
 
+//returns a list of unrelated artists to the data given
+exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
+  cors(req, res, () => {
+    //get the variables
+    const token = req.body.data.token;
+    const limit = req.body.data.limit;
+    const genres = req.body.data.genres;  //should be an array
+
+    console.log(genres);
+
+    //genres sorted by their similarity to each other
+    //Thanks to ChatGPT for this
+    const similarGenres = [
+      "electronic", "edm", "electro", "minimal-techno", "techno", "trance",
+      "house", "deep-house", "progressive-house",
+      "hip-hop", "r&b",
+      "pop", "power-pop", "pop-film", "indie-pop",
+      "rock", "alt-rock", "punk-rock", "grunge", "psych-rock", "post-dubstep",
+      "metal", "heavy-metal", "black-metal", "metal-misc", "metalcore", "grindcore",
+      "jazz", "blues",
+      "folk", "country", "bluegrass",
+      "latin", "salsa", "samba", "reggae", "reggaeton",
+      "classical", "opera",
+      "ambient", "chill", "new-age", "rainy-day", "sleep", "study",
+      "world-music", "african", "afrobeat", "brazilian", "french", "german", "indian", "iranian", "malay", "spanish", "swedish", "tango", "turkish",
+      "singer-songwriter", "acoustic", "guitar", "soul",
+      "anime", "children", "disney", "holidays", "kids", "movies", "show-tunes",
+      "dance", "club", "dancehall", "disco", "dub", "dubstep", "funk", "groove", "hardcore", "hardstyle", "house", "j-dance", "j-idol", "j-pop", "j-rock", "k-pop", "party", "road-trip", "summer", "work-out",
+      "alternative", "cantopop", "british", "indie",
+      "bossanova", "forro", "gospel", "honky-tonk", "pagode"
+    ];    
+
+    let searchGenre = "";
+    genres.forEach(genre => {
+      genre = genre.toLowerCase();
+      if(similarGenres.includes(genre)){
+        do {
+          let index = Math.floor(Math.random() * 125);
+          searchGenre = similarGenres[index];
+          console.log(genre, searchGenre, index);
+        } while(Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(genre)) < 20);
+      }
+    });
+
+    //specify request options
+    let options = {
+      method: 'GET',
+      url: `https://api.spotify.com/v1/search?q=genre:${searchGenre}&type=artist&limit=${limit}`,
+      headers: {'Authorization': `Bearer ${token}`},
+    };
+
+    axios(options).then((result) => {
+      res.send({data: result.data.artists.items});
+    }).catch((error) => {
+      res.send({data: error});
+    });
+  });
+});
+
 // get single artist by id
 // send request as {token: token, id: artistId}
 exports.getArtist = functions.https.onRequest((req, res) => {
