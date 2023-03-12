@@ -1,5 +1,5 @@
 <script>
-import { app } from "../../api/firebase";
+import { app, updateSuggestedArtists, recentlySuggested } from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 //get componenets
@@ -24,25 +24,35 @@ export default {
         }
     },
     created() {
-        this.refresh();
+        this.refresh(this.$route.params.aid);
     },
     methods: {
         //refreshes the data on the page
-        refresh() {
+        refresh(artistID) {
             //get a new token for spotify requests
             getToken().then((res) => {
                 //get the artist
-                getArtist({ token: res.data.access_token, id: this.$route.params.aid }).then((artist) => {
+                getArtist({ token: res.data.access_token, id: artistID }).then((artist) => {
                     this.artistName = artist.data.name;
 
                     //get artist albums
-                    getAlbums({ token: res.data.access_token, id: this.$route.params.aid }).then((albums) => {
+                    getAlbums({ token: res.data.access_token, id: artistID }).then((albums) => {
                         this.albums = albums.data.items.sort(this.compareDates);
 
                         //get the most related artist to this artist
-                        getRelated({ token: res.data.access_token, id: this.$route.params.aid }).then((relatedArtist) => {
-                            console.log(relatedArtist);
-                            this.mostRelated = relatedArtist.data.artists[0];
+                        getRelated({ token: res.data.access_token, id: artistID }).then((relatedArtist) => {
+                            let i = 0;
+                            //while the most related was recently suggested to the user
+                            do {
+                                this.mostRelated = relatedArtist.data.artists[i];
+                                i++;
+                                if(i == 20){
+                                    this.refresh(relatedArtist.data.artists[19].id);
+                                    return;
+                                }
+                            } while(recentlySuggested(this.mostRelated.name))
+
+                            updateSuggestedArtists(this.mostRelated.name);
                         }).catch((error) => {
                             console.log(error);
                         });
@@ -92,7 +102,7 @@ export default {
 
         goToNewArtist(id) {
             this.$router.push({ name: "ArtistPage", params: { aid: id } });
-            this.refresh();
+            this.refresh(id);
         }
     },
 }
