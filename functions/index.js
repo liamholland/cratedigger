@@ -327,6 +327,26 @@ exports.getArtist = functions.https.onRequest((req, res) => {
   });
 });
 
+// get weezer
+// send request as {token: token}
+exports.getWeezer = functions.https.onRequest((req, res) => {
+  cors(req, res, () => {
+    const token = req.body.data.token;
+
+    let options = {
+      method: 'GET',
+      url: `https://api.spotify.com/v1/artists/3jOstUTkEu2JkjvRdBA5Gu`,
+      headers: { 'Authorization': `Bearer ${token}`}
+    };
+
+    axios(options).then((result) => {
+      res.send({ data: result.data });
+    }).catch((error) => {
+      res.send({ data: error.data });
+    });
+  });
+});
+
 // get artist's albums
 // send request as {token: token, id: artistId}
 exports.getAlbums = functions.https.onRequest((req, res) => {
