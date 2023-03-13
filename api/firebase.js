@@ -20,7 +20,7 @@ export const app = initializeApp(firebaseConfig);
 let profileInfo = {}; //users profile data
 let uid = ""; //users id
 
-let max = 40;
+let max = 50;
 let suggestedArtists = []; //the artist pages the user has viewed in the last [max] page changes
 
 export function getProfileInfo(){

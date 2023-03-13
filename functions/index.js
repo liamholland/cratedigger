@@ -252,6 +252,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
     const limit = req.body.data.limit;
     const genres = req.body.data.genres;  //should be an array
     const backupGenre = req.body.data.backup; //the last successful genre
+    console.log(backupGenre);
 
     //genres sorted by their similarity to each other
     //Thanks to ChatGPT for this
@@ -260,19 +261,19 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       "house", "deep-house", "progressive-house",
       "hip-hop", "r&b",
       "pop", "power-pop", "pop-film", "indie-pop",
+      "dance", "club", "dancehall", "disco", "dub", "dubstep", "funk", "groove", "hardcore", "hardstyle", "house", "j-dance", "j-idol", "j-pop", "j-rock", "k-pop", "party", "road-trip",
       "rock", "alt-rock", "punk-rock", "grunge", "psych-rock", "post-dubstep",
       "metal", "heavy-metal", "black-metal", "metal-misc", "metalcore", "grindcore",
       "jazz", "blues",
-      "folk", "country", "bluegrass",
-      "latin", "salsa", "samba", "reggae", "reggaeton",
-      "classical", "opera",
-      "ambient", "chill", "new-age", "rainy-day", "sleep", "study",
-      "world-music", "african", "afrobeat", "brazilian", "french", "german", "indian", "iranian", "malay", "spanish", "swedish", "tango", "turkish",
-      "singer-songwriter", "acoustic", "guitar", "soul",
-      "anime", "children", "disney", "holidays", "kids", "movies", "show-tunes",
-      "dance", "club", "dancehall", "disco", "dub", "dubstep", "funk", "groove", "hardcore", "hardstyle", "house", "j-dance", "j-idol", "j-pop", "j-rock", "k-pop", "party", "road-trip", "summer", "work-out",
       "alternative", "cantopop", "british", "indie",
+      "folk", "country", "bluegrass",
       "bossanova", "forro", "gospel", "honky-tonk", "pagode",
+      "latin", "salsa", "samba", "reggae", "reggaeton",
+      "world-music", "african", "afrobeat", "brazilian", "french", "german", "indian", "iranian", "malay", "spanish", "swedish", "tango", "turkish",
+      "ambient", "chill", "new-age", "rainy-day", "sleep", "study",
+      "singer-songwriter", "acoustic", "guitar", "soul",
+      "classical", "opera",
+      "anime", "children", "film", "show-tunes",
     ];    
 
     let searchGenre = ""; //the genre search filter
@@ -280,15 +281,19 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       genre = genre.toLowerCase();
       if(similarGenres.includes(genre)){
         do {
-          let index = Math.floor(Math.random() * 125);
+          let index = Math.floor(Math.random() * 120);
           searchGenre = similarGenres[index];
         } while(Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(genre)) < 30);  //the higher the number the more "different" the result will be but also the longer it could potentially take to find a result
+        return;
       }
     });
 
     //avoids a case of returning an empty array
-    if(searchGenre.length < 1){
-      searchGenre = backupGenre;
+    if(searchGenre == undefined || searchGenre == ""){
+      do {
+        let index = Math.floor(Math.random() * 120);
+        searchGenre = similarGenres[index];
+      } while(Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(backupGenre)) < 40 || searchGenre == undefined);  //the higher the number the more "different" the result will be but also the longer it could potentially take to find a result
     }
 
     //specify request options

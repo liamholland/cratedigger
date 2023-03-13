@@ -13,7 +13,7 @@ const getRelated = httpsCallable(functions, "getRelatedArtists");
 const getUnrelated = httpsCallable(functions, "getUnrelatedArtists");
 
 //TODO: remove emulator connection on prod
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -40,7 +40,7 @@ export default {
                     this.artistName = artist.data.name;
                     this.genres = ""; //reset the genre
                     artist.data.genres.forEach(genre => {
-                        this.genres += genre + '   ';
+                        this.genres += genre + ' , ';
                     });
 
                     //get artist albums
