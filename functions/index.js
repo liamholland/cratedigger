@@ -75,8 +75,6 @@ exports.login = functions.https.onRequest((req, res) => {
 });
 
 //update any part of a profile with a provided id, field and value
-//FORMAT: URL...?id={id}&field={field}&value={value}
-//^ must provide a valid ID
 exports.updateProfile = functions.https.onRequest((req, res) => {
   cors(req, res, () => {
     //get variables

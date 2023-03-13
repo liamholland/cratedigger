@@ -1,7 +1,7 @@
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" /> -->
 <script>
-import { app, getProfileInfo, setProfileInfo, setUID } from "../../api/firebase";
+import { app, getProfileInfo, setProfileInfo, setUID, isLoggedIn } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -24,7 +24,7 @@ export default {
       email: "",
       password: "",
       uid: "",  //this is here instead of the global one because it needs to work from the url
-      isLoggedIn: false,
+      loggedIn: isLoggedIn(),
 
       //account information
       accountInfo: {},
@@ -64,15 +64,13 @@ export default {
     //refresh the data contained on the page
     refresh() {
       this.accountInfo = {};
-
       //onAuthStateChanged returns a function which unhooks the event listener
       let listener = onAuthStateChanged(auth, (user) => {
         //if there is no user, user.uid will be undefined
         this.uid = user ? user.uid : this.$route.params.uid;
-        this.isLoggedIn = user ? true : false;
 
         //if logged in and there is a valid user and the data has not been retrieved
-        if (this.isLoggedIn && this.uid != undefined && JSON.stringify(getProfileInfo()) == '{}') {
+        if (isLoggedIn() && this.uid != undefined && JSON.stringify(getProfileInfo()) == '{}') {
           console.log("Getting Profile From Server");
 
           //get the profile information of the user once their are signed in
@@ -81,6 +79,7 @@ export default {
             //set the data on the page
             setProfileInfo(info.data);
             this.accountInfo = info.data;
+            console.log(this.accountInfo);
           }).catch((error) => {
             console.log(error.code);
             console.log(error.message);
@@ -92,6 +91,7 @@ export default {
       });
       //unhook the listener
       listener();
+      this.loggedIn = isLoggedIn();
     },
 
     logout() {
@@ -99,7 +99,7 @@ export default {
       auth.signOut();
       setUID("");
       setProfileInfo({});
-      this.isLoggedIn = false;
+      this.loggedIn = isLoggedIn();
       endLoad();
       this.$router.push({ path: '/AccountPage/' });
     },
@@ -160,7 +160,7 @@ export default {
 }
 </script>
 <template>
-  <div v-if="this.isLoggedIn">
+  <div v-if="this.loggedIn">
     <div id="myModal1" class="modal"> <!-- edit profile popup  -->
       <!-- Modal content -->
       <div style="align-items: center" class="modal-content">
@@ -232,37 +232,7 @@ export default {
                   </nav>
                   <!-- album covers -->
                   <div class="photos">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/6/6d/Dire_Straits_-_Alchemy_Dire_Straits_Live.jpg"
-                      alt="Photo" />
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Random_Access_Memories.jpg/220px-Random_Access_Memories.jpg" />
-                    <img
-                      src="https://mixdownmag.com.au/wp-content/uploads/2020/11/mixdown-magazine-kanye-west-mbdtf.jpg" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/3/3b/Dark_Side_of_the_Moon.png" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/7/70/Graduation_%28album%29.jpg" />
-                    <img
-                      src="https://americansongwriter.com/wp-content/uploads/2022/07/Kanye-West-album-cover-kids-see-ghosts.jpg" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/6/6d/Dire_Straits_-_Alchemy_Dire_Straits_Live.jpg"
-                      alt="Photo" />
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Random_Access_Memories.jpg/220px-Random_Access_Memories.jpg" />
-                    <img
-                      src="https://mixdownmag.com.au/wp-content/uploads/2020/11/mixdown-magazine-kanye-west-mbdtf.jpg" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/3/3b/Dark_Side_of_the_Moon.png" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/7/70/Graduation_%28album%29.jpg" />
-                    <img
-                      src="https://americansongwriter.com/wp-content/uploads/2022/07/Kanye-West-album-cover-kids-see-ghosts.jpg" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/6/6d/Dire_Straits_-_Alchemy_Dire_Straits_Live.jpg"
-                      alt="Photo" />
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Random_Access_Memories.jpg/220px-Random_Access_Memories.jpg" />
-                    <img
-                      src="https://mixdownmag.com.au/wp-content/uploads/2020/11/mixdown-magazine-kanye-west-mbdtf.jpg" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/3/3b/Dark_Side_of_the_Moon.png" />
-                    <img src="https://upload.wikimedia.org/wikipedia/en/7/70/Graduation_%28album%29.jpg" />
-                    <img
-                      src="https://americansongwriter.com/wp-content/uploads/2022/07/Kanye-West-album-cover-kids-see-ghosts.jpg" />
-
+                      <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name">
                   </div>
                 </div>
               </div>

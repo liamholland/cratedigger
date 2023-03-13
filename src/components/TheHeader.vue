@@ -1,5 +1,5 @@
 <script>
-import { app, setProfileInfo, getUID, setUID } from "../../api/firebase";
+import { app, setProfileInfo, getUID, setUID, isLoggedIn } from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -23,32 +23,16 @@ export default {
       email: "",
       username: "",
       password: "",
-      isLoggedIn: false,
       loadingBar: "",
+      loggedIn: isLoggedIn(),
+
+      //error messages
       errorMessage1: "",
       errorMessage2: "",
       errorMessage3: "",
       errorMessage4: "",
       errorMessage5: "",
       errorMessage6: "",
-    }
-  },
-  created() {
-    let listener = onAuthStateChanged(auth, (user) => {
-      this.isLoggedIn = user ? true : false;
-    });
-
-    //unhook listener
-    listener();
-  },
-  computed: {
-    checkLogin() {
-      let listener = onAuthStateChanged(auth, (user) => {
-        this.isLoggedIn = user ? true : false;
-      });
-
-      //unhook listener
-      listener();
     }
   },
   methods: {
@@ -121,9 +105,9 @@ export default {
       signInWithEmailAndPassword(auth, this.email, this.password).then((userCred) => {
         const user = userCred.user;
         setUID(user.uid);
-        this.isLoggedIn = true;
         this.routeToAccount();
         this.closesignin(0); //close the sign in popup
+        this.loggedIn = isLoggedIn();
         endLoad();
       }).catch((error) => {
         //handle the firebase errors
@@ -143,9 +127,10 @@ export default {
             console.log(error.message);
             break;
         }
-
         endLoad();
       });
+
+      this.loggedIn = isLoggedIn();
     },
 
     //register an account
@@ -210,7 +195,7 @@ export default {
 
     routeToAccount() {
       console.log("Routing to", getUID() != "" ? getUID() : "Account Page");
-      if (this.isLoggedIn && getUID() != "") {
+      if (isLoggedIn() && getUID() != "") {
         this.$router.push({ name: 'AccountPage', params: { uid: getUID() } });
       }
       else {
@@ -222,12 +207,13 @@ export default {
       startLoad(this);
       auth.signOut();
       setUID("");
-      this.isLoggedIn = false;
       setProfileInfo({});
+      this.loggedIn = isLoggedIn();
       endLoad();
       this.routeToAccount();
     }
-  }
+  },
+
 }
 </script>
 
@@ -302,11 +288,11 @@ export default {
           <li class="nav-item" style="margin-right: 30px;">
             <router-link to="/">Home</router-link>
           </li>
-          <li v-if="!this.isLoggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a
+          <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a
               class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
-          <li v-if="!this.isLoggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
+          <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
               id="myBtn" @click="opensignin()">Login</a></li>
-          <li v-if="this.isLoggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
+          <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
               id="myBtn" @click="logout()">Log Out</a></li>
           <li class="nav-item" style="margin-right: 30px;">
             <router-link to="/AboutUs">About Us</router-link>

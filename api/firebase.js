@@ -39,6 +39,10 @@ export function setUID(id){
   uid = id;
 }
 
+export function isLoggedIn(){
+  return uid != "";
+}
+
 export function updateSuggestedArtists(artist){
   if(suggestedArtists.length == max){
     suggestedArtists.shift();
