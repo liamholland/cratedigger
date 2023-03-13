@@ -298,6 +298,9 @@ export default {
             <router-link to="/AboutUs">About Us</router-link>
           </li>
           <li class="nav-item" style="margin-right: 30px;">
+            <router-link to="/New">What's New?</router-link>
+          </li>
+          <li class="nav-item" style="margin-right: 30px;">
             <router-link to="/Search">Search</router-link>
           </li>
 

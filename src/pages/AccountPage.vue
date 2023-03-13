@@ -15,21 +15,19 @@ export default {
 
 </script>
 <template>
-
-<header>
+  <header>
     <TheHeader />
-<div class="wrapper">
+    <div class="wrapper">
 
 
-    <AccountPageBody />
+      <AccountPageBody />
 
- 
 
-</div>
-</header>
-<main>
-<TheFooter />
-</main>
+
+    </div>
+  </header>
+  <main>
+    <TheFooter />
+  </main>
 </template>
-<style scoped>
-</style>
+<style scoped></style>
