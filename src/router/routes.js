@@ -11,4 +11,5 @@ export default [
     { path: '/Account/', component: loadPage('AccountPage') },
     { path: '/Artist/:aid/', name: "ArtistPage", component: loadPage('ArtistPage'), props: (route) => { aid: route.params.aid } },
     { path: '/New', component: loadPage('WhatsNew') },
+    { path: '/Recommend', component: loadPage('RecommendingPage') },
 ]

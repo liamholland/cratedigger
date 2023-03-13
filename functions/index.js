@@ -157,6 +157,13 @@ exports.getProfileInfo = functions.https.onRequest( (req, res) => {
   });
 });
 
+exports.recommendArtists = functions.https.onRequest((req, res) => {
+  cors(req, res, () => {
+    
+  });
+});
+
+
 /*
 --SPOTIFY API FUNCTIONS--
 */
