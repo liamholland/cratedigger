@@ -339,7 +339,7 @@ exports.getAlbums = functions.https.onRequest((req, res) => {
       headers: { 'Authorization': `Bearer ${token}` }
     };
 
-    // make the request
+    // make the request for a RANDOM artist
     axios(options).then((result) => {
       res.send({ data: result.data });
     }).catch((error) => {
@@ -351,58 +351,99 @@ exports.getAlbums = functions.https.onRequest((req, res) => {
 exports.recommendArtists = functions.https.onRequest((req, res) => {
   cors(req, res, () => {
     const token = req.body.data.token;
-    const user = req.body.data.userData;  //a user is represented by their profile data
+    const user = req.body.data.user;
+
+    let genres = [];
+
+    user.likedArtists.forEach((artist) => {
+      artist.genres.forEach((genre) => {
+        genres.push(genre);
+      })
+    });
+
 
     //get a random search query
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-    const randomSearch = alphabet.charAt(Math.floor(Math.random() * 25)) + '%';
-
+    const randomSearch = alphabet.charAt(Math.floor(Math.random() * 25));
+    const randomUserGenre = genres[Math.floor(Math.random() * genres.length)];
     //search the spotify API for a random artist
 
     //specify request options
     let options = {
       method: 'GET',
-      url: `https://api.spotify.com/v1/search?q=${randomSearch}&type=artist&limit=5`,
+      url: `https://api.spotify.com/v1/search?q="${randomSearch}"genre:${randomUserGenre}&type=artist&limit=5`,
       headers: { 'Authorization': `Bearer ${token}` },
     };
 
     //make request
     axios(options).then((result) => {
       //return first result
-      let album = result.data.artists.items[0];
-      console.log(album);
+      let potentialArtist = result.data.artists.items[0];
 
+      if(user.likedArtists.includes(potentialArtist) || user.suggestedArtists.includes(potentialArtist)){
+        res.send({data: {result: "Failure - Artist already liked", artist: potentialArtist, code: 1 }});
+        return;
+      }
 
-      //get the probability that a user will like this album
-      let countSawAndLiked = 0;
-      let countSaw = 0;
+      let probPos = 1;
+      let probNeg = 1;
       let finalProb = 0;
 
-      //get all the users who liked the album that spotify found
-      console.log("Getting users who have liked", album);
-      db.collection("UserData").where("likedAlbums", "array-contains", album).limit(50).get().then((docs) => {
-        countSawAndLiked = docs.length;
-      }).catch((error) => {
-        res.send({data: {error: error, stage: "Getting Users who liked the album"}});
+      let countBoth = 0;
+      let countEither = 0;
+
+      const dbRef = db.collection("UserData");
+
+      //get the probability that a user will like this album
+      dbRef.get().then((dbSnap) => {
+        dbSnap.forEach((doc) => {
+          doc.data().likedArtists.forEach((artist) => {    //for each of each users liked artists
+
+            dbSnap.forEach((user) => {
+              let liked = user.data().likedArtists;
+              if(liked.includes(artist)){
+                countEither++;
+                if(liked.includes(potentialArtist)){
+                  countBoth++;
+                }
+              }
+              else if(liked.includes(potentialArtist)){
+                countEither++;
+              }
+            });
+
+            probPos *= countEither == 0 ? 1 : countBoth / countEither;
+
+            countBoth = 0;
+            countEither = 0;
+
+            dbSnap.forEach((user) => {
+              let seen = user.data().suggestedArtists;
+              if(seen.includes(artist)){
+                countEither++;
+                if(seen.includes(potentialArtist)){
+                  countBoth++;
+                }
+              }
+              else if(seen.includes(potentialArtist)){
+                countEither++;
+              }
+            })
+
+            probNeg *= countEither == 0 ? 1 : countBoth /countEither;
+
+          });
+        });
+        
+        finalProb = probPos - (probNeg *0.5);
+
+        if (finalProb > 0.45) {
+          res.send({ data: { result: "Success", artist: potentialArtist, prob: finalProb, code: 0 } });
+        }
+        else {
+          res.send({ data: { result: "Failure", artist: potentialArtist, prob: finalProb, code: 1 } });
+        }
       });
-
-    }).catch((error) => {
-      res.send({ data: {error: error, stage: "Searching Spotify"} });
     });
-
-
-
-
-
-    //for each other user
-    //for each artist x the user has liked, and given the suggested artist y
-        //have they been suggested/looked at y?
-          //this could be within the last 100 viewed artists
-        //if so, did they like them (as in the act of clicking a like button)
-        //if yes, increase the count of times x was liked and the times x and y occur together
-
-
-    //percentage who liked the album - the percentage who didnt
-
   });
 });

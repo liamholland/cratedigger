@@ -283,6 +283,8 @@ export default {
 
 .artistName {
     color: white;
+    font-size: 100px;
+    text-align: center;
 }
 
 .body {

@@ -1,5 +1,5 @@
 <script>
-import { app } from "../../api/firebase";
+import { app, isLoggedIn, getProfileInfo, setProfileInfo, updateSuggestedArtists, recentlySuggested, getUID } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
@@ -7,26 +7,112 @@ import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/
 const functions = getFunctions(app);
 const auth = getAuth(app);
 
+//define the function
+const getToken = httpsCallable(functions, "getSpotifyToken");
+const recommend = httpsCallable(functions, "recommendArtists");
+const update = httpsCallable(functions, "updateProfile");
+
+//TODO: remove emulator connection on prod
+connectFunctionsEmulator(functions, "localhost", 5001);
+
 export default {
     data() {
         return {
+            token: "",
             currentSuggestion: {},
+            loggedIn: false,
+            genres: "",
         }
     },
-    created() {
+    beforeCreate() {
+        if (isLoggedIn()) {
+            this.loggedIn = true;
+            getToken().then((result) => {
+                this.token = result.data.access_token;
+                this.refreshRecommendation();
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+        else {
+            this.loggedIn = false;
+        }
 
+    },
+    mounted(){
+        this.loggedIn = isLoggedIn();
+    },
+    methods: {
+        refreshRecommendation() {
+
+            recommend({ token: this.token, user: getProfileInfo() }).then((recommendation) => {
+                console.log(recommendation.data);
+                if(recentlySuggested(recommendation.data.artist)){
+                    this.refreshRecommendation();
+                }
+                else{
+                    this.currentSuggestion = recommendation.data.artist;
+                    this.genres = "";
+                    this.currentSuggestion.genres.forEach((genre) => {
+                        this.genres += genre + ' , ';
+                    });
+                }
+            });
+        },
+
+        likeArtist() {
+            let currProfileInfo = getProfileInfo(); //make a copy of the current profile information
+            console.log(currProfileInfo);
+            currProfileInfo.likedArtists.push(this.currentSuggestion);
+            let newData = currProfileInfo.likeArtists;
+
+            
+            setProfileInfo(currProfileInfo);
+            updateSuggestedArtists(this.currentSuggestion);
+
+            update({id: getUID(), field: 'likedArtists', value: newData}).then((result) => {
+                console.log(result.data);
+                this.refreshRecommendation();
+            }).catch((error) => {
+                console.log(error);
+            });
+
+        },
+
+        skipArtist(){
+            updateSuggestedArtists(this.currentSuggestion);
+
+            let newData = getProfileInfo().suggestedArtists;
+
+            update({id: getUID(), field: 'suggestedArtists', value: newData}).then((result) => {
+                console.log(result.data);
+                this.refreshRecommendation();
+            }).catch((error) => {
+                console.log(error);
+            });
+        },
     },
 }
 
 </script>
 
 <template >
-    <meta charset="utf-8">
-    <section id="hero" class="hero">
-        <button class="btn-get-started">Like</button>
-        <img :src="this.currentSuggestion.url" :alt="this.currentSuggestion.name">
-        <button class="btn-get-started">Don't Like</button>
-    </section>
+    <div v-if="loggedIn">
+        <meta charset="utf-8">
+        <section class="hero">
+            <p class="artistName">{{ this.currentSuggestion.name }}</p><br>
+            <p class="artistGenre">{{ this.genres }}</p>
+        </section>
+        
+        <section id="hero" class="hero">
+            <button @click="likeArtist" class="btn-get-started">Like</button>
+            <img :src="this.currentSuggestion.images[0].url" :alt="this.currentSuggestion.name">
+            <button @click="skipArtist" class="btn-get-started">Don't Like</button>
+        </section>
+    </div>
+    <div v-else>
+        <p>Not Logged In</p>
+    </div>
 </template>
 
 <style scoped>
@@ -53,5 +139,17 @@ export default {
 .btn-get-started:hover {
     background: #1DB954;
     color: black;
+}
+
+.artistName {
+    color: white;
+    font-size: 100px;
+    text-align: center;
+}
+
+.artistGenre {
+    color: white;
+    font-size: 20px;
+    text-align: center;
 }
 </style>

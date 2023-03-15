@@ -70,9 +70,9 @@ export function updateSuggestedArtists(artist){
 
 export function recentlySuggested(artist){
   if(isLoggedIn()){
-    return profileInfo.suggestedArtists.includes(artist);
+    return profileInfo.suggestedArtists.find(entry => entry.id == artist.id);
   }
   else{
-    return localSuggestedArtists.includes(artist);
+    return localSuggestedArtists.includes(entry => entry.id == artist.id);
   }
 }
