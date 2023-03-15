@@ -1,9 +1,9 @@
 <template>
     <body style="background-color: black; color:white">
         <div style="padding:75px" class="col-lg-6 mx-auto " id="section-one">
-            <h1 class="display-4 fw-bold">Like Albums!</h1>
-
-            <p class="lead mb-4">Finally some interaction has arrived. You can now like an artists albums when you find your favourites, and they'll show up in your profile.</p>
+            <h1 class="display-4 fw-bold">Like Artists!</h1>
+            <h2 class="display-4 fw-bold">v0.8</h2>
+            <p class="lead mb-4">In addition to the album system, you can now like artists. Soon they too, will appear on your profile!</p>
         </div>
     </body>
 </template>
