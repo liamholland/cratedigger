@@ -21,7 +21,6 @@ let profileInfo = {}; //users profile data
 let uid = ""; //users id
 
 let max = 50;
-let suggestedArtists = []; //the artist pages the user has viewed in the last [max] page changes
 
 export function getProfileInfo(){
   return profileInfo;
@@ -43,14 +42,20 @@ export function isLoggedIn(){
   return uid != "";
 }
 
+//this is local - it is written to the server whenever the rest of the profile info is
 export function updateSuggestedArtists(artist){
+  //backwards compatability for accounts made before this was saved to the users profile
+  if(!profileInfo.hasOwnProperty('suggestedArtists')){
+    profileInfo.suggestedArtists = [];
+  }
+  
   if(suggestedArtists.length == max){
-    suggestedArtists.shift();
+    profileInfo.suggestedArtists.shift();
   }
 
-  suggestedArtists.push(artist);
+  profileInfo.suggestedArtists.push(artist);
 }
 
 export function recentlySuggested(artist){
-  return suggestedArtists.includes(artist);
+  return profileInfo.suggestedArtists.includes(artist);
 }

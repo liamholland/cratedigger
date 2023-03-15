@@ -30,6 +30,7 @@ exports.registerAccount = functions.https.onRequest((req, res) => {
       db.collection("UserData").doc(`${ID}`).set({
         likedArtists: [],
         likedAlbums: [],
+        suggestedArtists: [], //queue ADT used for recommendations - length configured application side
         id: ID,
         bio: "",
         username: name,

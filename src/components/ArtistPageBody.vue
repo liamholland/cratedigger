@@ -20,7 +20,7 @@ export default {
     data() {
         return {
             //spotify search artists
-            artistName: "",
+            artist: "",
             genres: "",
             albums: [],
             mostRelated: "",
@@ -38,7 +38,7 @@ export default {
             getToken().then((res) => {
                 //get the artist
                 getArtist({ token: res.data.access_token, id: artistID }).then((artist) => {
-                    this.artistName = artist.data.name;
+                    this.artist = artist.data;
                     this.genres = ""; //reset the genre
                     artist.data.genres.forEach(genre => {
                         this.genres += genre + ' , ';
@@ -49,7 +49,7 @@ export default {
                         this.albums = albums.data.items.sort(this.compareDates);
 
                         //if you are updating the whole page
-                        if(!onlyAlbums){
+                        if (!onlyAlbums) {
                             //get the most related artist to this artist
                             getRelated({ token: res.data.access_token, id: artistID }).then((relatedArtist) => {
                                 let i = 0;
@@ -62,13 +62,13 @@ export default {
                                         return;
                                     }
                                 } while (recentlySuggested(this.mostRelated.id))
-    
+
                                 //get artists different to the current artist
                                 getUnrelated({ token: res.data.access_token, limit: 20, genres: artist.data.genres, backup: this.lastSuggestedGenre }).then((unrelatedArtist) => {
                                     console.log(unrelatedArtist.data);
-    
+
                                     this.lastSuggestedGenre = unrelatedArtist.data.genre;
-    
+
                                     let i = 0;
                                     do {
                                         this.leastRelated = unrelatedArtist.data.artists[i];
@@ -139,6 +139,11 @@ export default {
             }
         },
 
+        // like/unlike an artist
+        toggleLikeArtist(artist){
+
+        },
+
         //checks if an album is repeated in an array
         isRepeat(album) {
             let index = this.albums.indexOf(album);
@@ -178,10 +183,10 @@ export default {
         },
 
         isLiked(album) {
-            if(isLoggedIn()){
+            if (isLoggedIn()) {
                 return getProfileInfo().likedAlbums.find((likedAlbum) => likedAlbum.id == album.id);
             }
-            else{
+            else {
                 return false;
             }
         },
@@ -192,7 +197,20 @@ export default {
 <template class="body">
     <section class="body">
         <br>
-        <p class="artistName">{{ this.artistName }}</p>
+        <p class="artistName">{{ this.artist.name }}</p>
+        <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn-outline-danger"
+            style="position:absolute; left: 72.5%">
+
+            <svg v-if="isLiked(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
+                <path
+                    d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-heart-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+            </svg>
+        </button>
         <p class="artistGenre">{{ this.genres }}</p>
         <button class="btn-get-started" @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name
         }}</button>
@@ -208,13 +226,13 @@ export default {
                         <button @click="toggleLikeAlbum(album)" type="button" class="btn btn-outline-danger"
                             style="position:absolute; left: 72.5%">
 
-                            <svg v-if="isLiked(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
+                            <svg v-if="isLiked(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
                                 <path
                                     d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
                             </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-heart-fill" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd"
                                     d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                             </svg>
@@ -303,4 +321,5 @@ img {
     padding: 5px;
     height: 250px;
     width: 250px;
-}</style>
+}
+</style>
