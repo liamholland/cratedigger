@@ -33,7 +33,7 @@ export default {
     },
     methods: {
         //refreshes the data on the page
-        refresh(artistID, onlyAlbums) {
+        refresh(artistID, onlyLikes) {
             //get a new token for spotify requests
             getToken().then((res) => {
                 //get the artist
@@ -41,15 +41,15 @@ export default {
                     this.artist = artist.data;
                     this.genres = ""; //reset the genre
                     artist.data.genres.forEach(genre => {
-                        this.genres += genre + ' , ';
+                        this.genres += genre + ' - ';
                     });
 
                     //get artist albums
                     getAlbums({ token: res.data.access_token, id: artistID }).then((albums) => {
                         this.albums = albums.data.items.sort(this.compareDates);
 
-                        //if you are updating the whole page
-                        if (!onlyAlbums) {
+                        //dont refresh the suggestions unless its a full page refresh
+                        if (!onlyLikes) {
                             //get the most related artist to this artist
                             getRelated({ token: res.data.access_token, id: artistID }).then((relatedArtist) => {
                                 let i = 0;
@@ -95,20 +95,31 @@ export default {
             });
         },
 
-        //like an album
+        //like/unlike an album
         toggleLikeAlbum(album) {
-            if (isLoggedIn()) {
-                let currProfileInfo = getProfileInfo();
+            this.toggleLike(album, 'likedAlbums');
+        },
 
-                //if the album is liked, unlike it
-                if (currProfileInfo.likedAlbums.find(likedAlbum => likedAlbum.id == album.id)) {
+        // like/unlike an artist
+        toggleLikeArtist(artist){
+            this.toggleLike(artist, 'likedArtists');
+        },
+
+        //generalised function for liking items
+        toggleLike(item, type){
+            //ensure the user is logged in
+            if (isLoggedIn()) {
+                let currProfileInfo = getProfileInfo(); //make a copy of the current profile information
+
+                //if the artist is liked, unlike it
+                if (currProfileInfo[type].find(likedItem => likedItem.id == item.id)) {
 
                     //create a new array without the album
-                    currProfileInfo.likedAlbums.splice(currProfileInfo.likedAlbums.indexOf(album), 1);
-                    let newLikedAlbums = currProfileInfo.likedAlbums;
+                    currProfileInfo[type].splice(currProfileInfo[type].indexOf(item), 1);
+                    let newData = currProfileInfo[type];
 
                     //update the server
-                    updateProfile({ id: getUID(), field: 'likedAlbums', value: newLikedAlbums }).then((result) => {
+                    updateProfile({ id: getUID(), field: type, value: newData }).then((result) => {
                         this.refresh(this.$route.params.aid, true);
                     }).catch((error) => {
                         console.log(error);
@@ -120,11 +131,11 @@ export default {
                 else {   //otherwise like it
 
                     //create a new array which includes the album id
-                    currProfileInfo.likedAlbums.push(album);
-                    let newLikedAlbums = currProfileInfo.likedAlbums;
+                    currProfileInfo[type].push(item);
+                    let newData = currProfileInfo[type];
 
                     //update the server
-                    updateProfile({ id: getUID(), field: 'likedAlbums', value: newLikedAlbums }).then((result) => {
+                    updateProfile({ id: getUID(), field: type, value: newData }).then((result) => {
                         this.refresh(this.$route.params.aid, true);
                     }).catch((error) => {
                         console.log(error);
@@ -134,14 +145,9 @@ export default {
                     setProfileInfo(currProfileInfo);
                 }
             }
-            else {
+            else{
                 console.log("Not Logged In");
             }
-        },
-
-        // like/unlike an artist
-        toggleLikeArtist(artist){
-
         },
 
         //checks if an album is repeated in an array
@@ -182,9 +188,18 @@ export default {
             this.refresh(id, false);
         },
 
-        isLiked(album) {
+        isLikedAlbum(album) {
+            return this.checkLike(album, getProfileInfo().likedAlbums);
+        },
+
+        isLikedArtist(artist){
+            return this.checkLike(artist, getProfileInfo().likedArtists);
+        },
+
+        //generalised function for checking the status of likes
+        checkLike(item, array){
             if (isLoggedIn()) {
-                return getProfileInfo().likedAlbums.find((likedAlbum) => likedAlbum.id == album.id);
+                return array.find((likedItem) => likedItem.id == item.id);
             }
             else {
                 return false;
@@ -201,7 +216,7 @@ export default {
         <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn-outline-danger"
             style="position:absolute; left: 72.5%">
 
-            <svg v-if="isLiked(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                 class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
                 <path
                     d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
@@ -226,7 +241,7 @@ export default {
                         <button @click="toggleLikeAlbum(album)" type="button" class="btn btn-outline-danger"
                             style="position:absolute; left: 72.5%">
 
-                            <svg v-if="isLiked(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                 fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
                                 <path
                                     d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />

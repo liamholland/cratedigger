@@ -20,7 +20,8 @@ export const app = initializeApp(firebaseConfig);
 let profileInfo = {}; //users profile data
 let uid = ""; //users id
 
-let max = 50;
+let max = 150;
+let localSuggestedArtists = [] // used if the user is not logged in
 
 export function getProfileInfo(){
   return profileInfo;
@@ -42,20 +43,36 @@ export function isLoggedIn(){
   return uid != "";
 }
 
-//this is local - it is written to the server whenever the rest of the profile info is
+//this is local - even when logged in - it is written to the server whenever the rest of the profile info is
 export function updateSuggestedArtists(artist){
-  //backwards compatability for accounts made before this was saved to the users profile
-  if(!profileInfo.hasOwnProperty('suggestedArtists')){
-    profileInfo.suggestedArtists = [];
+  if(isLoggedIn()){
+    //backwards compatability for accounts made before this was saved to the users profile
+    if(!profileInfo.hasOwnProperty('suggestedArtists')){
+      profileInfo.suggestedArtists = [];
+    }
+    
+    if(profileInfo.suggestedArtists.length == max){
+      profileInfo.suggestedArtists.shift();
+    }
+  
+    profileInfo.suggestedArtists.push(artist);
+
+  }
+  else{
+    if(localSuggestedArtists.length == max){
+      localSuggestedArtists.shift();
+    }
+  
+    localSuggestedArtists.push(artist);
   }
   
-  if(suggestedArtists.length == max){
-    profileInfo.suggestedArtists.shift();
-  }
-
-  profileInfo.suggestedArtists.push(artist);
 }
 
 export function recentlySuggested(artist){
-  return profileInfo.suggestedArtists.includes(artist);
+  if(isLoggedIn()){
+    return profileInfo.suggestedArtists.includes(artist);
+  }
+  else{
+    return localSuggestedArtists.includes(artist);
+  }
 }
