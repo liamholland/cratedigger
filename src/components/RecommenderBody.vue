@@ -13,7 +13,7 @@ const recommend = httpsCallable(functions, "recommendArtists");
 const update = httpsCallable(functions, "updateProfile");
 
 //TODO: remove emulator connection on prod
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -37,7 +37,7 @@ export default {
         else {
             this.loggedIn = false;
         }
-
+        
     },
     mounted(){
         this.loggedIn = isLoggedIn();
@@ -61,35 +61,38 @@ export default {
         },
 
         likeArtist() {
-            let currProfileInfo = getProfileInfo(); //make a copy of the current profile information
-            console.log(currProfileInfo);
-            currProfileInfo.likedArtists.push(this.currentSuggestion);
-            let newData = currProfileInfo.likeArtists;
-
-            
-            setProfileInfo(currProfileInfo);
-            updateSuggestedArtists(this.currentSuggestion);
-
-            update({id: getUID(), field: 'likedArtists', value: newData}).then((result) => {
-                console.log(result.data);
-                this.refreshRecommendation();
-            }).catch((error) => {
-                console.log(error);
-            });
-
+            if(!this.currentSuggestion == null){
+                let currProfileInfo = getProfileInfo(); //make a copy of the current profile information
+                console.log(currProfileInfo);
+                currProfileInfo.likedArtists.push(this.currentSuggestion);
+                let newData = currProfileInfo.likeArtists;
+    
+                
+                setProfileInfo(currProfileInfo);
+                updateSuggestedArtists(this.currentSuggestion);
+    
+                update({id: getUID(), field: 'likedArtists', value: newData}).then((result) => {
+                    console.log(result.data);
+                    this.refreshRecommendation();
+                }).catch((error) => {
+                    console.log(error);
+                });
+            }          
         },
 
         skipArtist(){
-            updateSuggestedArtists(this.currentSuggestion);
-
-            let newData = getProfileInfo().suggestedArtists;
-
-            update({id: getUID(), field: 'suggestedArtists', value: newData}).then((result) => {
-                console.log(result.data);
-                this.refreshRecommendation();
-            }).catch((error) => {
-                console.log(error);
-            });
+            if(!this.currentSuggestion == null){
+                updateSuggestedArtists(this.currentSuggestion);
+    
+                let newData = getProfileInfo().suggestedArtists;
+    
+                update({id: getUID(), field: 'suggestedArtists', value: newData}).then((result) => {
+                    console.log(result.data);
+                    this.refreshRecommendation();
+                }).catch((error) => {
+                    console.log(error);
+                });
+            }
         },
     },
 }

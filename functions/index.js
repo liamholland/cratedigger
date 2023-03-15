@@ -358,14 +358,14 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
     user.likedArtists.forEach((artist) => {
       artist.genres.forEach((genre) => {
         genres.push(genre);
-      })
+      });
     });
 
 
     //get a random search query
     const alphabet = 'abcdefghijklmnopqrstuvwxyz';
     const randomSearch = alphabet.charAt(Math.floor(Math.random() * 25));
-    const randomUserGenre = genres[Math.floor(Math.random() * genres.length)];
+    const randomUserGenre = genres.length > 0 ? genres[Math.floor(Math.random() * genres.length)] : "";
     //search the spotify API for a random artist
 
     //specify request options
