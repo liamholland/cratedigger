@@ -397,7 +397,7 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
       //get the probability that a user will like this album
       dbRef.get().then((dbSnap) => {
         dbSnap.forEach((doc) => {
-          doc.data().likedArtists.forEach((artist) => {    //for each of each users liked artists
+          doc.data().suggestedArtists.forEach((artist) => {    //for each of each users liked artists
 
             dbSnap.forEach((user) => {
               let liked = user.data().likedArtists;

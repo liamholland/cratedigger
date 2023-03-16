@@ -220,7 +220,7 @@ export default {
 
         //generalised function for checking the status of likes
         checkLike(item, array){
-            if (isLoggedIn()) {
+            if (isLoggedIn() && array.length > 0) {
                 return array.find((likedItem) => likedItem.id == item.id);
             }
             else {
