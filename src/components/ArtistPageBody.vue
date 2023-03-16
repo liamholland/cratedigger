@@ -200,6 +200,12 @@ export default {
         },
 
         goToNewArtist(id) {
+            if(isLoggedIn()){
+                updateProfile({id: getUID(), field: 'suggestedArtists', value: getProfileInfo().suggestedArtists}).catch((error) => {
+                    console.log(error);
+                });
+            }
+            
             this.$router.push({ name: "ArtistPage", params: { aid: id } });
             this.refresh(id, false);
         },
