@@ -243,7 +243,7 @@ export default {
         </div>
       </div>
  
-  <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:#1a1a1a">
+  <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:##151515">
   </div>
  
     </body>
