@@ -78,6 +78,6 @@ export function recentlySuggested(artist){
     return profileInfo.suggestedArtists.find(entry => entry.id == artist.id);
   }
   else{
-    return localSuggestedArtists.includes(entry => entry.id == artist.id);
+    return localSuggestedArtists.find(entry => entry.id == artist.id);
   }
 }

@@ -57,13 +57,23 @@ export default {
                                 do {
                                     if (i == 20) {
                                         getRelated({ token: res.data.access_token, id: relatedArtist.data.artists[19].id }).then((fallbackartists) => {
-                                            this.mostRelated = fallbackartists.data.artists[0];
+                                            i = 0;
+
+                                            do{
+                                                if(i == 20){
+                                                    this.mostRelated = fallbackartists.data.artists[19];
+                                                    return;
+                                                }
+                                                this.mostRelated = fallbackartists.data.artists[i];
+                                                i++;
+                                            } while(recentlySuggested(this.mostRelated))
+                                            
                                         });
                                         return;
                                     }
                                     this.mostRelated = relatedArtist.data.artists[i];
                                     i++;
-                                } while (recentlySuggested(this.mostRelated.id))
+                                } while (recentlySuggested(this.mostRelated))
 
                                 updateSuggestedArtists(this.mostRelated);
 
@@ -77,7 +87,7 @@ export default {
                                     do {
                                         this.leastRelated = unrelatedArtist.data.artists[i];
                                         i++;
-                                    } while (recentlySuggested(this.leastRelated.id));
+                                    } while (recentlySuggested(this.leastRelated));
 
                                     updateSuggestedArtists(this.leastRelated);
 
@@ -190,7 +200,6 @@ export default {
         },
 
         goToNewArtist(id) {
-            updateSuggestedArtists(id);
             this.$router.push({ name: "ArtistPage", params: { aid: id } });
             this.refresh(id, false);
         },
