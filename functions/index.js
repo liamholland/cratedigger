@@ -230,7 +230,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       "house", "deep-house", "progressive-house",
       "hip-hop", "r&b",
       "pop", "power-pop", "pop-film", "indie-pop",
-      "dance", "club", "dancehall", "disco", "dub", "dubstep", "funk", "groove", "hardcore", "hardstyle", "house", "j-dance", "j-idol", "j-pop", "j-rock", "k-pop", "party", "road-trip",
+      "dance", "club", "dancehall", "disco", "dub", "dubstep", "funk", "groove", "hardcore", "hardstyle", "house", "j-dance", "j-idol", "j-pop", "j-rock", "k-pop", "party",
       "rock", "alt-rock", "punk-rock", "grunge", "psych-rock", "post-dubstep",
       "metal", "heavy-metal", "black-metal", "metalcore", "grindcore",
       "jazz", "blues",
@@ -250,7 +250,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       genre = genre.toLowerCase();
       if (similarGenres.includes(genre)) {
         do {
-          let index = Math.floor(Math.random() * similarGenres.length);
+          let index = Math.floor(Math.random() * (similarGenres.length - 1));
           searchGenre = similarGenres[index];
         } while (Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(genre)) < 30);  //the higher the number the more "different" the result will be but also the longer it could potentially take to find a result
         return;
@@ -260,7 +260,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
     //avoids a case of returning an empty array
     if (searchGenre == undefined || searchGenre == "") {
       do {
-        let index = Math.floor(Math.random() * similarGenres.length);
+        let index = Math.floor(Math.random() * (similarGenres.length - 1));
         searchGenre = similarGenres[index];
       } while (Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(backupGenre)) < 40 || searchGenre == undefined);  //the higher the number the more "different" the result will be but also the longer it could potentially take to find a result
     }
