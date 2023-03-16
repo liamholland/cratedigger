@@ -42,6 +42,12 @@ export default {
     mounted(){
         this.loggedIn = isLoggedIn();
     },
+    // watch: {
+    //     loggedIn(){
+    //         this.loggedIn = true;
+    //         this.refreshRecommendation();
+    //     }
+    // },
     methods: {
         refreshRecommendation() {
 
@@ -61,11 +67,11 @@ export default {
         },
 
         likeArtist() {
-            if(!this.currentSuggestion == null){
+            if(this.currentSuggestion != null){
                 let currProfileInfo = getProfileInfo(); //make a copy of the current profile information
                 console.log(currProfileInfo);
                 currProfileInfo.likedArtists.push(this.currentSuggestion);
-                let newData = currProfileInfo.likeArtists;
+                let newData = currProfileInfo.likedArtists;
     
                 
                 setProfileInfo(currProfileInfo);
@@ -81,7 +87,7 @@ export default {
         },
 
         skipArtist(){
-            if(!this.currentSuggestion == null){
+            if(this.currentSuggestion != null){
                 updateSuggestedArtists(this.currentSuggestion);
     
                 let newData = getProfileInfo().suggestedArtists;
@@ -95,6 +101,11 @@ export default {
             }
         },
     },
+    computed: {
+        artistImage(){
+            return JSON.stringify(this.currentSuggestion) != '{}' ? this.currentSuggestion.images[0].url : "";
+        }
+    }
 }
 
 </script>
@@ -109,7 +120,7 @@ export default {
         
         <section id="hero" class="hero">
             <button @click="likeArtist" class="btn-get-started">Like</button>
-            <img :src="this.currentSuggestion.images[0].url" :alt="this.currentSuggestion.name">
+            <img :src="artistImage" :alt="this.currentSuggestion.name">
             <button @click="skipArtist" class="btn-get-started">Don't Like</button>
         </section>
     </div>

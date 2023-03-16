@@ -1,5 +1,8 @@
 // Import the functions you need from the SDKs you need
+import { HttpStatusCode } from "axios";
 import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,7 +23,7 @@ export const app = initializeApp(firebaseConfig);
 let profileInfo = {}; //users profile data
 let uid = ""; //users id
 
-let max = 150;
+let max = 100;
 let localSuggestedArtists = [] // used if the user is not logged in
 
 export function getProfileInfo(){
@@ -51,8 +54,10 @@ export function updateSuggestedArtists(artist){
       profileInfo.suggestedArtists = [];
     }
     
-    if(profileInfo.suggestedArtists.length == max){
-      profileInfo.suggestedArtists.shift();
+    if(profileInfo.suggestedArtists.length >= max){
+      do{
+        profileInfo.suggestedArtists.shift();
+      } while(profileInfo.suggestedArtists.length >= max)
     }
   
     profileInfo.suggestedArtists.push(artist);

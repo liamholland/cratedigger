@@ -239,7 +239,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       "forro", "gospel", "honky-tonk", "pagode",
       "latin", "salsa", "samba", "reggae", "reggaeton",
       "world-music", "african", "afrobeat", "brazilian", "french", "german", "indian", "iranian", "malay", "spanish", "swedish", "tango", "turkish",
-      "ambient", "chill", "new-age", "rainy-day", "sleep", "study",
+      "ambient", "chill", "new-age", "study",
       "singer-songwriter", "acoustic", "guitar", "soul",
       "classical", "opera",
       "anime", "children", "filmi", "show-tunes",
@@ -250,7 +250,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       genre = genre.toLowerCase();
       if (similarGenres.includes(genre)) {
         do {
-          let index = Math.floor(Math.random() * 119);
+          let index = Math.floor(Math.random() * similarGenres.length);
           searchGenre = similarGenres[index];
         } while (Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(genre)) < 30);  //the higher the number the more "different" the result will be but also the longer it could potentially take to find a result
         return;
@@ -260,7 +260,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
     //avoids a case of returning an empty array
     if (searchGenre == undefined || searchGenre == "") {
       do {
-        let index = Math.floor(Math.random() * 119);
+        let index = Math.floor(Math.random() * similarGenres.length);
         searchGenre = similarGenres[index];
       } while (Math.abs(similarGenres.indexOf(searchGenre) - similarGenres.indexOf(backupGenre)) < 40 || searchGenre == undefined);  //the higher the number the more "different" the result will be but also the longer it could potentially take to find a result
     }

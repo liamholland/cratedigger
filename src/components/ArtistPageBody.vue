@@ -55,13 +55,17 @@ export default {
                                 let i = 0;
                                 //while the most related was recently suggested to the user
                                 do {
-                                    this.mostRelated = relatedArtist.data.artists[i];
-                                    i++;
                                     if (i == 20) {
-                                        this.refresh(relatedArtist.data.artists[19].id, false);
+                                        getRelated({ token: res.data.access_token, id: relatedArtist.data.artists[19].id }).then((fallbackartists) => {
+                                            this.mostRelated = fallbackartists.data.artists[0];
+                                        });
                                         return;
                                     }
+                                    this.mostRelated = relatedArtist.data.artists[i];
+                                    i++;
                                 } while (recentlySuggested(this.mostRelated.id))
+
+                                updateSuggestedArtists(this.mostRelated);
 
                                 //get artists different to the current artist
                                 getUnrelated({ token: res.data.access_token, limit: 20, genres: artist.data.genres, backup: this.lastSuggestedGenre }).then((unrelatedArtist) => {
@@ -74,6 +78,9 @@ export default {
                                         this.leastRelated = unrelatedArtist.data.artists[i];
                                         i++;
                                     } while (recentlySuggested(this.leastRelated.id));
+
+                                    updateSuggestedArtists(this.leastRelated);
+
                                 }).catch((error) => {
                                     console.log(error);
                                 });
@@ -171,7 +178,7 @@ export default {
             let date1 = new Date(d1.release_date);
             let date2 = new Date(d2.release_date);
 
-            if (date1 < date2) {
+            if (date1 > date2) {
                 return -1;
             }
             else if (date1 > date2) {
@@ -210,133 +217,144 @@ export default {
 </script>
 
 <template class="body">
-    <section class="body">
-        <br>
-        <p class="artistName">{{ this.artist.name }}</p>
+
+    <section class="px-4 py-5 text-center" style="color:white; background-color:black">
+        <h1 class="display-5 fw-bold artistName" style="padding-top:10%; font-size:55px">{{ this.artist.name }}</h1>
+        
         <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn-outline-danger"
-            style="position:absolute; left: 72.5%">
-
-            <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
-                <path
-                    d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
-            </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                class="bi bi-heart-fill" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-            </svg>
-        </button>
-        <p class="artistGenre">{{ this.genres }}</p>
-        <button class="btn-get-started" @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name
-        }}</button>
-        <button class="btn-get-started" @click="goToNewArtist(this.leastRelated.id)">Unrelated Artist: {{
-            this.leastRelated.name }}</button>
-        <br><br><br><br>
-
-        <ul style="background-color:black">
-            <li v-for="album in this.albums">
-                <div v-if="!this.isRepeat(album)" class="albumResult">
-                    <img :src="album.images[0].url" alt="Album Cover">
-                    <div class="albumInfo">
-                        <button @click="toggleLikeAlbum(album)" type="button" class="btn btn-outline-danger"
-                            style="position:absolute; left: 72.5%">
-
-                            <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
-                                <path
-                                    d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
-                            </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-heart-fill" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-                            </svg>
-                        </button>
-
-
-                        <h1> {{ album.name }} </h1>
-
-
-
-                        <h3>{{ album.release_date }}</h3>
-
-
+                style="position:absolute; left: 72.5%">
+    
+                
+    
+                <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
+                    <path
+                        d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-heart-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                </svg>
+            </button>
+    
+        <div class="col-lg-6 mx-auto">
+    <p class="artistGenre">{{ this.genres }}</p>
+            
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+              <button type="button" class="btn btn-lg px-4 gap-3 btn-get-started" @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name
+            }}</button>
+            <button type="button" class="btn btn-lg px-4 gap-3 btn-get-started" @click="goToNewArtist(this.leastRelated.id)">Unrelated Artist: {{
+                this.leastRelated.name }}</button>
+     
+          </div>
+        </div>
+        <br><br><br>
+    
+    
+    
+    
+    
+            <ul style="background-color:black">
+                <li v-for="album in this.albums">
+                    <div class="row">
+                    <div v-if="!this.isRepeat(album)">
+              
+                        <img :src="album.images[0].url" alt="Album Cover">
+        <button @click="toggleLikeAlbum(album)" type="button" class="btn btn-outline-danger"
+                                style="position:absolute; ">
+    
+                                <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
+                                </svg>
+                                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                        d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                                </svg>
+                            </button>
+    
+    
+                        </div>
+                        
+                        
+                        <div class="col-2.5">
+                            
+    
+                            <h1 style="font-size:14px"> {{ album.name }} </h1>
+    
+    
+    
+                            <h3 style="font-size:12px">{{ album.release_date }}</h3>
+                            
+                            
+    
+                        </div>
                     </div>
-
-                </div>
-            </li>
-
-        </ul>
-
-    </section>
-</template>
-  
-<style scoped>
-.albumResult {
-    background-color: #151515;
-    text-align: left;
-}
-
-.albumInfo {
-    color: whitesmoke;
-}
-
-.artistName {
-    color: white;
-    font-size: 100px;
-    text-align: center;
-}
-
-.body {
-    background-color: black;
-    text-align: center;
-}
-
-.btn-get-started {
-    background-color: black;
-    font-weight: 500;
-    font-size: 16px;
-    letter-spacing: 1px;
-    display: inline-block;
-    padding: 12px 40px;
-    border-radius: 50px;
-    transition: 0.5s;
-    margin: 10px;
-    color: white;
-    text-decoration: none;
-    border: 2px solid #1DB954;
-}
-
-.btn-get-started:hover {
-    background: #1DB954;
-    color: black
-}
-
-.artistName {
-    font-size: 100px;
-    text-align: center;
-}
-
-.artistGenre {
-    color: white;
-    font-size: 20px;
-    text-align: center;
-}
-
-.albumResult {
-    display: inline-flex;
-    width: 50%;
-}
-
-ul {
-    list-style-type: none;
-    text-align: center;
-}
-
-img {
-    position: relative;
-    padding: 5px;
-    height: 250px;
-    width: 250px;
-}
-</style>
+    
+    
+                </li>
+    
+            </ul>
+    
+        </section>
+    </template>
+      
+    <style scoped>
+    .albumResult {
+        background-color: #151515;
+        text-align: left;
+    }
+    .albumInfo {
+        color: whitesmoke;
+    }
+    .artistName {
+        color: white;
+    }
+    .body {
+        background-color: black;
+        text-align: center;
+    }
+    .btn-get-started {
+        background-color: black;
+        font-weight: 500;
+        font-size: 16px;
+        letter-spacing: 1px;
+        display: inline-block;
+        padding: 12px 40px;
+        border-radius: 50px;
+        transition: 0.5s;
+        margin: 10px;
+        color: white;
+        text-decoration: none;
+        border: 2px solid #1DB954;
+    }
+    .btn-get-started:hover {
+        background: #1DB954;
+        color: black
+    }
+    .artistName {
+        font-size: 100px;
+        text-align: center;
+    }
+    .artistGenre {
+        color: white;
+        font-size: 20px;
+        text-align: center;
+    }
+    .albumResult {
+        display: inline-flex;
+        width: 50%;
+    }
+    ul {
+        list-style-type: none;
+        text-align: center;
+    }
+    img {
+        position: relative;
+        padding: 5px;
+        height: 180px;
+        width: 180px;
+    }
+    </style>

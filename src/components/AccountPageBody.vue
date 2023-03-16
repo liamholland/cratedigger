@@ -1,7 +1,7 @@
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" /> -->
 <script>
-import { app, getProfileInfo, setProfileInfo, setUID, isLoggedIn } from "../../api/firebase";
+import { app, getProfileInfo, setProfileInfo, getUID, setUID, isLoggedIn } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -24,7 +24,7 @@ export default {
       email: "",
       password: "",
       uid: "",  //this is here instead of the global one because it needs to work from the url
-      loggedIn: isLoggedIn(),
+      loggedIn: false,
 
       //account information
       accountInfo: {},
@@ -35,14 +35,29 @@ export default {
     }
   },
   created() {
-    this.refresh();
+    let listener = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUID(user.uid);
+        this.loggedIn = true;
+      }
+      else {
+        this.loggedIn = false;
+      }
+    });
+
+    listener();
   },
   watch: {
+    loggedIn() {
+      this.refresh();
+    },
+
     '$route.params': {
       handler() {
         this.refresh();
       }
-    }
+    },
+
   },
   methods: {
     opensignin() {
@@ -64,33 +79,26 @@ export default {
     //refresh the data contained on the page
     refresh() {
       this.accountInfo = {};
-      //onAuthStateChanged returns a function which unhooks the event listener
-      let listener = onAuthStateChanged(auth, (user) => {
-        //if there is no user, user.uid will be undefined
-        this.uid = user ? user.uid : this.$route.params.uid;
+      if (isLoggedIn() && getUID() != "" && JSON.stringify(getProfileInfo()) == '{}') {
+        console.log("Getting Profile From Server");
 
+        //get the profile information of the user once their are signed in
+        //stored under the users id
+        requestProfileInfo({ "id": getUID() }).then((info) => {
+          //set the data on the page
+          setProfileInfo(info.data);
+          this.accountInfo = info.data;
+          console.log(this.accountInfo);
+        }).catch((error) => {
+          console.log(error.code);
+          console.log(error.message);
+        });
         //if logged in and there is a valid user and the data has not been retrieved
-        if (isLoggedIn() && this.uid != undefined && JSON.stringify(getProfileInfo()) == '{}') {
-          console.log("Getting Profile From Server");
+      }
+      else {
+        this.accountInfo = getProfileInfo();
+      }
 
-          //get the profile information of the user once their are signed in
-          //stored under the users id
-          requestProfileInfo({ "id": this.uid }).then((info) => {
-            //set the data on the page
-            setProfileInfo(info.data);
-            this.accountInfo = info.data;
-            console.log(this.accountInfo);
-          }).catch((error) => {
-            console.log(error.code);
-            console.log(error.message);
-          });
-        }
-        else {
-          this.accountInfo = getProfileInfo();
-        }
-      });
-      //unhook the listener
-      listener();
       this.loggedIn = isLoggedIn();
     },
 
@@ -127,7 +135,7 @@ export default {
 
     //update bio
     updateBio() {
-      update({ "id": this.uid, "field": 'bio', "value": this.newBio }).then((res) => {
+      update({ "id": getUID(), "field": 'bio', "value": this.newBio }).then((res) => {
         console.log(res.data.body);
         this.accountInfo.bio = this.newBio;
         setProfileInfo(this.accountInfo);
@@ -140,7 +148,7 @@ export default {
 
     //update pfp
     updatePFP() {
-      update({ "id": this.uid, "field": 'pfpURL', "value": this.newURL }).then((res) => {
+      update({ "id": getUID(), "field": 'pfpURL', "value": this.newURL }).then((res) => {
         console.log(res.data.body);
         this.accountInfo.pfpURL = this.newURL;
         setProfileInfo(this.accountInfo);
@@ -153,7 +161,7 @@ export default {
   },
   computed: {
     pfpURL() {
-      return this.accountInfo.pfpURL ? this.accountInfo.pfpURL : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+      return (JSON.stringify(this.accountInfo) != '{}' && this.accountInfo.pfpURL != undefined) ? this.accountInfo.pfpURL : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
     },
   },
 
@@ -209,7 +217,7 @@ export default {
                   </div>
                   <div class="ms-4 mt-5flex-column" style="width: 150px; background-color:#151515">
                     <img v-bind:src="this.pfpURL" alt="Generic placeholder image"
-                      class="img-fluid img-thumbnail mt-4 mb-2" style="width: 150px; z-index: 1">
+                      class="img-fluid img-thumbnail mt-4 mb-2" style="height: 150px; width: 150px; z-index: 1">
                     <button type="button"
                       style="z-index: 1; background-color:white; border-radius:4px; border:none; width: 150px; "
                       @click="openProfileEdit()">
@@ -218,7 +226,8 @@ export default {
 
                   </div>
                   <div class="ms-3" style="margin-top: 30px;">
-                    <h2 style="text-align:left; font-size:50px">{{ this.accountInfo.username }}</h2>
+
+                    <h2 class="display-5 fw-bold" style="font-size:225%">{{ this.accountInfo.username }}</h2>
                     <p>{{ this.accountInfo.bio }}</p>
                   </div>
                 </div>
@@ -232,7 +241,7 @@ export default {
                   </nav>
                   <!-- album covers -->
                   <div class="photos">
-                      <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name">
+                    <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name">
                   </div>
                 </div>
               </div>
@@ -241,26 +250,37 @@ export default {
           </div>
         </div>
       </div>
+
+      <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:#151515">
+      </div>
+
     </body>
   </div>
-  <div v-else>
-    <section id="hero" class="hero" style="height:100%">
-              <br><br><br><br><br><br><br><br><br>
-              <h5 style="color:white">You are not logged into your account. To login click <h4 style="display:inline"><strong><a @click="opensignin()">here</a></strong></h4> or to create an account click <h4 style="display:inline"><strong><a @click="opensignup()">here</a></strong></h4></h5>
 
-              <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
- 
- 
-    
-     </section>
+  <div v-else>
+
+    <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+
+      <div class="col-lg-6 mx-auto" style="padding-top:10%">
+        <h4 class="lead mb-4" style="color:white; ">You are not logged into your account. To login click <h3
+            style="display:inline"><strong><a @click="opensignin()">here</a></strong></h3> or to create an account click
+          <h3 style="display:inline"><strong><a @click="opensignup()">here</a></strong></h3>
+        </h4>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+
+        </div>
+      </div>
+    </section>
+
   </div>
 </template>
 
 <style scoped>
-.hero{
-  background-color:black;
+.hero {
+  background-color: black;
   text-align: center;
 }
+
 /* The Modal for edit profile (background) */
 .btn-get-started {
   font-weight: 500;
@@ -282,7 +302,6 @@ export default {
 }
 
 .modal {
-
   display: none;
   /* Hidden by default */
   position: fixed;
@@ -310,8 +329,6 @@ export default {
   background-color: #1a1a1a;
   margin: auto;
   padding: 5px;
-
-
 }
 
 /* The Close Button */
@@ -359,9 +376,6 @@ a {
   text-decoration: none;
 }
 
-
-
-
 /* profile picture */
 .header__wrapper .cols__container .left__col .img__container {
   position: absolute;
@@ -394,8 +408,6 @@ a {
   margin: 0;
 }
 
-
-
 /* "Liked albums" color and uppercase */
 .header__wrapper .cols__container .right__col nav ul li a {
   text-transform: uppercase;
@@ -410,15 +422,11 @@ a {
 }
 
 .header__wrapper .cols__container .right__col .photos img {
-  max-width: 100%;
+  max-width: 250px;
   display: block;
-  height: 100%;
+  height: 250px;
   object-fit: cover;
 }
-
-
-
-
 
 @media (min-width: 1017px) {
   .header__wrapper .cols__container .left__col {
@@ -429,6 +437,4 @@ a {
   .header__wrapper .cols__container .right__col nav {
     flex-direction: row;
   }
-}
-</style>
-
+}</style>

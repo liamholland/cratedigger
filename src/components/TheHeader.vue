@@ -35,6 +35,20 @@ export default {
       errorMessage6: "",
     }
   },
+  created() {
+    let listener = onAuthStateChanged(auth, (user) => {
+      if(user){
+        this.loggedIn = true;
+        setUID(user.uid);
+      }
+      else{
+        this.loggedIn = false;
+      }
+    });
+
+    //unhook the listener
+    listener();
+  },
   methods: {
 
     opensignin() {
@@ -218,268 +232,238 @@ export default {
 </script>
 
 <template>
-<div id="myModal" class="modal"> <!-- Sign in popup  -->
-    <!-- Modal content -->
-    <div style="align-items: center" class="modal-content">
-      <span class="close" @click="closesignin()">&times;</span>
-      <p style="font-size: 40px; color: white">Sign in</p>
-
-      <p style="color:red">{{errorMessage1}}</p>
-      <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="email">>
-          <label for="floatingInput">Email or Username</label>
-        </div>
+  <div id="myModal" class="modal"> <!-- Sign in popup  -->
+      <!-- Modal content -->
+      <div style="align-items: center" class="modal-content">
+        <span class="close" @click="closesignin()">&times;</span>
+        <p style="font-size: 40px; color: white">Sign in</p>
   
-      <p style="color:red">{{errorMessage2}}</p>
-      <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="password">>
-          <label for="floatingInput">Password</label>
-        </div>
-
-      <a @click="beforeLogin()" class="btn-get-started">Sign in</a>
-    </div>
-  </div>
-
-  <div id="myModal1" class="modal"> <!-- create account popup  -->
-    <!-- Modal content -->
-    <div style="align-items: center" class="modal-content">
-      <span class="close" @click="closesignup()">&times;</span>
-      <p style="font-size: 40px; text-align: center; color: white">Create account</p>
-
-      <p style="color:red">{{errorMessage3}}{{errorMessage5}}</p>
-      <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="email">>
-          <label for="floatingInput">Email</label>
-        </div>
-      
-      <p style="color:red">{{errorMessage4}}</p>
-      <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="username">>
-          <label for="floatingInput">Username</label>
-        </div>
-
-    <p style="color:red">{{errorMessage6}}</p>
-      <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="password">>
-          <label for="floatingInput">Password</label>
-        </div>
-      <a @click="register" class="btn-get-started">Create</a>
-    </div>
-  </div>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <meta charset="utf-8">
-  <nav class="navbar navbar-expand-sm " aria-label="Third navbar example" style="background-color:black">
-    <div class="container-fluid">
-      <router-link to="/">
-
-        <img src="../assets/img/cratedigger_banner.png" alt="Crate Digger" width="150" height="60"><!--Logo-->
-      </router-link>
-
-      <button style="background-color: grey" class="navbar-toggler" type="button" data-bs-toggle="collapse"
-        data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false"
-        aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarsExample03" style="text-align: center; margin-left:40%">
-        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-          <li class="nav-item" style="margin-right: 30px;">
-            <router-link to="/">Home</router-link>
-          </li>
-          <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a
-              class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
-          <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
-              id="myBtn" @click="opensignin()">Login</a></li>
-          <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
-              id="myBtn" @click="logout()">Log Out</a></li>
-          <li class="nav-item" style="margin-right: 30px;">
-            <router-link to="/AboutUs">About Us</router-link>
-          </li>
-          <li class="nav-item" style="margin-right: 30px;">
-            <router-link to="/New">What's New?</router-link>
-          </li>
-          <li class="nav-item" style="margin-right: 30px;">
-            <router-link to="/Search">Search</router-link>
-          </li>
-
-          <li class="nav-item" @click="routeToAccount">
-            <router-link to="">Account</router-link>
-          </li>
-
-        </ul>
-
+        <p style="color:red">{{errorMessage1}}</p>
+        <div class="form-floating">
+            <input class="form-control" id="floatingInput" required v-model="email">
+            <label for="floatingInput">Email or Username</label>
+          </div>
+    
+        <p style="color:red">{{errorMessage2}}</p>
+        <div class="form-floating">
+            <input class="form-control" id="floatingInput" required v-model="password">
+            <label for="floatingInput">Password</label>
+          </div>
+  <br>
+        <a @click="beforeLogin()" class="btn-get-started">Sign in</a>
       </div>
     </div>
-  </nav>
-</template>
-<style scoped>
-.nav-item {
-  color: rebeccapurple;
-}
-
-.myBtn1 {
-  list-style-type: none;
-}
-
-.header {
-  z-index: 997;
-  position: absolute;
-
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: black;
-  list-style-type: none;
-}
-
-.navbar {
-  padding: 20px 0;
-}
-
-.navbar a,
-.navbar a:focus {
-  display: flex;
-  padding: 0 3px;
-  font-family: "Roboto", sans-serif;
-  font-size: 20px;
-  font-weight: 500;
-  text-decoration: none;
-  color: #1DB954;
-
-  text-transform: uppercase;
-
-  transition: 0.3s;
-
-}
-
-
-.navbar a:hover {
-  color: white;
-}
-
-
-
-.hero {
-  background-color: black;
-  padding-top: 12.5%;
-}
-
-.btn-get-started {
-  font-weight: 500;
-  font-size: 16px;
-  letter-spacing: 1px;
-  display: inline-block;
-  padding: 12px 40px;
-  border-radius: 50px;
-  transition: 0.5s;
-  margin: 10px;
-  color: white;
-  text-decoration: none;
-  border: 2px solid #1DB954;
-}
-
-.btn-get-started:hover {
-  background: #1DB954;
-  color: black
-}
-
-
-.heading:hover {
-  color: #1DB954;
-}
-
-.services {
-  color: white;
-  background-color: black;
-  background-size: cover;
-  font-size: 14px;
-  padding: 80px 0 60px 0;
-  position: relative;
-}
-
-.section-header {
-
-  padding-bottom: 7.5%;
-
-  color: white;
-}
-
-.service-item {
-  background-color: #262626;
-}
-
-.service-item:hover {
-  color: #1DB954;
-}
-
-/* The Modal (background) */
-.modal {
-
-  display: none;
-  /* Hidden by default */
-  position: fixed;
-  /* Stay in place */
-  z-index: 1;
-  /* Sit on top */
-  padding-top: 10px;
-  /* Location of the box */
-  left: 0;
-  top: 0;
-  /*width: 100%; /* Full width */
-  /*height: 100%; /* Full height */
-  overflow: auto;
-  /* Enable scroll if needed */
-  /* background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.6);
-  /* Black w/ opacity */
-}
-
-/* Modal Content */
-.modal-content {
-  align-items: left;
+  
+    <div id="myModal1" class="modal"> <!-- create account popup  -->
+      <!-- Modal content -->
+      <div style="align-items: center" class="modal-content">
+        <span class="close" @click="closesignup()">&times;</span>
+        <p style="font-size: 40px; text-align: center; color: white">Create account</p>
+  
+        <p style="color:red">{{errorMessage3}}{{errorMessage5}}</p>
+        <div class="form-floating">
+            <input class="form-control" id="floatingInput" required v-model="email">
+            <label for="floatingInput">Email</label>
+          </div>
+        
+        <p style="color:red">{{errorMessage4}}</p>
+        <div class="form-floating">
+            <input class="form-control" id="floatingInput" required v-model="username">
+            <label for="floatingInput">Username</label>
+          </div>
+  
+      <p style="color:red">{{errorMessage6}}</p>
+        <div class="form-floating">
+            <input class="form-control" id="floatingInput" required v-model="password">
+            <label for="floatingInput">Password</label>
+          </div>
+          <br>
+        <a @click="register" class="btn-get-started">Create</a>
+      </div>
+    </div>
+  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <meta charset="utf-8">
+    <nav class="navbar navbar-expand-lg " aria-label="Offcanvas navbar large" style="background-color:black">
+      <div class="container-fluid" >
+         <router-link to="/">
+  
+          <img src="../assets/img/cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
+        </router-link>
+  
+        <button style="background-color: grey" class="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <div class="collapse navbar-collapse" id="navbarsExample03">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+          
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/">Home</router-link>
+            </li>
+            <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a
+                class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
+            <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a class="myBtn"
+                id="myBtn" @click="opensignin()">Login</a></li>
+            <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;" ><a class="myBtn"
+                id="myBtn" @click="logout()">Log Out</a></li>
+            <li class="nav-item " style=" margin-right: 10px;">
+              <router-link to="/AboutUs">About Us</router-link>
+            </li>
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/New">What's New?</router-link>
+            </li>
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/Search">Search</router-link>
+            </li>
+  
+            <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
+              <router-link to="">Account</router-link>
+            </li>
+  
+          </ul>
+  
+        </div>
+      </div>
+    </nav>
+    
+  </template>
+  <style scoped>
+  .nav-item {
+    color: rebeccapurple;
+  }
+  .myBtn1 {
+    list-style-type: none;
+  }
+  .header {
+    z-index: 997;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: black;
+    list-style-type: none;
+  }
+  .navbar {
+    padding: 20px 0;
+  }
+  .navbar a,
+  .navbar a:focus {
+    display: flex;
+    padding: 0 3px;
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #1DB954;
+    text-transform: uppercase;
+    transition: 0.3s;
+  }
+  .navbar a:hover {
+    color: white;
+  }
+  .hero {
+    background-color: black;
+    padding-top: 12.5%;
+  }
+  .btn-get-started {
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 12px 40px;
+    border-radius: 50px;
+    transition: 0.5s;
+    margin: 10px;
+    color: white;
+    text-decoration: none;
+    border: 2px solid #1DB954;
+  }
+  .btn-get-started:hover {
+    background: #1DB954;
+    color: black
+  }
+  .heading:hover {
+    color: #1DB954;
+  }
+  .services {
+    color: white;
+    background-color: black;
+    background-size: cover;
+    font-size: 14px;
+    padding: 80px 0 60px 0;
+    position: relative;
+  }
+  .section-header {
+    padding-bottom: 7.5%;
+    color: white;
+  }
+  .service-item {
+    background-color: #262626;
+  }
+  .service-item:hover {
+    color: #1DB954;
+  }
+  /* The Modal (background) */
+  .modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    padding-top: 10px;
+    /* Location of the box */
+    left: 0;
+    top: 0;
+    /*width: 100%; /* Full width */
+    /*height: 100%; /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    /* background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Black w/ opacity */
+  }
+  /* Modal Content */
+  .modal-content {
+    align-items: left;
+    width: 325px;
+    height: 500px;
+    background-color: #1a1a1a;
+    margin: auto;
+    padding: 5px;
+  }
+  /* The Close Button */
+  .close {
+    position: relative;
+    left: 40%;
+    color: white;
+    float: right;
+    font-size: 32px;
+    font-weight: bold;
+  }
+  .close:hover,
+  .close:focus {
+    color: #1DB954;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .close1:hover,
+  .close1:focus {
+    color: #1DB954;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  /* .modal-content {
+  align-items: center;
   width: 350px;
-  height: 600px;
+  height: 450px;
   background-color: #1a1a1a;
   margin: auto;
-  padding: 5px;
-
-
-}
-
-/* The Close Button */
-.close {
-  position: relative;
-  left: 40%;
-  color: white;
-  float: right;
-  font-size: 32px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: #1DB954;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.close1:hover,
-.close1:focus {
-  color: #1DB954;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* .modal-content {
-align-items: center;
-width: 350px;
-height: 450px;
-background-color: #1a1a1a;
-margin: auto;
-padding: 10px;
-
-
-} */
-</style>
+  padding: 10px;
+  } */
+  </style>
+  
