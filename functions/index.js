@@ -231,7 +231,7 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
       "hip-hop", "r&b",
       "pop", "power-pop", "pop-film", "indie-pop",
       "dance", "club", "dancehall", "disco", "dub", "dubstep", "funk", "groove", "hardcore", "hardstyle", "house", "j-dance", "j-idol", "j-pop", "j-rock", "k-pop", "party",
-      "rock", "alt-rock", "punk-rock", "grunge", "psych-rock", "post-dubstep",
+      "rock", "alt-rock", "punk-rock", "grunge", "psych-rock",
       "metal", "heavy-metal", "black-metal", "metalcore", "grindcore",
       "jazz", "blues",
       "alternative", "cantopop", "british", "indie",
