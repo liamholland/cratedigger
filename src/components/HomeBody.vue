@@ -1,51 +1,16 @@
 <template >
 <meta charset="utf-8">
-<section id="hero" class="hero" >
-              <br><br><br><br><br><br>
-              <h2 class="animated bounce infinite" style="font-size: 57px; color: white;" >Welcome to Crate Digger</h2><br>
-              <p style="font-size: 20px; color: #949494;">We recommend you artists, you write reviews and rate them</p>
-
-              <router-link class="btn-get-started" to="/Search">Search</router-link>
-              <br><br><br><br><br><br><br><br>
- 
-  </section>
-   
-  <div id="myModal" class="modal"> <!-- Sign in popup  -->
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <p style="font-size: 40px;">Sign in</p>
-    <label style="color: #949494;">Username</label>
-    <input style="height: 40px; border-radius: 7.5px;" required><br>
-    <label style="color: #949494;"> Password</label>
-    <input style="height: 40px; border-radius: 7.5px;" required><br>
-    <a onclick="closesignin()" class="btn-get-started">Sign in</a>
-  </div>
-</div>
-
-<div id="myModal1" class="modal1"> <!-- create account popup  -->
-    <!-- Modal content -->
-    <div class="modal-content1">
-      <span class="close1">&times;</span><br><br>
-      <p style="font-size: 40px;">Create account</p>
-      <label style="color: #949494;" >Email</label><br>
-      <input style="height: 40px; border-radius: 7.5px;"  required><br><br>
-      <label style="color: #949494;" >Username</label><br>
-      <input style="height: 40px; border-radius: 7.5px;"  required><br><br>
-      <label style="color: #949494;">Password</label><br>
-      <input style="height: 40px; border-radius: 7.5px;"  required><br><br>
-      <a onclick="closesignin1()" class="btn-get-started">Create</a>
+<section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+    <h1 class="display-5 fw-bold" style="padding-top:10%">Welcome to Crate Digger</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Search for your favourite artists, like your favourite artists and your favourite albums by them saving them to your profile page. then we recommend you artists based on your favourited artists</p>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <router-link type="button" class="btn btn-lg px-4 gap-3 btn-get-started" to="/Search">Search</router-link>
+        <router-link type="button" class="btn btn-lg px-4 gap-3 btn-get-started" to="/Recommend">Get Recommendations</router-link>
+        
+      </div>
     </div>
-  </div>
-
-  <section  id="services" class="services section-bg">
-      <div class="container" data-aos="fade-up">
-        <div class="section-header">
-          <h2 >Crate Digger lets you...</h2></div></div>
-
-     </section>
-     
-   
+  </section>
 
   </template>
   

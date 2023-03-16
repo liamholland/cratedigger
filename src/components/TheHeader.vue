@@ -1,5 +1,5 @@
 <script>
-import { app, setProfileInfo, getUID, setUID } from "../../api/firebase";
+import { app, setProfileInfo, getUID, setUID, isLoggedIn } from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -23,32 +23,16 @@ export default {
       email: "",
       username: "",
       password: "",
-      isLoggedIn: false,
       loadingBar: "",
+      loggedIn: isLoggedIn(),
+
+      //error messages
       errorMessage1: "",
       errorMessage2: "",
       errorMessage3: "",
       errorMessage4: "",
       errorMessage5: "",
       errorMessage6: "",
-    }
-  },
-  created() {
-    let listener = onAuthStateChanged(auth, (user) => {
-      this.isLoggedIn = user ? true : false;
-    });
-
-    //unhook listener
-    listener();
-  },
-  computed: {
-    checkLogin() {
-      let listener = onAuthStateChanged(auth, (user) => {
-        this.isLoggedIn = user ? true : false;
-      });
-
-      //unhook listener
-      listener();
     }
   },
   methods: {
@@ -83,26 +67,31 @@ export default {
       if (!this.isEmail(this.email)) {
         console.log("Not Email; Getting ID from Username");
 
-
-        getEmail({ username: this.email }).then((res) => {
-          console.log(res.data.body);
-          switch (res.data.code) {
-            case 0:
-              this.username = this.email;
-              this.email = res.data.body;
-              this.login();
-              break;
-            case 1:
-              this.errorMessage1 = "Email or username does not exist";
-              console.log("User Does Not Exist");
-              endLoad();
-              break;
-            default:
-              console.log("Unknown Code Returned From Server");
-              endLoad();
-              break;
-          }
-        });
+        if(this.email.length > 0){
+          getEmail({ username: this.email }).then((res) => {
+            console.log(res.data.body);
+            switch (res.data.code) {
+              case 0:
+                this.username = this.email;
+                this.email = res.data.body;
+                this.login();
+                break;
+              case 1:
+                this.errorMessage1 = "Email or username does not exist";
+                console.log("User Does Not Exist");
+                endLoad();
+                break;
+              default:
+                console.log("Unknown Code Returned From Server");
+                endLoad();
+                break;
+            }
+          });
+        }
+        else {
+          this.errorMessage1 = "Enter a username or password";
+          endLoad();
+        }
       }
       else {
         this.login();
@@ -116,9 +105,9 @@ export default {
       signInWithEmailAndPassword(auth, this.email, this.password).then((userCred) => {
         const user = userCred.user;
         setUID(user.uid);
-        this.isLoggedIn = true;
         this.routeToAccount();
         this.closesignin(0); //close the sign in popup
+        this.loggedIn = isLoggedIn();
         endLoad();
       }).catch((error) => {
         //handle the firebase errors
@@ -138,28 +127,29 @@ export default {
             console.log(error.message);
             break;
         }
-
         endLoad();
       });
+
+      this.loggedIn = isLoggedIn();
     },
 
     //register an account
     //calls login after successful execution
     register() {
-      endLoad();
+      startLoad(this);
 
       //dont run if the email is invalid
       if (!this.isEmail(this.email)) {
         this.errorMessage3 = "invalid email"
         console.log("invalid email");
-        this.hideLoad();
+        endLoad();
         return;
       }
 
       if (this.username == "") {
         this.errorMessage4 = "Enter a username"
         console.log("Enter a Username");
-        this.hideLoad();
+        endLoad();
         return;
       }
 
@@ -179,7 +169,7 @@ export default {
           //register function sets up the database for this users data
           register({ "id": user.uid, "username": this.username, "email": this.email }).then((res) => {
             console.log(res.data);
-            this.closesignin(1);  //close the register popup
+            this.closesignup();  //close the register popup
             this.login(); //log the user in
           });
         }).catch((error) => {
@@ -205,7 +195,7 @@ export default {
 
     routeToAccount() {
       console.log("Routing to", getUID() != "" ? getUID() : "Account Page");
-      if (this.isLoggedIn && getUID() != "") {
+      if (isLoggedIn() && getUID() != "") {
         this.$router.push({ name: 'AccountPage', params: { uid: getUID() } });
       }
       else {
@@ -217,14 +207,17 @@ export default {
       startLoad(this);
       auth.signOut();
       setUID("");
-      this.isLoggedIn = false;
       setProfileInfo({});
-      this.routeToAccount();
+      this.loggedIn = isLoggedIn();
       endLoad();
+      this.routeToAccount();
     }
-  }
+  },
+
 }
+
 </script>
+
 
 <template>
 <div id="myModal" class="modal"> <!-- Sign in popup  -->
@@ -235,16 +228,16 @@ export default {
 
       <p style="color:red">{{errorMessage1}}</p>
       <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="email">>
+          <input class="form-control" id="floatingInput" required v-model="email">
           <label for="floatingInput">Email or Username</label>
         </div>
   
       <p style="color:red">{{errorMessage2}}</p>
       <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="password">>
+          <input class="form-control" id="floatingInput" required v-model="password">
           <label for="floatingInput">Password</label>
         </div>
-
+<br>
       <a @click="beforeLogin()" class="btn-get-started">Sign in</a>
     </div>
   </div>
@@ -257,21 +250,22 @@ export default {
 
       <p style="color:red">{{errorMessage3}}{{errorMessage5}}</p>
       <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="email">>
+          <input class="form-control" id="floatingInput" required v-model="email">
           <label for="floatingInput">Email</label>
         </div>
       
       <p style="color:red">{{errorMessage4}}</p>
       <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="username">>
+          <input class="form-control" id="floatingInput" required v-model="username">
           <label for="floatingInput">Username</label>
         </div>
 
     <p style="color:red">{{errorMessage6}}</p>
       <div class="form-floating">
-          <input class="form-control" id="floatingInput" required v-model="password">>
+          <input class="form-control" id="floatingInput" required v-model="password">
           <label for="floatingInput">Password</label>
         </div>
+        <br>
       <a @click="register" class="btn-get-started">Create</a>
     </div>
   </div>
@@ -279,11 +273,11 @@ export default {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <meta charset="utf-8">
-  <nav class="navbar navbar-expand-sm " aria-label="Third navbar example" style="background-color:black">
-    <div class="container-fluid">
-      <router-link to="/">
+  <nav class="navbar navbar-expand-lg " aria-label="Offcanvas navbar large" style="background-color:black">
+    <div class="container-fluid" >
+       <router-link to="/">
 
-        <img src="../assets/img/cratedigger_banner.png" alt="Crate Digger" width="150" height="60"><!--Logo-->
+        <img src="../assets/img/cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
       </router-link>
 
       <button style="background-color: grey" class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -292,25 +286,29 @@ export default {
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarsExample03" style="text-align: center; margin-left:40%">
-        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-          <li class="nav-item" style="margin-right: 30px;">
+      <div class="collapse navbar-collapse" id="navbarsExample03">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+        
+          <li class="nav-item" style=" margin-right: 10px;">
             <router-link to="/">Home</router-link>
           </li>
-          <li v-if="!this.isLoggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a
+          <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a
               class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
-          <li v-if="!this.isLoggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
+          <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a class="myBtn"
               id="myBtn" @click="opensignin()">Login</a></li>
-          <li v-if="this.isLoggedIn" class="nav-item" style="list-style-type: none; margin-right: 30px;"><a class="myBtn"
+          <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;" ><a class="myBtn"
               id="myBtn" @click="logout()">Log Out</a></li>
-          <li class="nav-item" style="margin-right: 30px;">
+          <li class="nav-item " style=" margin-right: 10px;">
             <router-link to="/AboutUs">About Us</router-link>
           </li>
-          <li class="nav-item" style="margin-right: 30px;">
+          <li class="nav-item" style=" margin-right: 10px;">
+            <router-link to="/New">What's New?</router-link>
+          </li>
+          <li class="nav-item" style=" margin-right: 10px;">
             <router-link to="/Search">Search</router-link>
           </li>
 
-          <li class="nav-item" @click="routeToAccount">
+          <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
             <router-link to="">Account</router-link>
           </li>
 
@@ -319,6 +317,7 @@ export default {
       </div>
     </div>
   </nav>
+  
 </template>
 <style scoped>
 .nav-item {
@@ -445,8 +444,8 @@ export default {
 /* Modal Content */
 .modal-content {
   align-items: left;
-  width: 350px;
-  height: 600px;
+  width: 325px;
+  height: 500px;
   background-color: #1a1a1a;
   margin: auto;
   padding: 5px;

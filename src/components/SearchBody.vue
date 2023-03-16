@@ -58,48 +58,100 @@ export default {
 </script>
 
 <template>
-  <section id="SearchBar" class="SearchPage">
-
-    <h2 class="center">
-      <input v-model="input" @keyup="search(this.input)" placeholder="What artist do you want to see?" type="search"
-        style="width:50%; height:50px; border">
-    </h2><br>
-
-    <ul id="results">
+<section class="py-5 text-center" style=" color:white; background-color:black">
+  
+    
+    <div class="col-lg-6 mx-auto" style="padding-top:10%;">
+     <input class="input-search" v-model="input" @keyup="search(this.input)" placeholder="What artist do you want to see?" style="width:75%; height:50px;">
+    </div>
+    <div class="container">
+    <ul id="results" style="padding-top:25px;">
       <li v-for="artist in results">
-        <div class="artistResult" @click="this.$router.push({name: 'ArtistPage', params: { aid: artist.id}})">
+        <div class="photos" @click="this.$router.push({name: 'ArtistPage', params: { aid: artist.id}})">
           <img :src="this.setImage(artist.images)" :alt="artist.name">
-          <h1>{{ artist.name }}</h1>
+          <h1 style="font-size:30px">{{ artist.name }}</h1>
+          <br>
+          
         </div>
       </li>
     </ul>
-
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-
+    </div>
   </section>
-  <section>
-  </section>
+  <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:black">
+  </div>
+ 
+  
 </template>
 
 <style scoped>
+
+*{
+  box-sizing: border-box;
+}
+body{
+  margin: 0px;
+  padding: 0px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+.search-box{
+  width: fit-content;
+  height: fit-content;
+  position: relative;
+}
+.input-search{
+  border: 0;
+  outline: 0;
+  height: 50px;
+  width: 50px;
+  border-style: none;
+  padding: 10px;
+  font-size: 18px;
+  letter-spacing: 2px;
+  outline: none;
+  border-radius: 25px;
+  transition: all .5s ease-in-out;
+  background-color: white;
+  padding-right: 40px;
+  color: gray;
+}
+.input-search::placeholder{
+  color:rgba(255,255,255,.5);
+  font-size: 18px;
+  letter-spacing: 2px;
+  font-weight: 100;
+}
+
+.input-search:focus{
+  width: 300px;
+  border-radius: 0px;
+  background-color: transparent;
+  border-bottom:1px solid rgba(255,255,255,.5);
+  transition: all 500ms cubic-bezier(0, 0.110, 0.35, 2);
+}
+
+
+
+.header__wrapper .cols__container .right__col .photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 20px;
+}
+
+.header__wrapper .cols__container .right__col .photos img {
+  max-width: 100%;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+}
 .SearchPage {
   font-family: "Roboto", sans-serif;
   background-color: black;
   color: white;
-  padding-top: 12.5%;
-}
-
-.center {
-  position: relative;
-  top: 30%;
-  width: 100%;
-  text-align: center;
-  font-size: 18px;
-}
-
-.artistResult {
-  display: inline-flex;
-  width: 50%;
 }
 
 ul {
@@ -109,8 +161,7 @@ ul {
 
 img {
   position: relative;
-  padding: 5px;
-  height: 250px;
-  width: 250px;
+  height: 180px;
+  width: 180px;
 }
 </style>

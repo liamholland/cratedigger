@@ -3,9 +3,10 @@ import App from './App.vue'
 import { createRouter, createWebHistory }
     from 'vue-router';
 import { LoadingPlugin } from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/css/index.css';
+import 'vue-loading-overlay/dist/css/index.css'; 
 import routes from './router/routes';
 import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap/dist/js/bootstrap.min.js"
 
 //router
 let router = createRouter({
