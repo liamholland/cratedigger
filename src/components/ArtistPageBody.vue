@@ -14,7 +14,7 @@ const getUnrelated = httpsCallable(functions, "getUnrelatedArtists");
 const updateProfile = httpsCallable(functions, "updateProfile");
 
 //TODO: remove emulator connection on prod
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -232,7 +232,7 @@ export default {
 </script>
 
 <template class="body">
-
+    <router-link type="button" class="btn btn-lg px-4 gap-3 btn-get-started" to="/Search">Back</router-link>
     <section class="px-4 py-5 text-center" style="color:white; background-color:black">
         <h1 class="display-5 fw-bold artistName" style="padding-top:10%; font-size:55px">{{ this.artist.name }}</h1>
         

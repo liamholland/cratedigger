@@ -15,7 +15,7 @@ const requestProfileInfo = httpsCallable(functions, "getProfileInfo");
 const update = httpsCallable(functions, "updateProfile");
 
 //connect emulator
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {

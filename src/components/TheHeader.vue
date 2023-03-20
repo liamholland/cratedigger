@@ -15,7 +15,7 @@ const register = httpsCallable(functions, "registerAccount");
 
 
 //TODO: remove emulator line when deploying
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {
