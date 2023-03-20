@@ -1,5 +1,5 @@
 <script>
-import { app, setProfileInfo, getUID, setUID, isLoggedIn } from "../../api/firebase";
+import { app, setProfileInfo, getProfileInfo } from "../../api/firebase";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -12,7 +12,7 @@ const functions = getFunctions(app);
 const checkUname = httpsCallable(functions, "checkUniqueUsername");
 const getEmail = httpsCallable(functions, "getEmail");
 const register = httpsCallable(functions, "registerAccount");
-
+const getUsername = httpsCallable(functions, "getProfileInfo");
 
 //TODO: remove emulator line when deploying
 // connectFunctionsEmulator(functions, "localhost", 5001);
@@ -24,7 +24,7 @@ export default {
       username: "",
       password: "",
       loadingBar: "",
-      loggedIn: isLoggedIn(),
+      loggedIn: false,
 
       //error messages
       errorMessage1: "",
@@ -36,10 +36,26 @@ export default {
     }
   },
   created() {
+    
+    //get the login status
     let listener = onAuthStateChanged(auth, (user) => {
-      if(user){
-        this.loggedIn = true;
-        setUID(user.uid);
+      if(user){   //if the user is logged in
+        if(this.username){  //if there is a saved username on the component continue on
+          this.loggedIn = true;
+        }
+        else if(getProfileInfo().username){   //if there is a saved username in the app set it and move on
+          this.username = getProfileInfo().username;
+          this.loggedIn = true;
+        }
+        else{   //otherwise get a username from the server which can be used to route to the account page and get the information
+          //usually invoked after a hard refresh
+          getUsername({field: "username"}).then((res) => {
+            this.username = res.data;
+            this.loggedIn = true;
+          }).catch((error) => {
+            console.log(error);
+          });
+        }
       }
       else{
         this.loggedIn = false;
@@ -118,10 +134,9 @@ export default {
       //sign in with firebase auth using email and password
       signInWithEmailAndPassword(auth, this.email, this.password).then((userCred) => {
         const user = userCred.user;
-        setUID(user.uid);
-        this.routeToAccount();
         this.closesignin(0); //close the sign in popup
-        this.loggedIn = isLoggedIn();
+        this.loggedIn = true;
+        this.routeToAccount();
         endLoad();
       }).catch((error) => {
         //handle the firebase errors
@@ -142,9 +157,9 @@ export default {
             break;
         }
         endLoad();
+        this.loggedIn = false;
       });
 
-      this.loggedIn = isLoggedIn();
     },
 
     //register an account
@@ -208,9 +223,8 @@ export default {
     },
 
     routeToAccount() {
-      console.log("Routing to", getUID() != "" ? getUID() : "Account Page");
-      if (isLoggedIn() && getUID() != "") {
-        this.$router.push({ name: 'AccountPage', params: { uid: getUID() } });
+      if (this.loggedIn) {
+        this.$router.push({ name: 'AccountPage', params: { name: (this.username ? this.username :  getProfileInfo().username) } });
       }
       else {
         this.$router.push({ path: '/Account/' });
@@ -220,9 +234,8 @@ export default {
     logout() {
       startLoad(this);
       auth.signOut();
-      setUID("");
       setProfileInfo({});
-      this.loggedIn = isLoggedIn();
+      this.loggedIn = false;
       endLoad();
       this.routeToAccount();
     }

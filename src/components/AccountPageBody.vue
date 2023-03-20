@@ -1,7 +1,7 @@
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" /> -->
 <script>
-import { app, getProfileInfo, setProfileInfo, getUID, setUID, isLoggedIn } from "../../api/firebase";
+import { app, getProfileInfo, setProfileInfo } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -23,7 +23,6 @@ export default {
       //login information
       email: "",
       password: "",
-      uid: "",  //this is here instead of the global one because it needs to work from the url
       loggedIn: false,
 
       //account information
@@ -37,7 +36,6 @@ export default {
   created() {
     let listener = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUID(user.uid);
         this.loggedIn = true;
       }
       else {
@@ -79,7 +77,8 @@ export default {
     //refresh the data contained on the page
     refresh() {
       this.accountInfo = {};
-      if (isLoggedIn() && getUID() != "" && JSON.stringify(getProfileInfo()) == '{}') {
+      if (this.$route.params.name && JSON.stringify(getProfileInfo()) == '{}') {
+        this.loggedIn = true;
         console.log("Getting Profile From Server");
 
         //get the profile information of the user once their are signed in
@@ -95,19 +94,20 @@ export default {
         });
         //if logged in and there is a valid user and the data has not been retrieved
       }
-      else {
+      else if(this.$route.params.name) {
+        this.loggedIn = true;
         this.accountInfo = getProfileInfo();
       }
-
-      this.loggedIn = isLoggedIn();
+      else{
+        this.loggedIn = false;
+      }
     },
 
     logout() {
       startLoad(this);
       auth.signOut();
-      setUID("");
       setProfileInfo({});
-      this.loggedIn = isLoggedIn();
+      this.loggedIn = false;
       endLoad();
       this.$router.push({ path: '/AccountPage/' });
     },

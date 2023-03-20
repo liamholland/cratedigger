@@ -1,8 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { HttpStatusCode } from "axios";
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -19,9 +17,10 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
+const auth = getAuth(app);
+
 //global variables
 let profileInfo = {}; //users profile data
-let uid = ""; //users id
 
 let max = 100;
 let localSuggestedArtists = [] // used if the user is not logged in
@@ -34,16 +33,8 @@ export function setProfileInfo(info){
   profileInfo = info;
 }
 
-export function getUID(){
-  return uid;
-}
-
-export function setUID(id){
-  uid = id;
-}
-
 export function isLoggedIn(){
-  return uid != "";
+  return JSON.stringify(profileInfo) != '{}';
 }
 
 //this is local - even when logged in - it is written to the server whenever the rest of the profile info is

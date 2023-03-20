@@ -1,9 +1,11 @@
 <script>
-import { app, updateSuggestedArtists, recentlySuggested, getProfileInfo, setProfileInfo, getUID, isLoggedIn } from "../../api/firebase";
+import { app, updateSuggestedArtists, recentlySuggested, getProfileInfo, setProfileInfo, isLoggedIn } from "../../api/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 //get componenets
 const functions = getFunctions(app);
+const auth = getAuth(app);
 
 //define functions
 const getToken = httpsCallable(functions, "getSpotifyToken");
@@ -26,87 +28,101 @@ export default {
             mostRelated: "",
             leastRelated: "",
             lastSuggestedGenre: "",
+            loggedIn: false,
+            token: "",
         }
     },
     created() {
-        this.refresh(this.$route.params.aid, false);
+        let listener = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                this.loggedIn = true;
+            }
+            else {
+                this.loggedIn = false;
+            }
+        });
+
+        //unhook the listener
+        listener();
+
+        //get a new token for spotify requests
+        getToken().then((res) => {
+            this.token = res.data.access_token;
+            this.refresh(this.$route.params.aid, false);
+        }).catch((error) => {
+            console.log(error);
+        });
     },
     methods: {
         //refreshes the data on the page
         refresh(artistID, onlyLikes) {
-            //get a new token for spotify requests
-            getToken().then((res) => {
-                //get the artist
-                getArtist({ token: res.data.access_token, id: artistID }).then((artist) => {
-                    this.artist = artist.data;
-                    this.genres = ""; //reset the genre
-                    artist.data.genres.forEach(genre => {
-                        this.genres += genre + ' - ';
-                    });
+            //get the artist
+            getArtist({ token: this.token, id: artistID }).then((artist) => {
+                this.artist = artist.data;
+                this.genres = ""; //reset the genre
+                artist.data.genres.forEach(genre => {
+                    this.genres += genre + ' - ';
+                });
 
-                    //get artist albums
-                    getAlbums({ token: res.data.access_token, id: artistID }).then((albums) => {
-                        this.albums = albums.data.items.sort(this.compareDates);
+                //get artist albums
+                getAlbums({ token: this.token, id: artistID }).then((albums) => {
+                    this.albums = albums.data.items.sort(this.compareDates);
 
-                        //dont refresh the suggestions unless its a full page refresh
-                        if (!onlyLikes) {
-                            //get the most related artist to this artist
-                            getRelated({ token: res.data.access_token, id: artistID }).then((relatedArtist) => {
+                    //dont refresh the suggestions unless its a full page refresh
+                    if (!onlyLikes) {
+                        //get the most related artist to this artist
+                        getRelated({ token: this.token, id: artistID }).then((relatedArtist) => {
+                            let i = 0;
+                            //while the most related was recently suggested to the user
+                            do {
+                                if (i == 20) {
+                                    getRelated({ token: this.token, id: relatedArtist.data.artists[19].id }).then((fallbackartists) => {
+                                        i = 0;
+
+                                        do {
+                                            if (i == 20) {
+                                                this.mostRelated = fallbackartists.data.artists[19];
+                                                return;
+                                            }
+                                            this.mostRelated = fallbackartists.data.artists[i];
+                                            i++;
+                                        } while (recentlySuggested(this.mostRelated))
+
+                                    });
+                                    return;
+                                }
+                                this.mostRelated = relatedArtist.data.artists[i];
+                                i++;
+                            } while (recentlySuggested(this.mostRelated))
+
+                            updateSuggestedArtists(this.mostRelated);
+
+                            //get artists different to the current artist
+                            getUnrelated({ token: this.token, limit: 20, genres: artist.data.genres, backup: this.lastSuggestedGenre }).then((unrelatedArtist) => {
+                                console.log(unrelatedArtist.data);
+
+                                this.lastSuggestedGenre = unrelatedArtist.data.genre;
+
                                 let i = 0;
-                                //while the most related was recently suggested to the user
                                 do {
-                                    if (i == 20) {
-                                        getRelated({ token: res.data.access_token, id: relatedArtist.data.artists[19].id }).then((fallbackartists) => {
-                                            i = 0;
-
-                                            do{
-                                                if(i == 20){
-                                                    this.mostRelated = fallbackartists.data.artists[19];
-                                                    return;
-                                                }
-                                                this.mostRelated = fallbackartists.data.artists[i];
-                                                i++;
-                                            } while(recentlySuggested(this.mostRelated))
-                                            
-                                        });
-                                        return;
-                                    }
-                                    this.mostRelated = relatedArtist.data.artists[i];
+                                    this.leastRelated = unrelatedArtist.data.artists[i];
                                     i++;
-                                } while (recentlySuggested(this.mostRelated))
+                                } while (recentlySuggested(this.leastRelated));
 
-                                updateSuggestedArtists(this.mostRelated);
+                                updateSuggestedArtists(this.leastRelated);
 
-                                //get artists different to the current artist
-                                getUnrelated({ token: res.data.access_token, limit: 20, genres: artist.data.genres, backup: this.lastSuggestedGenre }).then((unrelatedArtist) => {
-                                    console.log(unrelatedArtist.data);
-
-                                    this.lastSuggestedGenre = unrelatedArtist.data.genre;
-
-                                    let i = 0;
-                                    do {
-                                        this.leastRelated = unrelatedArtist.data.artists[i];
-                                        i++;
-                                    } while (recentlySuggested(this.leastRelated));
-
-                                    updateSuggestedArtists(this.leastRelated);
-
-                                }).catch((error) => {
-                                    console.log(error);
-                                });
                             }).catch((error) => {
                                 console.log(error);
                             });
-                        }
+                        }).catch((error) => {
+                            console.log(error);
+                        });
+                    }
 
 
-                    }).catch((error) => {
-                        console.log(error);
-                    });
                 }).catch((error) => {
                     console.log(error);
                 });
-
             }).catch((error) => {
                 console.log(error);
             });
@@ -118,14 +134,14 @@ export default {
         },
 
         // like/unlike an artist
-        toggleLikeArtist(artist){
+        toggleLikeArtist(artist) {
             this.toggleLike(artist, 'likedArtists');
         },
 
         //generalised function for liking items
-        toggleLike(item, type){
+        toggleLike(item, type) {
             //ensure the user is logged in
-            if (isLoggedIn()) {
+            if (this.loggedIn) {
                 let currProfileInfo = getProfileInfo(); //make a copy of the current profile information
 
                 //if the artist is liked, unlike it
@@ -136,14 +152,13 @@ export default {
                     let newData = currProfileInfo[type];
 
                     //update the server
-                    updateProfile({ field: type, value: newData }).then(() => {
-                        this.refresh(this.$route.params.aid, true);
-                    }).catch((error) => {
+                    updateProfile({ field: type, value: newData }).catch((error) => {
                         console.log(error);
                     });
 
                     //update the local copy
                     setProfileInfo(currProfileInfo);
+                    this.refresh(this.$route.params.aid, true);
                 }
                 else {   //otherwise like it
 
@@ -162,7 +177,7 @@ export default {
                     setProfileInfo(currProfileInfo);
                 }
             }
-            else{
+            else {
                 console.log("Not Logged In");
             }
         },
@@ -200,12 +215,12 @@ export default {
         },
 
         goToNewArtist(id) {
-            if(isLoggedIn()){
-                updateProfile({field: 'suggestedArtists', value: getProfileInfo().suggestedArtists}).catch((error) => {
+            if (this.loggedIn) {
+                updateProfile({ field: 'suggestedArtists', value: getProfileInfo().suggestedArtists }).catch((error) => {
                     console.log(error);
                 });
             }
-            
+
             this.$router.push({ name: "ArtistPage", params: { aid: id } });
             this.refresh(id, false);
         },
@@ -214,13 +229,13 @@ export default {
             return this.checkLike(album, getProfileInfo().likedAlbums);
         },
 
-        isLikedArtist(artist){
+        isLikedArtist(artist) {
             return this.checkLike(artist, getProfileInfo().likedArtists);
         },
 
         //generalised function for checking the status of likes
-        checkLike(item, array){
-            if (isLoggedIn() && array.length > 0) {
+        checkLike(item, array) {
+            if (this.loggedIn && array.length > 0) {
                 return array.find((likedItem) => likedItem.id == item.id);
             }
             else {
@@ -235,141 +250,152 @@ export default {
     <router-link type="button" class="btn btn-lg px-4 gap-3 btn-get-started" to="/Search">Back</router-link>
     <section class="px-4 py-5 text-center" style="color:white; background-color:black">
         <h1 class="display-5 fw-bold artistName" style="padding-top:10%; font-size:55px">{{ this.artist.name }}</h1>
-        
+
         <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn-outline-danger"
-                style="position:absolute; left: 72.5%">
-    
-                
-    
-                <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
-                    <path
-                        d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
-                </svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-heart-fill" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-                </svg>
-            </button>
-    
+            style="position:absolute; left: 72.5%">
+
+
+
+            <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
+                <path
+                    d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-heart-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+            </svg>
+        </button>
+
         <div class="col-lg-6 mx-auto">
-    <p class="artistGenre">{{ this.genres }}</p>
-            
-          <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-              <button type="button" class="btn btn-lg px-4 gap-3 btn-get-started" @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name
-            }}</button>
-            <button type="button" class="btn btn-lg px-4 gap-3 btn-get-started" @click="goToNewArtist(this.leastRelated.id)">Unrelated Artist: {{
-                this.leastRelated.name }}</button>
-     
-          </div>
+            <p class="artistGenre">{{ this.genres }}</p>
+
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="button" class="btn btn-lg px-4 gap-3 btn-get-started"
+                    @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name
+                    }}</button>
+                <button type="button" class="btn btn-lg px-4 gap-3 btn-get-started"
+                    @click="goToNewArtist(this.leastRelated.id)">Unrelated Artist: {{
+                        this.leastRelated.name }}</button>
+
+            </div>
         </div>
         <br><br><br>
-    
-    
-    
-    
-    
-            <ul style="background-color:black">
-                <li v-for="album in this.albums">
-                    <div class="row">
+
+
+
+
+
+        <ul style="background-color:black">
+            <li v-for="album in this.albums">
+                <div class="row">
                     <div v-if="!this.isRepeat(album)">
-              
+
                         <img :src="album.images[0].url" alt="Album Cover">
-        <button @click="toggleLikeAlbum(album)" type="button" class="btn btn-outline-danger"
-                                style="position:absolute; ">
-    
-                                <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                    fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
-                                </svg>
-                                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                    class="bi bi-heart-fill" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd"
-                                        d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-                                </svg>
-                            </button>
-    
-    
-                        </div>
-                        
-                        
-                        <div class="col-2.5">
-                            
-    
-                            <h1 style="font-size:14px"> {{ album.name }} </h1>
-    
-    
-    
-                            <h3 style="font-size:12px">{{ album.release_date }}</h3>
-                            
-                            
-    
-                        </div>
+                        <button @click="toggleLikeAlbum(album)" type="button" class="btn btn-outline-danger"
+                            style="position:absolute; ">
+
+                            <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                            </svg>
+                        </button>
+
+
                     </div>
-    
-    
-                </li>
-    
-            </ul>
-    
-        </section>
-    </template>
+
+
+                    <div class="col-2.5">
+
+
+                        <h1 style="font-size:14px"> {{ album.name }} </h1>
+
+
+
+                        <h3 style="font-size:12px">{{ album.release_date }}</h3>
+
+
+
+                    </div>
+                </div>
+
+
+            </li>
+
+        </ul>
+
+    </section>
+</template>
       
-    <style scoped>
-    .albumResult {
-        background-color: #151515;
-        text-align: left;
-    }
-    .albumInfo {
-        color: whitesmoke;
-    }
-    .artistName {
-        color: white;
-    }
-    .body {
-        background-color: black;
-        text-align: center;
-    }
-    .btn-get-started {
-        background-color: black;
-        font-weight: 500;
-        font-size: 16px;
-        letter-spacing: 1px;
-        display: inline-block;
-        padding: 12px 40px;
-        border-radius: 50px;
-        transition: 0.5s;
-        margin: 10px;
-        color: white;
-        text-decoration: none;
-        border: 2px solid #1DB954;
-    }
-    .btn-get-started:hover {
-        background: #1DB954;
-        color: black
-    }
-    .artistName {
-        font-size: 100px;
-        text-align: center;
-    }
-    .artistGenre {
-        color: white;
-        font-size: 20px;
-        text-align: center;
-    }
-    .albumResult {
-        display: inline-flex;
-        width: 50%;
-    }
-    ul {
-        list-style-type: none;
-        text-align: center;
-    }
-    img {
-        position: relative;
-        padding: 5px;
-        height: 180px;
-        width: 180px;
-    }
-    </style>
+<style scoped>
+.albumResult {
+    background-color: #151515;
+    text-align: left;
+}
+
+.albumInfo {
+    color: whitesmoke;
+}
+
+.artistName {
+    color: white;
+}
+
+.body {
+    background-color: black;
+    text-align: center;
+}
+
+.btn-get-started {
+    background-color: black;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 1px;
+    display: inline-block;
+    padding: 12px 40px;
+    border-radius: 50px;
+    transition: 0.5s;
+    margin: 10px;
+    color: white;
+    text-decoration: none;
+    border: 2px solid #1DB954;
+}
+
+.btn-get-started:hover {
+    background: #1DB954;
+    color: black
+}
+
+.artistName {
+    font-size: 100px;
+    text-align: center;
+}
+
+.artistGenre {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
+
+.albumResult {
+    display: inline-flex;
+    width: 50%;
+}
+
+ul {
+    list-style-type: none;
+    text-align: center;
+}
+
+img {
+    position: relative;
+    padding: 5px;
+    height: 180px;
+    width: 180px;
+}</style>
