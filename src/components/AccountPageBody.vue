@@ -15,7 +15,7 @@ const requestProfileInfo = httpsCallable(functions, "getProfileInfo");
 const update = httpsCallable(functions, "updateProfile");
 
 //connect emulator
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {
@@ -84,7 +84,7 @@ export default {
 
         //get the profile information of the user once their are signed in
         //stored under the users id
-        requestProfileInfo({ "id": getUID() }).then((info) => {
+        requestProfileInfo({field: null}).then((info) => {
           //set the data on the page
           setProfileInfo(info.data);
           this.accountInfo = info.data;
@@ -135,7 +135,7 @@ export default {
 
     //update bio
     updateBio() {
-      update({ "id": getUID(), "field": 'bio', "value": this.newBio }).then((res) => {
+      update({ "field": 'bio', "value": this.newBio }).then((res) => {
         console.log(res.data.body);
         this.accountInfo.bio = this.newBio;
         setProfileInfo(this.accountInfo);
@@ -148,7 +148,7 @@ export default {
 
     //update pfp
     updatePFP() {
-      update({ "id": getUID(), "field": 'pfpURL', "value": this.newURL }).then((res) => {
+      update({ "field": 'pfpURL', "value": this.newURL }).then((res) => {
         console.log(res.data.body);
         this.accountInfo.pfpURL = this.newURL;
         setProfileInfo(this.accountInfo);

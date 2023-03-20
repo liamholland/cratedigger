@@ -15,7 +15,7 @@ const register = httpsCallable(functions, "registerAccount");
 
 
 //TODO: remove emulator line when deploying
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
   data() {
@@ -181,7 +181,7 @@ export default {
           const user = userCred.user;
 
           //register function sets up the database for this users data
-          register({ "id": user.uid, "username": this.username, "email": this.email }).then((res) => {
+          register({"username": this.username, "email": this.email }).then((res) => {
             console.log(res.data);
             this.closesignup();  //close the register popup
             this.login(); //log the user in

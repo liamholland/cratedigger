@@ -14,7 +14,7 @@ const getUnrelated = httpsCallable(functions, "getUnrelatedArtists");
 const updateProfile = httpsCallable(functions, "updateProfile");
 
 //TODO: remove emulator connection on prod
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -136,7 +136,7 @@ export default {
                     let newData = currProfileInfo[type];
 
                     //update the server
-                    updateProfile({ id: getUID(), field: type, value: newData }).then((result) => {
+                    updateProfile({ field: type, value: newData }).then(() => {
                         this.refresh(this.$route.params.aid, true);
                     }).catch((error) => {
                         console.log(error);
@@ -152,7 +152,7 @@ export default {
                     let newData = currProfileInfo[type];
 
                     //update the server
-                    updateProfile({ id: getUID(), field: type, value: newData }).then((result) => {
+                    updateProfile({ field: type, value: newData }).then(() => {
                         this.refresh(this.$route.params.aid, true);
                     }).catch((error) => {
                         console.log(error);
@@ -201,7 +201,7 @@ export default {
 
         goToNewArtist(id) {
             if(isLoggedIn()){
-                updateProfile({id: getUID(), field: 'suggestedArtists', value: getProfileInfo().suggestedArtists}).catch((error) => {
+                updateProfile({field: 'suggestedArtists', value: getProfileInfo().suggestedArtists}).catch((error) => {
                     console.log(error);
                 });
             }

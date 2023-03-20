@@ -15,67 +15,60 @@ const db = admin.firestore();
 //replace everything in the {} for the formats
 
 //register an account on the DB
-exports.registerAccount = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {
-    //get variables
-    const ID = req.body.data.id;
-    const name = req.body.data.username;
-    const email = req.body.data.email;
+exports.registerAccount = functions.https.onCall((data, context) => {
+  //get variables
+  const ID = context.auth.uid;
+  const name = data.username;
+  const email = data.email;
 
-    //initialise the Profile for the user - this can be anything
-    db.collection("UserIDs").doc(`${name}`).set({
+  //initialise the Profile for the user - this can be anything
+  return db.collection("UserIDs").doc(`${name}`).set({
+    id: ID,
+    email: email
+  }).then(
+    db.collection("UserData").doc(`${ID}`).set({
+      likedArtists: [],
+      likedAlbums: [],
+      suggestedArtists: [], //queue ADT used for recommendations - length configured application side
       id: ID,
-      email: email
-    }).then(
-      db.collection("UserData").doc(`${ID}`).set({
-        likedArtists: [],
-        likedAlbums: [],
-        suggestedArtists: [], //queue ADT used for recommendations - length configured application side
-        id: ID,
-        bio: "",
-        username: name,
-        pfpURL: "",
-      })
-    ).then(
-      res.send({ result: "Created Account" })
-    );
-
-    return;
+      bio: "",
+      username: name,
+      pfpURL: "",
+    })
+  ).then(() => {
+    return { result: "Created Account" };
   });
 });
 
 //update any part of a profile with a provided id, field and value
-exports.updateProfile = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {
+exports.updateProfile = functions.https.onCall((data, context) => {
+  if(typeof context.auth !== 'undefined'){
     //get variables
-    const id = req.body.data.id;
-    const field = req.body.data.field;
-    const value = req.body.data.value;
-
+    const field = data.field;
+    const value = data.value;
+  
     let updateData = {};  //create an empty object
     updateData[field] = value;  //assign the value to a field in the object
-
+  
     //get a reference to the profile
-    db.collection("UserData").doc(`${id}`).update(updateData).then(() => {
-      res.send({ data: { code: 0, body: `Updated data regarding ${field} with ${value}` } });
+    return db.collection("UserData").doc(`${context.auth.uid}`).update(updateData).then(() => {
+      return { code: 0, body: `Updated data regarding ${field} with ${value}` };
     });
-  });
+  }
 });
 
 //function dedicated to receiving an ID of a given email
-exports.getEmail = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {
-    //access the document relating to the given email to get the uid
-    db.collection("UserIDs").doc(req.body.data.username).get().then((docSnap) => {
-      if (docSnap.exists) {
-        res.send({ data: { code: 0, body: docSnap.data()["email"] } });
-        return;
-      }
-      else {
-        res.send({ data: { code: 1, body: `Failed to find user ${req.body.data.username}` } });
-        return;
-      }
-    });
+exports.getEmail = functions.https.onCall((data, context) => {
+  console.log(data.username);
+
+  //access the document relating to the given email to get the uid
+  return db.collection("UserIDs").doc(`${data.username}`).get().then((docSnap) => {
+    if (docSnap.exists) {
+      return { code: 0, body: docSnap.data()["email"] };
+    }
+    else {
+      return { code: 1, body: `Failed to find user ${data.username}` };
+    }
   });
 });
 
@@ -100,31 +93,31 @@ exports.checkUniqueUsername = functions.https.onRequest((req, res) => {
 //function to provide all the profile info, or just one field, based on the input
 //FORMAT: URL...?id={id}&field={field}
 //for all info the field parameter should be left out
-exports.getProfileInfo = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {
+exports.getProfileInfo = functions.https.onCall((data, context) => {
+  if(typeof context.auth !== 'undefined'){
     //get the variables
-    const id = req.body.data.id;
-    const field = req.body.data.field;
-
+    const id = context.auth.uid;
+    const field = data.field;
+  
     //access the appropriate document in the profiles collection
-    db.collection("UserData").doc(`${id}`).get().then((docSnap) => {
+    return db.collection("UserData").doc(`${id}`).get().then((docSnap) => {
       if (docSnap.exists) {
         //return the entire profile if the field is null, otherwise return the desired field
         if (field == null) {
-          res.send({ data: docSnap.data() });
+          return docSnap.data();
         }
         else {
           const data = docSnap.data()[field];
           if (data == null) {
-            res.send({ data: "Unknown Field" });
+            return `Unknown Field: ${field}`;
           }
           else {
-            res.send({ data: data });
+            return data;
           }
         }
       }
     });
-  });
+  }
 });
 
 
@@ -401,37 +394,38 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
 
             dbSnap.forEach((user) => {
               let liked = user.data().likedArtists;
-              if(liked.includes(artist)){
+              if(liked.find(entry => entry.id == artist.id)){
                 countEither++;
-                if(liked.includes(potentialArtist)){
+                if(liked.find(entry => entry.id == potentialArtist.id)){
                   countBoth++;
                 }
               }
-              else if(liked.includes(potentialArtist)){
+              else if(liked.find(entry => entry.id == potentialArtist.id)){
                 countEither++;
               }
             });
 
-            probPos *= countEither == 0 ? 1 : countBoth / countEither;
+            probPos *= countEither == 0 ? 1 : parseFloat(countBoth) / parseFloat(countEither);
 
             countBoth = 0;
             countEither = 0;
 
             dbSnap.forEach((user) => {
               let seen = user.data().suggestedArtists;
-              if(seen.includes(artist)){
+              if(seen.find(entry => entry.id == artist.id)){
                 countEither++;
-                if(seen.includes(potentialArtist)){
+                if(seen.find(entry => entry.id == potentialArtist.id)){
                   countBoth++;
                 }
               }
-              else if(seen.includes(potentialArtist)){
+              else if(seen.find(entry => entry.id == potentialArtist.id)){
                 countEither++;
               }
             })
 
-            probNeg *= countEither == 0 ? 1 : countBoth /countEither;
+            probNeg *= countEither == 0 ? 1 : parseFloat(countBoth) / parseFloat(countEither);
 
+            // console.log(probPos - (probNeg *0.5));
           });
         });
         

@@ -13,7 +13,7 @@ const recommend = httpsCallable(functions, "recommendArtists");
 const update = httpsCallable(functions, "updateProfile");
 
 //TODO: remove emulator connection on prod
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -53,7 +53,7 @@ export default {
 
             recommend({ token: this.token, user: getProfileInfo() }).then((recommendation) => {
                 console.log(recommendation.data);
-                if(recentlySuggested(recommendation.data.artist)){
+                if(recentlySuggested(recommendation.data.artist)){  // || recommendation.data.code == 1
                     this.refreshRecommendation();
                 }
                 else{
