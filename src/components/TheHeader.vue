@@ -289,7 +289,7 @@ export default {
       <div class="container-fluid" >
          <router-link to="/">
   
-          <img src="../assets/img/cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
+          <img src="../assets/img/updated_cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
         </router-link>
   
         <button style="background-color: grey" class="navbar-toggler" type="button" data-bs-toggle="collapse"
