@@ -1,5 +1,5 @@
 <script>
-import { app, isLoggedIn, getProfileInfo, setProfileInfo, updateSuggestedArtists, recentlySuggested, getUID } from "../../api/firebase";
+import { app, isLoggedIn, getProfileInfo, setProfileInfo, updateSuggestedArtists, recentlySuggested } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
@@ -77,7 +77,7 @@ export default {
                 setProfileInfo(currProfileInfo);
                 updateSuggestedArtists(this.currentSuggestion);
     
-                update({id: getUID(), field: 'likedArtists', value: newData}).then((result) => {
+                update({ field: 'likedArtists', value: newData}).then((result) => {
                     console.log(result.data);
                     this.refreshRecommendation();
                 }).catch((error) => {
@@ -92,7 +92,7 @@ export default {
     
                 let newData = getProfileInfo().suggestedArtists;
     
-                update({id: getUID(), field: 'suggestedArtists', value: newData}).then((result) => {
+                update({ field: 'suggestedArtists', value: newData}).then((result) => {
                     console.log(result.data);
                     this.refreshRecommendation();
                 }).catch((error) => {
