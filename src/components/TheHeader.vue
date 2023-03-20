@@ -259,7 +259,7 @@ export default {
     
         <p style="color:red">{{errorMessage2}}</p>
         <div class="form-floating">
-            <input class="form-control" id="floatingInput" required v-model="password">
+            <input class="form-control" id="floatingInput" type="password" required v-model="password">
             <label for="floatingInput">Password</label>
           </div>
   <br>
@@ -287,7 +287,7 @@ export default {
   
       <p style="color:red">{{errorMessage6}}</p>
         <div class="form-floating">
-            <input class="form-control" id="floatingInput" required v-model="password">
+            <input class="form-control" id="floatingInput" type="password" required v-model="password">
             <label for="floatingInput">Password</label>
           </div>
           <br>
