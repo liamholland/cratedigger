@@ -414,27 +414,30 @@ a {
   color: #818181;
 }
 
-/* album grid layout*/
+ /* album grid layout*/
+  @media (min-width: 501px){
 .header__wrapper .cols__container .right__col .photos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+ grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
+  }
 
 .header__wrapper .cols__container .right__col .photos img {
-  max-width: 250px;
+  max-width: 100%;
   display: block;
-  height: 250px;
+  height: 100%;
   object-fit: cover;
 }
 
-@media (min-width: 1017px) {
-  .header__wrapper .cols__container .left__col {
-    margin: 0;
-    margin-right: auto;
+@media (max-width: 500px) {
+  .header__wrapper .cols__container .right__col .photos {
+    
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    
   }
 
-  .header__wrapper .cols__container .right__col nav {
-    flex-direction: row;
-  }
+}
 }</style>
