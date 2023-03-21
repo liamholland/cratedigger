@@ -247,9 +247,11 @@ export default {
 </script>
 
 <template class="body">
-    <router-link type="button" class="btn btn-lg px-4 gap-3 btn-get-started" to="/Search">Back</router-link>
     <section class="px-4 py-5 text-center" style="color:white; background-color:black">
-        <h1 class="display-5 fw-bold artistName" style="padding-top:10%; font-size:55px">{{ this.artist.name }}</h1>
+        <h1 class="display-5 fw-bold artistName" style="padding-top:10%; font-size:55px">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+            <router-link type="button"  class="fa fa-angle-double-left" style="font-size:48px;color:white; background-color:black; text-decoration: none; text-indent:20px" to="/Search"></router-link>{{ this.artist.name }}</h1>
+
 
         <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn-outline-danger"
             style="position:absolute; left: 72.5%">
