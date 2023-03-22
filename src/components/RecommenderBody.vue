@@ -76,13 +76,15 @@ export default {
                 
                 setProfileInfo(currProfileInfo);
                 updateSuggestedArtists(this.currentSuggestion);
-    
-                update({ field: 'likedArtists', value: newData}).then((result) => {
-                    console.log(result.data);
-                    this.refreshRecommendation();
-                }).catch((error) => {
-                    console.log(error);
-                });
+                
+                if(newData !== null){
+                    update({ field: 'likedArtists', value: newData}).then((result) => {
+                        console.log(result.data);
+                        this.refreshRecommendation();
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+                }
             }          
         },
 
@@ -91,13 +93,15 @@ export default {
                 updateSuggestedArtists(this.currentSuggestion);
     
                 let newData = getProfileInfo().suggestedArtists;
-    
-                update({ field: 'suggestedArtists', value: newData}).then((result) => {
-                    console.log(result.data);
-                    this.refreshRecommendation();
-                }).catch((error) => {
-                    console.log(error);
-                });
+                
+                if(newData !== null){
+                    update({ field: 'suggestedArtists', value: newData}).then((result) => {
+                        console.log(result.data);
+                        this.refreshRecommendation();
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+                }
             }
         },
     },
