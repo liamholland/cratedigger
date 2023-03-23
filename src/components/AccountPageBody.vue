@@ -234,7 +234,7 @@ export default {
                    <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name">
                   </div>
                   <div class="photos"  v-else>
-                    <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name">
+                    <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name" @click="this.$router.push({ name: 'ArtistPage', params: { aid: artist.id } })">
                   </div>
                 </div>
               </div>
