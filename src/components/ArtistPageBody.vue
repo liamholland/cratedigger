@@ -250,24 +250,25 @@ export default {
     <section class="px-4 py-5 text-center" style="color:white; background-color:black">
         <h1 class="display-5 fw-bold artistName" style="padding-top:10%; font-size:55px">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-            <router-link type="button"  class="fa fa-angle-double-left" style="font-size:48px;color:white; background-color:black; text-decoration: none; text-indent:20px" to="/Search"></router-link>{{ this.artist.name }}</h1>
-
-
-        <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn-outline-danger"
-            style="position:absolute; left: 72.5%">
+            <router-link type="button"  class="fa fa-angle-double-left" style="font-size:48px;color:white; background-color:black; text-decoration: none; text-indent:20px" to="/Search"></router-link> {{ this.artist.name }}
+            <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn" style=" border-color:black;">
 
 
 
-            <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
+            <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5"
+                fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:1DB954">
                 <path
-                    d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
+                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
             </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                class="bi bi-heart-fill" viewBox="0 0 16 16">
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5" fill="currentColor"
+                class="fa fa-heart" viewBox="0 0 16 16" style="color:white; font-size:48px;">
                 <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
             </svg>
         </button>
+            </h1>
+
+
+        
 
         <div class="col-lg-6 mx-auto">
             <p class="artistGenre">{{ this.genres }}</p>
@@ -294,16 +295,16 @@ export default {
                     <div v-if="!this.isRepeat(album)">
 
                         <img :src="album.images[0].url" alt="Album Cover">
-                        <button @click="toggleLikeAlbum(album)" type="button" class="btn btn-outline-danger"
+                        <button @click="toggleLikeAlbum(album)" type="button" class="btn btn"
                             style="position:absolute; ">
 
-                            <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                fill="currentColor" class="bi bi-heartbreak-fill" viewBox="0 0 16 16">
-                                <path
-                                    d="M8.931.586 7 3l1.5 4-2 3L8 15C22.534 5.396 13.757-2.21 8.931.586ZM7.358.77 5.5 3 7 7l-1.5 3 1.815 4.537C-6.533 4.96 2.685-2.467 7.358.77Z" />
+                            <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5"
+                            fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:1DB954">
+                            <path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                             </svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-heart-fill" viewBox="0 0 16 16">
+                           
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5" fill="currentColor"
+                                class="fa fa-heart" viewBox="0 0 16 16" style="color:white">
                                 <path fill-rule="evenodd"
                                     d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                             </svg>
@@ -401,3 +402,4 @@ img {
     height: 180px;
     width: 180px;
 }</style>
+
