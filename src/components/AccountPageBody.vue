@@ -231,7 +231,7 @@ export default {
                   
                   
                   <div class="photos" v-if="this.displayAlbums" >
-                   <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name">
+                   <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name" @click="this.$router.push({ name: 'ArtistPage', params: { aid: album.artists[0].id } })">
                   </div>
                   <div class="photos"  v-else>
                     <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name" @click="this.$router.push({ name: 'ArtistPage', params: { aid: artist.id } })">
@@ -394,8 +394,11 @@ a {
   text-transform: uppercase;
   color: #818181;
 }
-.photos{
-  display: none;
+img{
+  transition: transform .2s;
+}
+img:hover{
+  transform: scale(1.1);
 }
   /* album grid layout*/
   @media (min-width: 501px){
