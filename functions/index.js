@@ -59,7 +59,6 @@ exports.updateProfile = functions.https.onCall((data, context) => {
 
 //function dedicated to receiving an ID of a given email
 exports.getEmail = functions.https.onCall((data, context) => {
-  console.log(data.username);
 
   //access the document relating to the given email to get the uid
   return db.collection("UserIDs").doc(`${data.username}`).get().then((docSnap) => {
@@ -120,9 +119,8 @@ exports.getProfileInfo = functions.https.onCall((data, context) => {
   }
 });
 
-//function dedicated to receiving an ID of a given email
+//function dedicated to finding a user in the database
 exports.getUser = functions.https.onCall((data, context) => {
-  console.log(data.username);
 
   //access the document relating to the given email to get the uid
   return db.collection("UserIDs").doc(`${data.username}`).get().then((docSnap) => {
@@ -143,6 +141,74 @@ exports.getUser = functions.https.onCall((data, context) => {
       return { code: 1, body: `Failed to find user ${data.username}` };
     }
   });
+});
+
+//function for adding Listeners (friends)
+exports.addListener = functions.https.onCall((data, context) => {
+  //get variables
+  const userID = context.auth.uid;
+  const friendID = data.id;
+  
+  if(typeof context.auth !== 'undefined'){
+    return db.collection("UserData").doc(`${userID}`).update({
+      listeningTo: admin.firestore.FieldValue.arrayUnion(friendID)
+    }).then(() => {
+      return db.collection("UserData").doc(`${friendID}`).update({
+        listeners: admin.firestore.FieldValue.arrayUnion(userID),
+        listenerCount: admin.firestore.FieldValue.increment(1)
+      }).then(() => {
+        return "Updated Listeners";
+      });
+    });
+  }
+  else{
+    return "Not Authorised";
+  }
+});
+
+//function for adding Listeners (friends)
+exports.removeListener = functions.https.onCall((data, context) => {
+  //get variables
+  const userID = context.auth.uid;
+  const friendID = data.id;
+
+  if(typeof context.auth !== 'undefined'){
+    return db.collection("UserData").doc(`${userID}`).update({
+      listeningTo: admin.firestore.FieldValue.arrayRemove(friendID)
+    }).then(() => {
+      return db.collection("UserData").doc(`${friendID}`).update({
+        listeners: admin.firestore.FieldValue.arrayRemove(userID),
+        listenerCount: admin.firestore.FieldValue.increment(-1) //decrement
+      }).then(() => {
+        return "Updated Listeners";
+      });
+    });
+  }
+  else{
+    return "Not Authorised";
+  }
+});
+
+exports.getListeningTo = functions.https.onCall((data, context) => {
+  if(typeof context.auth !== 'undefined'){
+    const ID = context.auth.uid;
+
+    let friendData = [];
+
+    return db.collection("UserData").where("listeners", "array-contains", ID).get().then((users) => {
+      users.forEach((user) => {
+        friendData.push({
+          username: user.data()["username"],
+          pfpURL: user.data()["pfpURL"]
+        });
+      });
+
+      return friendData;
+    });
+  }
+  else{
+    return "Not Authorised";
+  }
 });
 
 

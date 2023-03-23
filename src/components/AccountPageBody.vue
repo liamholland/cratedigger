@@ -10,6 +10,10 @@ const auth = getAuth(app);
 const requestProfileInfo = httpsCallable(functions, "getProfileInfo");
 const update = httpsCallable(functions, "updateProfile");
 const getUser = httpsCallable(functions, "getUser");
+const addFriend = httpsCallable(functions, "addListener");
+const removeFriend = httpsCallable(functions, "removeListener");
+const getListeningTo = httpsCallable(functions, "getListeningTo");
+
 //connect emulator
 // connectFunctionsEmulator(functions, "localhost", 5001);
 
@@ -21,10 +25,16 @@ export default {
       password: "",
       loggedIn: false,
       displayAlbums: false,
+
       //account information
       accountInfo: {},
+      listeningTo: [],
+
+      //search information
       searchedUser: {},
       hasResult: false,
+      message: "",
+
       //updated profile temp variables
       newBio: "",
       newURL: "",
@@ -77,7 +87,15 @@ export default {
           //set the data on the page
           setProfileInfo(info.data);
           this.accountInfo = info.data;
-          console.log(this.accountInfo);
+
+          //get the data of the accounts that the user listens to
+          getListeningTo().then((result) => {
+            this.listeningTo = result.data;
+            console.log(this.listeningTo);
+          }).catch((error) => {
+            console.log(error);
+          });
+
         }).catch((error) => {
           console.log(error.code);
           console.log(error.message);
@@ -160,18 +178,51 @@ export default {
           else if(result.data.code === 0){
             console.log(result.data.userData);
             this.searchedUser = result.data.userData;
-            this.hasResult = true;
+            if(this.accountInfo.listeningTo.find(addedID => addedID == this.searchedUser.id)){
+              this.message = `Already Listening to ${this.searchedUser.username}`;
+              this.hasResult = false;
+            }
+            else{
+              this.hasResult = true;
+              this.message = "";
+            }
           }
         }).catch((error) => {
           console.log(error);
         });
       }
       else{
+        this.message = "No Such User";
         this.hasResult = false;
         this.searchedUser = {};
       }
       
     },
+
+    follow(){
+      if(this.hasResult){
+        addFriend({id: this.searchedUser.id}).then((result) => {
+          console.log(result);
+          //ensure the json object has an array to push to
+          if(!(this.accountInfo.hasOwnProperty("listeningTo"))){
+            this.accountInfo.listeningTo = [];
+          }
+
+          this.searchedUser = {};
+          this.hasResult = false;
+          this.accountInfo.listeningTo.push(this.searchedUser.id);
+          setProfileInfo(this.accountInfo);
+
+          getListeningTo().then((result) => {
+            this.listeningTo = result.data;
+          }).catch((error) => {
+            console.log(error);
+          });
+        }).catch((error) => {
+          console.log(error);
+        })
+      }
+    }
   },
   computed: {
     pfpURL() {
@@ -243,14 +294,22 @@ export default {
                     <h2 class="display-5 fw-bold" style="font-size:225%">{{ this.accountInfo.username }}</h2>
                     <p>{{ this.accountInfo.bio }}</p>
                   </div>
+                  <div>
+                    <div v-for="user in this.listeningTo">
+                      <img :src="user.pfpURL" style="height: 50px; width: 50px;" alt="PFP">
+                      <h4>{{ user.username }}</h4>
+                    </div>
+                  </div>
                   <input class="input-search" v-model="input" @keyup="search(this.input)"
                     placeholder="Who do you want to listen to?" style="width:20%; height:50px;">
                   <div v-if="hasResult">
-                    <img :src="this.searchedUser.pfp" style="height: 50px; width: 50px;" alt="PFP">
-                    <h4>{{ this.searchedUser.username }}</h4>
+                    <div @click="follow">
+                      <img :src="this.searchedUser.pfp" style="height: 50px; width: 50px;" alt="PFP">
+                      <h4>{{ this.searchedUser.username }}</h4>
+                    </div>
                   </div>
                   <div v-else>
-                    <h4>No Such User</h4>
+                    <h4>{{this.message}}</h4>
                   </div>
                 </div>
                 <br>
