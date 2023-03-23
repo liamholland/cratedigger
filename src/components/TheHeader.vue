@@ -133,11 +133,23 @@ export default {
 
       //sign in with firebase auth using email and password
       signInWithEmailAndPassword(auth, this.email, this.password).then((userCred) => {
-        const user = userCred.user;
         this.closesignin(0); //close the sign in popup
         this.loggedIn = true;
-        this.routeToAccount();
-        endLoad();
+        if(!(getProfileInfo().username)){
+          getUsername({field: "username"}).then((res) => {
+            this.username = res.data;
+            this.loggedIn = true;
+            this.routeToAccount();
+            endLoad();
+          }).catch((error) => {
+            console.log(error);
+          });
+        }
+        else{
+          this.routeToAccount();
+          endLoad();
+        }
+
       }).catch((error) => {
         //handle the firebase errors
         switch (error.code) {

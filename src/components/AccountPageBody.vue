@@ -131,15 +131,6 @@ export default {
       this.displayAlbums = false;
       this.displayRecs = true;
     },
-
-    logout() {
-      startLoad(this);
-      auth.signOut();
-      setProfileInfo({});
-      this.loggedIn = false;
-      endLoad();
-      this.$router.push({ path: '/AccountPage/' });
-    },
     updateProfile() {
       startLoad(this);
       //update both
@@ -315,7 +306,6 @@ export default {
 
         <a @click="updateProfile" class="btn-get-started">Submit</a>
         <br>
-        <a @click="logout" class="btn-get-started">Sign out</a>
       </div>
     </div>
 
