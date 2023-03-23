@@ -35,6 +35,8 @@ export default {
       searchedUser: {},
       hasResult: false,
       message: "",
+      input: "",
+      typing: false,
 
       //updated profile temp variables
       newBio: "",
@@ -182,6 +184,14 @@ export default {
     },
 
     search(input) {
+      if(!this.typing){
+        this.typing = true;
+        setTimeout(() => this.sendSearchRequest(input), 150);
+      }
+    },
+    
+    sendSearchRequest(input){
+      this.typing = false;
       if (input.length > 0) {
         getUser({ username: input }).then((result) => {
           if (result.data.code === 1) {
@@ -199,7 +209,7 @@ export default {
             }
             else {
               this.hasResult = true;
-              this.message = "";
+              this.message = "No Such User";
             }
           }
         }).catch((error) => {
@@ -207,11 +217,10 @@ export default {
         });
       }
       else {
-        this.message = "No Such User";
+        this.message = "";
         this.hasResult = false;
         this.searchedUser = {};
       }
-
     },
 
     follow() {
@@ -280,7 +289,7 @@ export default {
   },
   computed: {
     pfpURL() {
-      return (JSON.stringify(this.accountInfo) != '{}' && this.accountInfo.pfpURL != undefined) ? this.accountInfo.pfpURL : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+      return (JSON.stringify(this.accountInfo) == '{}' || this.accountInfo.pfpURL == "") ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" : this.accountInfo.pfpURL;
     },
   },
 }
@@ -330,10 +339,10 @@ export default {
               <div class="card" style="background-color:#151515">
 
                 <div class="rounded-top text-white d-flex flex-row" style="background-color: #151515; height:200px;">
-                  <div class="dropdown">
+                  <!-- <div class="dropdown">
 
-                  </div>
-                  <div class="ms-4 mt-5flex-column" style="width: 150px; background-color:#151515">
+                  </div> -->
+                  <div class="ms-4 mt-5flex-column" style="width: 150px; background-color:#151515;">
                     <img v-bind:src="this.pfpURL" alt="Generic placeholder image"
                       class="img-fluid img-thumbnail mt-4 mb-2" style="height: 150px; width: 150px; z-index: 1">
                     <button type="button"
@@ -349,7 +358,7 @@ export default {
                     <p>{{ this.accountInfo.bio }}</p>
                     <h5>Listeners: {{ this.accountInfo.listenerCount }}</h5>
                   </div>
-                  <div>
+                  <div class="ms-3">
                     <div v-for="user in this.listeningTo" @click="unfollow(user.id)">
                       <img :src="user.pfpURL" style="height: 50px; width: 50px;" alt="PFP">
                       <h4>{{ user.username }}</h4>
@@ -357,13 +366,13 @@ export default {
                   </div>
                   <input class="input-search" v-model="input" @keyup="search(this.input)"
                     placeholder="Who do you want to listen to?" style="width:20%; height:50px;">
-                  <div v-if="hasResult">
+                  <div class="ms-3" v-if="hasResult">
                     <div @click="follow">
                       <img :src="this.searchedUser.pfp" style="height: 50px; width: 50px;" alt="PFP">
                       <h4>{{ this.searchedUser.username }}</h4>
                     </div>
                   </div>
-                  <div v-else>
+                  <div class="ms-3" v-else>
                     <h4>{{ this.message }}</h4>
                   </div>
                 </div>

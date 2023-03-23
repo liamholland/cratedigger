@@ -17,6 +17,7 @@ export default {
       token: "",
       input: "",
       results: [],
+      typing: false,
     }
   },
   created() {
@@ -36,6 +37,14 @@ export default {
   methods: {
     //search for artists on spotify given a search term
     search(term) {
+      if(!this.typing){
+        this.typing = true;
+        setTimeout(() => this.sendSearchRequest(term), 400);
+      }
+    },
+    
+    sendSearchRequest(term){
+      this.typing = false;
       if (term.length > 0) {
         //send request (will return limit number of results)
         searchArtist({ token: this.token, term: term, limit: 10 }).then((res) => {

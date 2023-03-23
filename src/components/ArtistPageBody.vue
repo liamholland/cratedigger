@@ -1,5 +1,6 @@
 <script>
 import { app, updateSuggestedArtists, recentlySuggested, getProfileInfo, setProfileInfo, isLoggedIn } from "../../api/firebase";
+import { startLoad, endLoad } from "../assets/js/frontendFunctions"
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
@@ -57,6 +58,10 @@ export default {
     methods: {
         //refreshes the data on the page
         refresh(artistID, onlyLikes) {
+            if(!onlyLikes){
+                startLoad(this);
+            }
+
             //get the artist
             getArtist({ token: this.token, id: artistID }).then((artist) => {
                 this.artist = artist.data;
@@ -112,20 +117,30 @@ export default {
 
                                 updateSuggestedArtists(this.leastRelated);
 
+                                endLoad();
+
                             }).catch((error) => {
                                 console.log(error);
+                                endLoad();
                             });
                         }).catch((error) => {
                             console.log(error);
+                            endLoad();
                         });
                     }
 
 
                 }).catch((error) => {
                     console.log(error);
+                    if(!onlyLikes){
+                        endLoad();
+                    }
                 });
             }).catch((error) => {
                 console.log(error);
+                if(!onlyLikes){
+                    endLoad();
+                }
             });
         },
 
@@ -246,10 +261,13 @@ export default {
 
         recommendArtist(){
             if(this.loggedIn){
+                startLoad(this);
                 broadcast({artist: this.artist}).then((result) => {
                     console.log(result.data);
+                    endLoad();
                 }).catch((error) => {
                     console.log(error);
+                    endLoad();
                 });
             }
             else{

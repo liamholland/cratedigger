@@ -1,6 +1,7 @@
 <script>
 import { app, isLoggedIn, getProfileInfo, setProfileInfo, updateSuggestedArtists, recentlySuggested } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { startLoad, endLoad } from "../assets/js/frontendFunctions"
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 //get componenets
@@ -22,6 +23,7 @@ export default {
             currentSuggestion: {},
             loggedIn: false,
             genres: "",
+            loading: false,
         }
     },
     beforeCreate() {
@@ -50,7 +52,11 @@ export default {
     // },
     methods: {
         refreshRecommendation() {
-
+            if(!this.loading){
+                startLoad(this);
+                this.loading = true;
+            }
+            
             recommend({ token: this.token, user: getProfileInfo() }).then((recommendation) => {
                 console.log(recommendation.data);
                 if(recentlySuggested(recommendation.data.artist)){  // || recommendation.data.code == 1
@@ -62,6 +68,8 @@ export default {
                     this.currentSuggestion.genres.forEach((genre) => {
                         this.genres += genre + ' , ';
                     });
+                    endLoad();
+                    this.loading = false
                 }
             });
         },
