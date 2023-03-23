@@ -97,28 +97,7 @@ export default {
 
     
 
-   
-
-    
-    
-  },
-  
-
-}
-</script>
-<template>
-
-<body style="background-color: black; color:white; padding-top:10%">
-<div class="px-4 pt-5 text-center">
-    <h1 class="display-4 fw-bold">Change how you discover music with Crate Digger</h1>
-    <div class="col-lg-6 mx-auto">
-      <p class="lead mb-4"><strong> <h4 style="display:inline"><a @click="opensignin()">Sign in</a></h4> </strong> or <strong><h4 style="display:inline"><a @click="opensignup()">register</a></h4></strong> to get started. We’re your home for logging your favourite artists and albums. We also recommend you artists based on your favourite artists and albums</p>
-    </div>
-  </div>
-
-
-
-<div class="container col-xxl-8 px-4 py-5" >
+   <div class="container col-xxl-8 px-4 py-5" >
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
         
@@ -154,11 +133,11 @@ export default {
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
         
-        <img src="../assets/img/likingAlbums.png" class="d-block mx-lg-auto img-fluid" width="300" height="300" loading="lazy">
+        <img src="../assets/img/LikingTheBeatles.jpg" class="d-block mx-lg-auto img-fluid" width="300" height="300" loading="lazy">
       </div>
       <div class="col-lg-6">
-        <h1 class="display-5 fw-bold lh-1 mb-3">Then favourite your favourite albums</h1>
-        <p class="lead">Scroll through the artists entire discography and favourite your favourite albums</p>
+        <h1 class="display-5 fw-bold lh-1 mb-3">View their profile</h1>
+        <p class="lead">Here you can see what genre of music they make, related artists and unrelated artists. You can favourite this artist and scroll through their entire discography and favourite your favourite albums</p>
         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
         </div>
       </div>
@@ -168,18 +147,66 @@ export default {
   <div class="container col-xxl-8 px-4 py-5">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
-        <h1 class="display-5 fw-bold lh-1 mb-3">Your profile</h1>
-        <p class="lead">That album will then be saved to your profile. On your profile you can also edit your bio and your profile picture </p>
+        <h1 class="display-5 fw-bold lh-1 mb-3">View your favourite artists</h1>
+        <p class="lead">Once you favourite an artist they will be saved to yourn profile page. You can click on the artists profile picture to view their profile </p>
         
       </div>
       <div class="col-lg-6">
-        <img src="../assets/img/Profile.png" class="d-block mx-lg-auto img-fluid" width="700" height="500" loading="lazy">
+        <img src="../assets/img/TheBeatlesAddedToP.jpg" class="d-block mx-lg-auto img-fluid" width="700" height="500" loading="lazy">
         
         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
         </div>
       </div>
     </div>
   </div>
+
+<div class="container col-xxl-8 px-4 py-5" >
+    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+      <div class="col-10 col-sm-8 col-lg-6">
+        
+        <img src="../assets/img/LikingAlbums.jpg" class="d-block mx-lg-auto img-fluid" width="300" height="300" loading="lazy">
+      </div>
+      <div class="col-lg-6">
+        <h1 class="display-5 fw-bold lh-1 mb-3">Favourite their albums</h1>
+        <p class="lead">When scrolling through the artists discography you can favourite their albums</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 pt-5 text-center">
+    <h1 class="display-4 fw-bold">View your favourite albums</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Your profile will now display all your favourited artists and albums</p>
+     
+    </div>
+    <div>
+      <div class="container px-5">
+        <img src="../assets/img/AlbumsAddedTop.jpg" class="img-fluid rounded-3 shadow-lg mb-4" alt="Example image" width="700" height="500" loading="lazy">
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 pt-5 text-center">
+    <h1 class="display-4 fw-bold">Most importantly we reccomend you artists!</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Go to recommedations and start liking and disliking artists as they appear on the screen</p>
+     
+    </div>
+    <div>
+      <div class="container px-5">
+        <img src="https://townsquare.media/site/50/files/2016/09/superlike-2.jpg?w=1200&h=0&zc=1&s=0&a=t&q=89" class="img-fluid rounded-3 shadow-lg mb-4" alt="Example image" width="700" height="500" loading="lazy">
+      </div>
+    </div>
+  </div>
+
+    
+    
+
+
+
+   
   
 </body>
 </template>
