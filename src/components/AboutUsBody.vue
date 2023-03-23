@@ -94,14 +94,16 @@ export default {
       listener();
       this.loggedIn = isLoggedIn();
     },
-
-    
-
-   <div class="container col-xxl-8 px-4 py-5" >
+  }
+}
+</script>
+<template>
+  <div class="container col-xxl-8 px-4 py-5">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
-        
-        <img src="../assets/img/CreateAccount.png" class="d-block mx-lg-auto img-fluid" width="300" height="300" loading="lazy">
+
+        <img src="../assets/img/CreateAccount.png" class="d-block mx-lg-auto img-fluid" width="300" height="300"
+          loading="lazy">
       </div>
       <div class="col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">First create an account</h1>
@@ -111,33 +113,35 @@ export default {
       </div>
     </div>
   </div>
-      
+
 
   <div class="container col-xxl-8 px-4 py-5">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">Search for your favourite the artist</h1>
         <p class="lead">Go to the search page and search for your favourite artists. </p>
-        
+
       </div>
       <div class="col-lg-6">
         <img src="../assets/img/Search.png" class="d-block mx-lg-auto img-fluid" width="700" height="500" loading="lazy">
-        
+
         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
         </div>
       </div>
     </div>
   </div>
 
-<div class="container col-xxl-8 px-4 py-5" >
+  <div class="container col-xxl-8 px-4 py-5">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
-        
-        <img src="../assets/img/LikingTheBeatles.jpg" class="d-block mx-lg-auto img-fluid" width="300" height="300" loading="lazy">
+
+        <img src="../assets/img/LikingTheBeatles.jpg" class="d-block mx-lg-auto img-fluid" width="300" height="300"
+          loading="lazy">
       </div>
       <div class="col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">View their profile</h1>
-        <p class="lead">Here you can see what genre of music they make, related artists and unrelated artists. You can favourite this artist and scroll through their entire discography and favourite your favourite albums</p>
+        <p class="lead">Here you can see what genre of music they make, related artists and unrelated artists. You can
+          favourite this artist and scroll through their entire discography and favourite your favourite albums</p>
         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
         </div>
       </div>
@@ -148,23 +152,26 @@ export default {
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">View your favourite artists</h1>
-        <p class="lead">Once you favourite an artist they will be saved to yourn profile page. You can click on the artists profile picture to view their profile </p>
-        
+        <p class="lead">Once you favourite an artist they will be saved to yourn profile page. You can click on the
+          artists profile picture to view their profile </p>
+
       </div>
       <div class="col-lg-6">
-        <img src="../assets/img/TheBeatlesAddedToP.jpg" class="d-block mx-lg-auto img-fluid" width="700" height="500" loading="lazy">
-        
+        <img src="../assets/img/TheBeatlesAddedToP.jpg" class="d-block mx-lg-auto img-fluid" width="700" height="500"
+          loading="lazy">
+
         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
         </div>
       </div>
     </div>
   </div>
 
-<div class="container col-xxl-8 px-4 py-5" >
+  <div class="container col-xxl-8 px-4 py-5">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
-        
-        <img src="../assets/img/LikingAlbums.jpg" class="d-block mx-lg-auto img-fluid" width="300" height="300" loading="lazy">
+
+        <img src="../assets/img/LikingAlbums.jpg" class="d-block mx-lg-auto img-fluid" width="300" height="300"
+          loading="lazy">
       </div>
       <div class="col-lg-6">
         <h1 class="display-5 fw-bold lh-1 mb-3">Favourite their albums</h1>
@@ -179,11 +186,12 @@ export default {
     <h1 class="display-4 fw-bold">View your favourite albums</h1>
     <div class="col-lg-6 mx-auto">
       <p class="lead mb-4">Your profile will now display all your favourited artists and albums</p>
-     
+
     </div>
     <div>
       <div class="container px-5">
-        <img src="../assets/img/AlbumsAddedTop.jpg" class="img-fluid rounded-3 shadow-lg mb-4" alt="Example image" width="700" height="500" loading="lazy">
+        <img src="../assets/img/AlbumsAddedTop.jpg" class="img-fluid rounded-3 shadow-lg mb-4" alt="Example image"
+          width="700" height="500" loading="lazy">
       </div>
     </div>
   </div>
@@ -192,33 +200,26 @@ export default {
     <h1 class="display-4 fw-bold">Most importantly we reccomend you artists!</h1>
     <div class="col-lg-6 mx-auto">
       <p class="lead mb-4">Go to recommedations and start liking and disliking artists as they appear on the screen</p>
-     
+
     </div>
     <div>
       <div class="container px-5">
-        <img src="https://townsquare.media/site/50/files/2016/09/superlike-2.jpg?w=1200&h=0&zc=1&s=0&a=t&q=89" class="img-fluid rounded-3 shadow-lg mb-4" alt="Example image" width="700" height="500" loading="lazy">
+        <img src="https://townsquare.media/site/50/files/2016/09/superlike-2.jpg?w=1200&h=0&zc=1&s=0&a=t&q=89"
+          class="img-fluid rounded-3 shadow-lg mb-4" alt="Example image" width="700" height="500" loading="lazy">
       </div>
     </div>
   </div>
 
-    
-    
-
-
-
-   
-  
-</body>
 </template>
 
 <style scoped>
-.body{
+.body {
   background-color: black;
 }
-.hero{
-    font-family:"Roboto", sans-serif;
-    background-color: black;
-    color: white;
-    padding-top: 12.5%;
-}
-</style>
+
+.hero {
+  font-family: "Roboto", sans-serif;
+  background-color: black;
+  color: white;
+  padding-top: 12.5%;
+}</style>
