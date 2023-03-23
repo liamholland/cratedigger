@@ -216,6 +216,7 @@ export default {
 
     follow() {
       if (this.hasResult) {
+        startLoad(this);
         //ensure the json object has an array to push to
         if (!(this.accountInfo.hasOwnProperty("listeningTo"))) {
           this.accountInfo.listeningTo = [];
@@ -231,16 +232,20 @@ export default {
 
           getListeningTo().then((ret) => {
             this.listeningTo = ret.data;
+            endLoad();
           }).catch((error) => {
             console.log(error);
+            endLoad();
           });
         }).catch((error) => {
           console.log(error);
+          endLoad();
         })
       }
     },
 
     unfollow(id) {
+      startLoad(this);
       this.accountInfo.listeningTo.splice(this.accountInfo.listeningTo.indexOf(id), 1);
       this.listeningTo = this.accountInfo.listeningTo;
       setProfileInfo(this.accountInfo);
@@ -250,11 +255,14 @@ export default {
 
         getListeningTo().then((ret) => {
           this.listeningTo = ret.data;
+          endLoad();
         }).catch((error) => {
           console.log(error);
+          endLoad();
         });
       }).catch((error) => {
         console.log(error);
+        endLoad();
       });
     },
 
@@ -276,6 +284,10 @@ export default {
         console.log(result);
       });
       this.$router.push({ name: 'ArtistPage', params: { aid: id } });
+    },
+
+    getOtherPFP(url){
+      return url == "" ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" : url;
     },
   },
   computed: {
@@ -348,17 +360,18 @@ export default {
                     <p>{{ this.accountInfo.bio }}</p>
                     <h5>Listeners: {{ this.accountInfo.listenerCount }}</h5>
                   </div>
-                  <div class="ms-3">
+                  <div class="ms-3" style="overflow: scroll;">
+                    <h4>Listening To:</h4>
                     <div v-for="user in this.listeningTo" @click="unfollow(user.id)">
-                      <img :src="user.pfpURL" style="height: 50px; width: 50px;" alt="PFP">
+                      <img :src="getOtherPFP(user.pfpURL)" style="height: 50px; width: 50px;" alt="PFP">
                       <h4>{{ user.username }}</h4>
                     </div>
                   </div>
                   <input class="input-search" v-model="input" @keyup="search(this.input)"
-                    placeholder="Who do you want to listen to?" style="width:20%; height:50px;">
+                    placeholder="Whos recommendations do you want to listen to?" style="width:30%; height:50px;">
                   <div class="ms-3" v-if="hasResult">
                     <div @click="follow">
-                      <img :src="this.searchedUser.pfp" style="height: 50px; width: 50px;" alt="PFP">
+                      <img :src="getOtherPFP(this.searchedUser.pfp)" style="height: 50px; width: 50px;" alt="PFP">
                       <h4>{{ this.searchedUser.username }}</h4>
                     </div>
                   </div>
