@@ -175,13 +175,13 @@ export default {
     },
 
     search(input) {
-      if(!this.typing){
+      if (!this.typing) {
         this.typing = true;
         setTimeout(() => this.sendSearchRequest(input), 150);
       }
     },
-    
-    sendSearchRequest(input){
+
+    sendSearchRequest(input) {
       this.typing = false;
       if (input.length > 0) {
         getUser({ username: input }).then((result) => {
@@ -272,13 +272,13 @@ export default {
 
     viewArtist(id) {
       let newData = [];
-      if(this.accountInfo.recommendedArtists.length == 1){
+      if (this.accountInfo.recommendedArtists.length == 1) {
         this.accountInfo.recommendedArtists = [];
       }
-      else{
+      else {
         newData = this.accountInfo.recommendedArtists.splice(this.accountInfo.recommendedArtists.indexOf(this.accountInfo.recommendedArtists.find(artist => artist.id == id)), 1);
       }
-      
+
       setProfileInfo(this.accountInfo);
       update({ field: "recommendedArtists", value: newData }).then((result) => {
         console.log(result);
@@ -286,7 +286,7 @@ export default {
       this.$router.push({ name: 'ArtistPage', params: { aid: id } });
     },
 
-    getOtherPFP(url){
+    getOtherPFP(url) {
       return url == "" ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" : url;
     },
   },
@@ -330,92 +330,100 @@ export default {
 
     <body>
 
+      
       <div class="header__wrapper" style="background-color:black">
-
-        <div class="cols__container" style="background-color:#151515">
-
-          <div class="right__col" style="background-color:#151515">
-
-            <div class="left__col" style="background-color:#151515">
-
-              <div class="card" style="background-color:#151515">
-
-                <div class="rounded-top text-white d-flex flex-row" style="background-color: #151515; height:200px;">
-                  <!-- <div class="dropdown">
-
-                  </div> -->
-                  <div class="ms-4 mt-5flex-column" style="width: 150px; background-color:#151515;">
-                    <img v-bind:src="this.pfpURL" alt="Generic placeholder image"
-                      class="img-fluid img-thumbnail mt-4 mb-2" style="height: 150px; width: 150px; z-index: 1">
-                    <button type="button"
-                      style="z-index: 1; background-color:white; border-radius:4px; border:none; width: 150px; "
-                      @click="openProfileEdit()">
-                      Edit profile
-                    </button>
-
-                  </div>
-                  <div class="ms-3" style="margin-top: 30px;">
-
-                    <h2 class="display-5 fw-bold" style="font-size:225%">{{ this.accountInfo.username }}</h2>
-                    <p>{{ this.accountInfo.bio }}</p>
-                    <h5>Listeners: {{ this.accountInfo.listenerCount }}</h5>
-                  </div>
-                  <div class="ms-3" style="overflow: scroll;">
-                    <h4>Listening To:</h4>
-                    <div v-for="user in this.listeningTo" @click="unfollow(user.id)">
-                      <img :src="getOtherPFP(user.pfpURL)" style="height: 50px; width: 50px;" alt="PFP">
-                      <h4>{{ user.username }}</h4>
+        <div class="rounded-top text-white cols__container" style=" background-color: #151515;">
+          <div class="left__col">
+            <!-- profile information -->
+            <div class="right__col">
+              <div class="row">
+                <div class="col d-flex flex-row">
+                  <div class="pfpBio" style="background-color:#151515;">
+                    <div class="pfp">
+                      <img v-bind:src="this.pfpURL" alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
+                        style="height: 150px; width: 150px; z-index: 1">
+                      <button type="button"
+                        style="z-index: 1; background-color:white; border-radius:4px; border:none; width: 150px; "
+                        @click="openProfileEdit()">
+                        Edit profile
+                      </button>
+                    </div>
+                    <div class="bio">
+                      <h2 class="display-5 fw-bold" style="font-size:225%">{{ this.accountInfo.username }}</h2>
+                      <p>{{ this.accountInfo.bio }}</p>
+                      <h5>Listeners: {{ this.accountInfo.listenerCount }}</h5>
                     </div>
                   </div>
-                  <input class="input-search" v-model="input" @keyup="search(this.input)"
-                    placeholder="Whos recommendations do you want to listen to?" style="width:30%; height:50px;">
-                  <div class="ms-3" v-if="hasResult">
+
+                </div>
+                <div class="col">
+                  <div class="listeningTo"  >
+                    <h4>Listening To:</h4>
+                    <div class="listenList">
+                      <div v-for="user in this.listeningTo" @click="unfollow(user.id)">
+                        <img :src="getOtherPFP(user.pfpURL)" style="height: 50px; width: 50px;" alt="PFP">
+                        <h4>{{ user.username }}</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <input class="input-search mx-auto" v-model="input" @keyup="search(this.input)"
+                    placeholder="Whos recommendations do you want to listen to?" style="max-width: 90%; height:50px;">
+                  <div class="search" v-if="hasResult">
                     <div @click="follow">
                       <img :src="getOtherPFP(this.searchedUser.pfp)" style="height: 50px; width: 50px;" alt="PFP">
                       <h4>{{ this.searchedUser.username }}</h4>
                     </div>
                   </div>
-                  <div class="ms-3" v-else>
+                  <div class="mx-auto" v-else>
                     <h4>{{ this.message }}</h4>
                   </div>
                 </div>
-                <br>
-                <div class="p-4 text-black" style="text-align:left; background-color:#151515">
-                  <nav>
-                    <ul>
-                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(true)">Liked Albums</a></li>
-
-                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(false)">Liked Artists</a></li>
-
-                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showRecommendations">Recommended
-                          Artists</a></li>
-
-                    </ul>
-                    <br>
-                  </nav>
-                  <!-- album covers  v-if="this.DisplayAlbums1" v-if="this.DisplayArists1"-->
-
-
-                  <div class="photos" v-if="this.displayAlbums">
-                    <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name"
-                      @click="this.$router.push({ name: 'ArtistPage', params: { aid: album.artists[0].id } })">
+              </div>
+              
+            </div>
+            <br>
+            <!-- sorting albums -->
+            <div class="row">
+              <div class="col">
+                <nav>
+                  <ul>
+                    <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(true)">Liked Albums</a></li>
+    
+                    <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(false)">Liked Artists</a></li>
+    
+                    <li style="text-indent: 20px; cursor: pointer;"><a @click="showRecommendations">Recommended
+                        Artists</a></li>
+    
+                  </ul>
+                  <br>
+                </nav>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="photos" v-if="this.displayAlbums">
+                  <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name"
+                    @click="this.$router.push({ name: 'ArtistPage', params: { aid: album.artists[0].id } })">
+                </div>
+                <div class="photos" v-else-if="this.displayRecs">
+                  <div v-for="artist in this.accountInfo.recommendedArtists">
+                    <img v-if="notAlreadyLiked(artist.id)" :src="artist.images[0].url" :alt="artist.name"
+                      @click="viewArtist(artist.id)">
                   </div>
-                  <div class="photos" v-else-if="this.displayRecs">
-                    <div v-for="artist in this.accountInfo.recommendedArtists">
-                      <img v-if="notAlreadyLiked(artist.id)" :src="artist.images[0].url" :alt="artist.name"
-                        @click="viewArtist(artist.id)">
-                    </div>
-                  </div>
-                  <div class="photos" v-else>
-                    <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name"
-                      @click="this.$router.push({ name: 'ArtistPage', params: { aid: artist.id } })">
-                  </div>
+                </div>
+                <div class="photos" v-else>
+                  <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name"
+                    @click="this.$router.push({ name: 'ArtistPage', params: { aid: artist.id } })">
                 </div>
               </div>
             </div>
-            <br>
+
           </div>
         </div>
+        
+        
       </div>
 
       <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:#151515">
@@ -547,15 +555,56 @@ a {
   text-decoration: none;
 }
 
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+.listeningTo {
+  max-width: 600px;
+  margin: 20px
+}
+
+.listenList {
+  overflow-y: scroll;
+  max-height: 190px;
+  max-width: 600px;
+}
+
+.pfpBio {
+  display: flex;
+}
+
+.pfp {
+  width: 150px;
+  margin: 20px;
+}
+
+
+.search {
+  max-height: 200px;
+  justify-content: center;
+}
+
 /* profile picture */
-.header__wrapper .cols__container .left__col .img__container {
+.header__wrapper .cols__container .right__col .img__container {
   position: absolute;
   top: -60px;
   left: 50%;
   transform: translatex(-50%);
 }
 
-.header__wrapper .cols__container .left__col .img__container img {
+.header__wrapper .cols__container .right__col .img__container img {
   width: 130px;
   height: 130px;
   object-fit: cover;
@@ -565,7 +614,7 @@ a {
 }
 
 /* username */
-.header__wrapper .cols__container .left__col h2 {
+.header__wrapper .cols__container .right__col h2 {
   margin-top: 60px;
   font-weight: 600;
   font-size: 22px;
@@ -573,14 +622,14 @@ a {
 }
 
 /*bio*/
-.header__wrapper .cols__container .left__col p {
+.header__wrapper .cols__container .right__col p {
   font-size: 0.9rem;
   color: #818181;
   margin: 0;
 }
 
 /* "Liked albums" color and uppercase */
-.header__wrapper .cols__container .right__col nav ul li a {
+.header__wrapper .cols__container .left__col nav ul li a {
   text-transform: uppercase;
   color: #818181;
 }
@@ -598,9 +647,10 @@ img {
   border: 0;
   outline: 0;
   height: 50px;
-  width: 50px;
+  width: 100%;
   border-style: none;
   padding: 10px;
+  margin: 10px;
   font-size: 18px;
   letter-spacing: 2px;
   outline: none;
@@ -619,7 +669,6 @@ img {
 }
 
 .input-search:focus {
-  width: 50px;
   border-radius: 0px;
   background-color: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, .5);
@@ -629,14 +678,14 @@ img {
 
 /* album grid layout*/
 @media (min-width: 501px) {
-  .header__wrapper .cols__container .right__col .photos {
+  .header__wrapper .cols__container .left__col .photos {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
   }
 }
 
-.header__wrapper .cols__container .right__col .photos img {
+.header__wrapper .cols__container .left__col .photos img {
   max-width: 100%;
   display: block;
   height: 100%;
@@ -644,12 +693,17 @@ img {
 }
 
 @media (max-width: 500px) {
-  .header__wrapper .cols__container .right__col .photos {
+  .header__wrapper .cols__container .left__col .photos {
 
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 10px;
 
   }
+
+  .header__wrapper .cols__container .right__col .col{
+    width: 100%;
+  }
+
 }
 </style>
