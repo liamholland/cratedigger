@@ -120,6 +120,31 @@ exports.getProfileInfo = functions.https.onCall((data, context) => {
   }
 });
 
+//function dedicated to receiving an ID of a given email
+exports.getUser = functions.https.onCall((data, context) => {
+  console.log(data.username);
+
+  //access the document relating to the given email to get the uid
+  return db.collection("UserIDs").doc(`${data.username}`).get().then((docSnap) => {
+    if (docSnap.exists) {
+      const id = docSnap.data()["id"];
+
+      return db.collection("UserData").doc(`${id}`).get().then((userDoc) => {
+        if(userDoc.exists){
+          const user = userDoc.data();
+          return { code: 0, userData: { id: user["id"], username: user["username"], pfp: user["pfpURL"] }};
+        }
+        else{
+          return {code: 1, body: "Error when fetching user data"};
+        }
+      });
+    }
+    else {
+      return { code: 1, body: `Failed to find user ${data.username}` };
+    }
+  });
+});
+
 
 /*
 --SPOTIFY API FUNCTIONS--

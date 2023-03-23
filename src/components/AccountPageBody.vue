@@ -9,8 +9,10 @@ const auth = getAuth(app);
 //define functions
 const requestProfileInfo = httpsCallable(functions, "getProfileInfo");
 const update = httpsCallable(functions, "updateProfile");
+const getUser = httpsCallable(functions, "getUser");
 //connect emulator
 // connectFunctionsEmulator(functions, "localhost", 5001);
+
 export default {
   data() {
     return {
@@ -18,9 +20,11 @@ export default {
       email: "",
       password: "",
       loggedIn: false,
-      displayAlbums:  false,
+      displayAlbums: false,
       //account information
       accountInfo: {},
+      searchedUser: {},
+      hasResult: false,
       //updated profile temp variables
       newBio: "",
       newURL: "",
@@ -60,7 +64,7 @@ export default {
     closeProfileEdit() {
       closeModal(2);
     },
-   
+
     //refresh the data contained on the page
     refresh() {
       this.accountInfo = {};
@@ -69,7 +73,7 @@ export default {
         console.log("Getting Profile From Server");
         //get the profile information of the user once their are signed in
         //stored under the users id
-        requestProfileInfo({field: null}).then((info) => {
+        requestProfileInfo({ field: null }).then((info) => {
           //set the data on the page
           setProfileInfo(info.data);
           this.accountInfo = info.data;
@@ -80,16 +84,16 @@ export default {
         });
         //if logged in and there is a valid user and the data has not been retrieved
       }
-      else if(this.$route.params.name) {
+      else if (this.$route.params.name) {
         this.loggedIn = true;
         this.accountInfo = getProfileInfo();
       }
-      else{
+      else {
         this.loggedIn = false;
       }
     },
-    
-    showAlbums(show){
+
+    showAlbums(show) {
       this.displayAlbums = show;
     },
 
@@ -143,6 +147,31 @@ export default {
         console.log(error.code, error.message);
       });
     },
+
+    search(input){
+      if(input.length > 0){
+        getUser({username: input}).then((result) => {
+          if(result.data.code === 1){
+            console.log(result.data.body);
+            this.hasResult = false;
+            this.searchedUser == {};
+            return;
+          }
+          else if(result.data.code === 0){
+            console.log(result.data.userData);
+            this.searchedUser = result.data.userData;
+            this.hasResult = true;
+          }
+        }).catch((error) => {
+          console.log(error);
+        });
+      }
+      else{
+        this.hasResult = false;
+        this.searchedUser = {};
+      }
+      
+    },
   },
   computed: {
     pfpURL() {
@@ -152,7 +181,6 @@ export default {
 }
 </script>
 <template>
-
   <div v-if="this.loggedIn">
     <div id="myModal1" class="modal"> <!-- edit profile popup  -->
       <!-- Modal content -->
@@ -211,30 +239,41 @@ export default {
 
                   </div>
                   <div class="ms-3" style="margin-top: 30px;">
-
+                    
                     <h2 class="display-5 fw-bold" style="font-size:225%">{{ this.accountInfo.username }}</h2>
                     <p>{{ this.accountInfo.bio }}</p>
+                  </div>
+                  <input class="input-search" v-model="input" @keyup="search(this.input)"
+                    placeholder="Who do you want to listen to?" style="width:20%; height:50px;">
+                  <div v-if="hasResult">
+                    <img :src="this.searchedUser.pfp" style="height: 50px; width: 50px;" alt="PFP">
+                    <h4>{{ this.searchedUser.username }}</h4>
+                  </div>
+                  <div v-else>
+                    <h4>No Such User</h4>
                   </div>
                 </div>
                 <br>
                 <div class="p-4 text-black" style="text-align:left; background-color:#151515">
                   <nav>
                     <ul>
-                      <li style="text-indent: 20px; cursor: pointer;"><a  @click="showAlbums(true)">Liked Albums</a></li>
-                   
-                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(false)" >Liked Artists</a></li>
-                      
+                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(true)">Liked Albums</a></li>
+
+                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(false)">Liked Artists</a></li>
+
                     </ul>
                     <br>
                   </nav>
                   <!-- album covers  v-if="this.DisplayAlbums1" v-if="this.DisplayArists1"-->
-                  
-                  
-                  <div class="photos" v-if="this.displayAlbums" >
-                   <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name" @click="this.$router.push({ name: 'ArtistPage', params: { aid: album.artists[0].id } })">
+
+
+                  <div class="photos" v-if="this.displayAlbums">
+                    <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name"
+                      @click="this.$router.push({ name: 'ArtistPage', params: { aid: album.artists[0].id } })">
                   </div>
-                  <div class="photos"  v-else>
-                    <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name" @click="this.$router.push({ name: 'ArtistPage', params: { aid: artist.id } })">
+                  <div class="photos" v-else>
+                    <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name"
+                      @click="this.$router.push({ name: 'ArtistPage', params: { aid: artist.id } })">
                   </div>
                 </div>
               </div>
@@ -269,13 +308,15 @@ export default {
 </template>
 
 <style scoped>
-.display-artists{
+.display-artists {
   display: none;
 }
+
 .hero {
   background-color: black;
   text-align: center;
 }
+
 /* The Modal for edit profile (background) */
 .btn-get-started {
   font-weight: 500;
@@ -290,10 +331,12 @@ export default {
   text-decoration: none;
   border: 2px solid #1DB954;
 }
+
 .btn-get-started:hover {
   background: #1DB954;
   color: black
 }
+
 .modal {
   display: none;
   /* Hidden by default */
@@ -313,6 +356,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.6);
   /* Black w/ opacity */
 }
+
 /* Modal Content */
 .modal-content {
   align-items: left;
@@ -322,6 +366,7 @@ export default {
   margin: auto;
   padding: 5px;
 }
+
 /* The Close Button */
 .close {
   position: relative;
@@ -331,17 +376,20 @@ export default {
   font-size: 32px;
   font-weight: bold;
 }
+
 .close:hover,
 .close:focus {
   color: #1DB954;
   text-decoration: none;
   cursor: pointer;
 }
+
 .close1:hover,
 .close1:focus {
   color: #1DB954;
   text-decoration: none;
 }
+
 body {
   width: 100%;
   margin: 0;
@@ -350,6 +398,7 @@ body {
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
 }
+
 /* liked albums */
 ul {
   list-style-type: none;
@@ -358,9 +407,11 @@ ul {
   display: flex;
   align-items: center;
 }
+
 a {
   text-decoration: none;
 }
+
 /* profile picture */
 .header__wrapper .cols__container .left__col .img__container {
   position: absolute;
@@ -368,6 +419,7 @@ a {
   left: 50%;
   transform: translatex(-50%);
 }
+
 .header__wrapper .cols__container .left__col .img__container img {
   width: 130px;
   height: 130px;
@@ -376,6 +428,7 @@ a {
   display: block;
   box-shadow: 1px 3px 12px rgba(0, 0, 0, .4);
 }
+
 /* username */
 .header__wrapper .cols__container .left__col h2 {
   margin-top: 60px;
@@ -383,44 +436,84 @@ a {
   font-size: 22px;
   margin-bottom: 5px;
 }
+
 /*bio*/
 .header__wrapper .cols__container .left__col p {
   font-size: 0.9rem;
   color: #818181;
   margin: 0;
 }
+
 /* "Liked albums" color and uppercase */
 .header__wrapper .cols__container .right__col nav ul li a {
   text-transform: uppercase;
   color: #818181;
 }
-img{
+
+img {
   transition: transform .2s;
 }
-img:hover{
+
+.photos img:hover {
   transform: scale(1.1);
 }
-  /* album grid layout*/
-  @media (min-width: 501px){
-.header__wrapper .cols__container .right__col .photos {
-  display: grid;
- grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+
+/* Friend Search Bar */
+.input-search {
+  border: 0;
+  outline: 0;
+  height: 50px;
+  width: 50px;
+  border-style: none;
+  padding: 10px;
+  font-size: 18px;
+  letter-spacing: 2px;
+  outline: none;
+  border-radius: 25px;
+  transition: all .5s ease-in-out;
+  background-color: white;
+  padding-right: 40px;
+  color: gray;
 }
+
+.input-search::placeholder {
+  color: rgba(255, 255, 255, .5);
+  font-size: 18px;
+  letter-spacing: 2px;
+  font-weight: 100;
+}
+
+.input-search:focus {
+  width: 50px;
+  border-radius: 0px;
+  background-color: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, .5);
+  transition: all 500ms cubic-bezier(0, 0.110, 0.35, 2);
+}
+
+
+/* album grid layout*/
+@media (min-width: 501px) {
+  .header__wrapper .cols__container .right__col .photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
   }
+}
+
 .header__wrapper .cols__container .right__col .photos img {
   max-width: 100%;
   display: block;
   height: 100%;
   object-fit: cover;
 }
+
 @media (max-width: 500px) {
   .header__wrapper .cols__container .right__col .photos {
-    
+
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 10px;
-    
+
   }
-}
-</style>
+}</style>
