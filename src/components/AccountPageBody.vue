@@ -1,22 +1,16 @@
-
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" /> -->
 <script>
 import { app, getProfileInfo, setProfileInfo } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
-
 //get componenets
 const functions = getFunctions(app);
 const auth = getAuth(app);
-
 //define functions
 const requestProfileInfo = httpsCallable(functions, "getProfileInfo");
 const update = httpsCallable(functions, "updateProfile");
-
 //connect emulator
 // connectFunctionsEmulator(functions, "localhost", 5001);
-
 export default {
   data() {
     return {
@@ -24,10 +18,9 @@ export default {
       email: "",
       password: "",
       loggedIn: false,
-
+      displayAlbums:  false,
       //account information
       accountInfo: {},
-
       //updated profile temp variables
       newBio: "",
       newURL: "",
@@ -42,45 +35,38 @@ export default {
         this.loggedIn = false;
       }
     });
-
     listener();
   },
   watch: {
     loggedIn() {
       this.refresh();
     },
-
     '$route.params': {
       handler() {
         this.refresh();
       }
     },
-
   },
   methods: {
     opensignin() {
       openModal(0);
     },
-
     opensignup() {
       openModal(1);
     },
-
     openProfileEdit() {
       openModal(2);
     },
-
     closeProfileEdit() {
       closeModal(2);
     },
-
+   
     //refresh the data contained on the page
     refresh() {
       this.accountInfo = {};
       if (this.$route.params.name && JSON.stringify(getProfileInfo()) == '{}') {
         this.loggedIn = true;
         console.log("Getting Profile From Server");
-
         //get the profile information of the user once their are signed in
         //stored under the users id
         requestProfileInfo({field: null}).then((info) => {
@@ -102,6 +88,10 @@ export default {
         this.loggedIn = false;
       }
     },
+    
+    showAlbums(show){
+      this.displayAlbums = show;
+    },
 
     logout() {
       startLoad(this);
@@ -111,10 +101,8 @@ export default {
       endLoad();
       this.$router.push({ path: '/AccountPage/' });
     },
-
     updateProfile() {
       startLoad(this);
-
       //update both
       if (this.newBio.length > 0 && this.newURL.length > 0) {
         this.updateBio();
@@ -128,11 +116,9 @@ export default {
       else if (this.newURL.length > 0) {
         this.updatePFP();
       }
-
       this.closeProfileEdit();
       this.refresh();
     },
-
     //update bio
     updateBio() {
       update({ "field": 'bio', "value": this.newBio }).then((res) => {
@@ -145,7 +131,6 @@ export default {
         console.log(error.code, error.message);
       });
     },
-
     //update pfp
     updatePFP() {
       update({ "field": 'pfpURL', "value": this.newURL }).then((res) => {
@@ -164,10 +149,10 @@ export default {
       return (JSON.stringify(this.accountInfo) != '{}' && this.accountInfo.pfpURL != undefined) ? this.accountInfo.pfpURL : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
     },
   },
-
 }
 </script>
 <template>
+
   <div v-if="this.loggedIn">
     <div id="myModal1" class="modal"> <!-- edit profile popup  -->
       <!-- Modal content -->
@@ -235,13 +220,21 @@ export default {
                 <div class="p-4 text-black" style="text-align:left; background-color:#151515">
                   <nav>
                     <ul>
-                      <li><a href="">Liked Albums</a></li>
+                      <li style="text-indent: 20px; cursor: pointer;"><a  @click="showAlbums(true)">Liked Albums</a></li>
+                   
+                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(false)" >Liked Artists</a></li>
+                      
                     </ul>
                     <br>
                   </nav>
-                  <!-- album covers -->
-                  <div class="photos">
-                    <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name">
+                  <!-- album covers  v-if="this.DisplayAlbums1" v-if="this.DisplayArists1"-->
+                  
+                  
+                  <div class="photos" v-if="this.displayAlbums" >
+                   <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name">
+                  </div>
+                  <div class="photos"  v-else>
+                    <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name">
                   </div>
                 </div>
               </div>
@@ -276,11 +269,13 @@ export default {
 </template>
 
 <style scoped>
+.display-artists{
+  display: none;
+}
 .hero {
   background-color: black;
   text-align: center;
 }
-
 /* The Modal for edit profile (background) */
 .btn-get-started {
   font-weight: 500;
@@ -295,12 +290,10 @@ export default {
   text-decoration: none;
   border: 2px solid #1DB954;
 }
-
 .btn-get-started:hover {
   background: #1DB954;
   color: black
 }
-
 .modal {
   display: none;
   /* Hidden by default */
@@ -320,7 +313,6 @@ export default {
   background-color: rgba(0, 0, 0, 0.6);
   /* Black w/ opacity */
 }
-
 /* Modal Content */
 .modal-content {
   align-items: left;
@@ -330,7 +322,6 @@ export default {
   margin: auto;
   padding: 5px;
 }
-
 /* The Close Button */
 .close {
   position: relative;
@@ -340,20 +331,17 @@ export default {
   font-size: 32px;
   font-weight: bold;
 }
-
 .close:hover,
 .close:focus {
   color: #1DB954;
   text-decoration: none;
   cursor: pointer;
 }
-
 .close1:hover,
 .close1:focus {
   color: #1DB954;
   text-decoration: none;
 }
-
 body {
   width: 100%;
   margin: 0;
@@ -362,7 +350,6 @@ body {
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
 }
-
 /* liked albums */
 ul {
   list-style-type: none;
@@ -371,11 +358,9 @@ ul {
   display: flex;
   align-items: center;
 }
-
 a {
   text-decoration: none;
 }
-
 /* profile picture */
 .header__wrapper .cols__container .left__col .img__container {
   position: absolute;
@@ -383,7 +368,6 @@ a {
   left: 50%;
   transform: translatex(-50%);
 }
-
 .header__wrapper .cols__container .left__col .img__container img {
   width: 130px;
   height: 130px;
@@ -392,7 +376,6 @@ a {
   display: block;
   box-shadow: 1px 3px 12px rgba(0, 0, 0, .4);
 }
-
 /* username */
 .header__wrapper .cols__container .left__col h2 {
   margin-top: 60px;
@@ -400,21 +383,21 @@ a {
   font-size: 22px;
   margin-bottom: 5px;
 }
-
 /*bio*/
 .header__wrapper .cols__container .left__col p {
   font-size: 0.9rem;
   color: #818181;
   margin: 0;
 }
-
 /* "Liked albums" color and uppercase */
 .header__wrapper .cols__container .right__col nav ul li a {
   text-transform: uppercase;
   color: #818181;
 }
-
- /* album grid layout*/
+.photos{
+  display: none;
+}
+  /* album grid layout*/
   @media (min-width: 501px){
 .header__wrapper .cols__container .right__col .photos {
   display: grid;
@@ -422,14 +405,12 @@ a {
   gap: 20px;
 }
   }
-
 .header__wrapper .cols__container .right__col .photos img {
   max-width: 100%;
   display: block;
   height: 100%;
   object-fit: cover;
 }
-
 @media (max-width: 500px) {
   .header__wrapper .cols__container .right__col .photos {
     
@@ -438,6 +419,5 @@ a {
     gap: 10px;
     
   }
-
 }
 </style>
