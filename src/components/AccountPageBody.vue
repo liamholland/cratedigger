@@ -25,6 +25,7 @@ export default {
       password: "",
       loggedIn: false,
       displayAlbums: false,
+      displayRecs: false,
 
       //account information
       accountInfo: {},
@@ -95,7 +96,6 @@ export default {
           }).catch((error) => {
             console.log(error);
           });
-
         }).catch((error) => {
           console.log(error.code);
           console.log(error.message);
@@ -105,6 +105,14 @@ export default {
       else if (this.$route.params.name) {
         this.loggedIn = true;
         this.accountInfo = getProfileInfo();
+
+        //get the data of the accounts that the user listens to
+        getListeningTo().then((result) => {
+          this.listeningTo = result.data;
+          console.log(this.listeningTo);
+        }).catch((error) => {
+          console.log(error);
+        });
       }
       else {
         this.loggedIn = false;
@@ -113,6 +121,13 @@ export default {
 
     showAlbums(show) {
       this.displayAlbums = show;
+      this.displayRecs = false;
+    },
+
+    showRecommendations() {
+      console.log(this.accountInfo.recommendedArtists);
+      this.displayAlbums = false;
+      this.displayRecs = true;
     },
 
     logout() {
@@ -166,23 +181,23 @@ export default {
       });
     },
 
-    search(input){
-      if(input.length > 0){
-        getUser({username: input}).then((result) => {
-          if(result.data.code === 1){
+    search(input) {
+      if (input.length > 0) {
+        getUser({ username: input }).then((result) => {
+          if (result.data.code === 1) {
             console.log(result.data.body);
             this.hasResult = false;
             this.searchedUser == {};
             return;
           }
-          else if(result.data.code === 0){
+          else if (result.data.code === 0) {
             console.log(result.data.userData);
             this.searchedUser = result.data.userData;
-            if(this.accountInfo.listeningTo.find(addedID => addedID == this.searchedUser.id)){
+            if (this.accountInfo.listeningTo.find(addedID => addedID == this.searchedUser.id)) {
               this.message = `Already Listening to ${this.searchedUser.username}`;
               this.hasResult = false;
             }
-            else{
+            else {
               this.hasResult = true;
               this.message = "";
             }
@@ -191,30 +206,31 @@ export default {
           console.log(error);
         });
       }
-      else{
+      else {
         this.message = "No Such User";
         this.hasResult = false;
         this.searchedUser = {};
       }
-      
+
     },
 
-    follow(){
-      if(this.hasResult){
-        addFriend({id: this.searchedUser.id}).then((result) => {
+    follow() {
+      if (this.hasResult) {
+        //ensure the json object has an array to push to
+        if (!(this.accountInfo.hasOwnProperty("listeningTo"))) {
+          this.accountInfo.listeningTo = [];
+        }
+
+        this.hasResult = false;
+        this.accountInfo.listeningTo.push(this.searchedUser.id);
+        setProfileInfo(this.accountInfo);
+
+        addFriend({ id: this.searchedUser.id }).then((result) => {
           console.log(result);
-          //ensure the json object has an array to push to
-          if(!(this.accountInfo.hasOwnProperty("listeningTo"))){
-            this.accountInfo.listeningTo = [];
-          }
-
           this.searchedUser = {};
-          this.hasResult = false;
-          this.accountInfo.listeningTo.push(this.searchedUser.id);
-          setProfileInfo(this.accountInfo);
 
-          getListeningTo().then((result) => {
-            this.listeningTo = result.data;
+          getListeningTo().then((ret) => {
+            this.listeningTo = ret.data;
           }).catch((error) => {
             console.log(error);
           });
@@ -222,7 +238,45 @@ export default {
           console.log(error);
         })
       }
-    }
+    },
+
+    unfollow(id) {
+      this.accountInfo.listeningTo.splice(this.accountInfo.listeningTo.indexOf(id), 1);
+      this.listeningTo = this.accountInfo.listeningTo;
+      setProfileInfo(this.accountInfo);
+
+      removeFriend({ id: id }).then((result) => {
+        console.log(result.data);
+
+        getListeningTo().then((ret) => {
+          this.listeningTo = ret.data;
+        }).catch((error) => {
+          console.log(error);
+        });
+      }).catch((error) => {
+        console.log(error);
+      });
+    },
+
+    notAlreadyLiked(id) {
+      return !(this.accountInfo.likedArtists.find(artist => artist.id == id));
+    },
+
+    viewArtist(id) {
+      let newData = [];
+      if(this.accountInfo.recommendedArtists.length == 1){
+        this.accountInfo.recommendedArtists = [];
+      }
+      else{
+        newData = this.accountInfo.recommendedArtists.splice(this.accountInfo.recommendedArtists.indexOf(this.accountInfo.recommendedArtists.find(artist => artist.id == id)), 1);
+      }
+      
+      setProfileInfo(this.accountInfo);
+      update({ field: "recommendedArtists", value: newData }).then((result) => {
+        console.log(result);
+      });
+      this.$router.push({ name: 'ArtistPage', params: { aid: id } });
+    },
   },
   computed: {
     pfpURL() {
@@ -290,12 +344,13 @@ export default {
 
                   </div>
                   <div class="ms-3" style="margin-top: 30px;">
-                    
+
                     <h2 class="display-5 fw-bold" style="font-size:225%">{{ this.accountInfo.username }}</h2>
                     <p>{{ this.accountInfo.bio }}</p>
+                    <h5>Listeners: {{ this.accountInfo.listenerCount }}</h5>
                   </div>
                   <div>
-                    <div v-for="user in this.listeningTo">
+                    <div v-for="user in this.listeningTo" @click="unfollow(user.id)">
                       <img :src="user.pfpURL" style="height: 50px; width: 50px;" alt="PFP">
                       <h4>{{ user.username }}</h4>
                     </div>
@@ -309,7 +364,7 @@ export default {
                     </div>
                   </div>
                   <div v-else>
-                    <h4>{{this.message}}</h4>
+                    <h4>{{ this.message }}</h4>
                   </div>
                 </div>
                 <br>
@@ -320,6 +375,9 @@ export default {
 
                       <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(false)">Liked Artists</a></li>
 
+                      <li style="text-indent: 20px; cursor: pointer;"><a @click="showRecommendations">Recommended
+                          Artists</a></li>
+
                     </ul>
                     <br>
                   </nav>
@@ -329,6 +387,12 @@ export default {
                   <div class="photos" v-if="this.displayAlbums">
                     <img v-for="album in this.accountInfo.likedAlbums" :src="album.images[0].url" :alt="album.name"
                       @click="this.$router.push({ name: 'ArtistPage', params: { aid: album.artists[0].id } })">
+                  </div>
+                  <div class="photos" v-else-if="this.displayRecs">
+                    <div v-for="artist in this.accountInfo.recommendedArtists">
+                      <img v-if="notAlreadyLiked(artist.id)" :src="artist.images[0].url" :alt="artist.name"
+                        @click="viewArtist(artist.id)">
+                    </div>
                   </div>
                   <div class="photos" v-else>
                     <img v-for="artist in this.accountInfo.likedArtists" :src="artist.images[0].url" :alt="artist.name"
@@ -575,4 +639,5 @@ img {
     gap: 10px;
 
   }
-}</style>
+}
+</style>

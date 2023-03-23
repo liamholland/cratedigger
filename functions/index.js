@@ -30,6 +30,10 @@ exports.registerAccount = functions.https.onCall((data, context) => {
       likedArtists: [],
       likedAlbums: [],
       suggestedArtists: [], //queue ADT used for recommendations - length configured application side
+      listeners: [],
+      listeningTo: [],
+      listenerCount: 0,
+      recommendedArtists: [], //artists recommended by people you are listening to
       id: ID,
       bio: "",
       username: name,
@@ -40,16 +44,34 @@ exports.registerAccount = functions.https.onCall((data, context) => {
   });
 });
 
+//reset for the friends data in the database
+exports.updateProfiles = functions.https.onRequest((req, res) => {
+  cors(req, res, () => {
+    db.collection("UserData").get().then((dbSnap) => {
+      dbSnap.forEach((doc) => {
+        doc.ref.update({
+          listeners: [],
+          listeningTo: [],
+          listenerCount: 0,
+          recommendedArtists: [], //artists recommended by people you are listening to
+        }).then(() => {
+          console.log(`Updated User ${doc.data()["username"]}`);
+        })
+      });
+    });
+  });
+});
+
 //update any part of a profile with a provided id, field and value
 exports.updateProfile = functions.https.onCall((data, context) => {
-  if(typeof context.auth !== 'undefined'){
+  if (typeof context.auth !== 'undefined') {
     //get variables
     const field = data.field;
     const value = data.value;
-  
+
     let updateData = {};  //create an empty object
     updateData[field] = value;  //assign the value to a field in the object
-  
+
     //get a reference to the profile
     return db.collection("UserData").doc(`${context.auth.uid}`).update(updateData).then(() => {
       return { code: 0, body: `Updated data regarding ${field} with ${value}` };
@@ -93,11 +115,11 @@ exports.checkUniqueUsername = functions.https.onRequest((req, res) => {
 //FORMAT: URL...?id={id}&field={field}
 //for all info the field parameter should be left out
 exports.getProfileInfo = functions.https.onCall((data, context) => {
-  if(typeof context.auth !== 'undefined'){
+  if (typeof context.auth !== 'undefined') {
     //get the variables
     const id = context.auth.uid;
     const field = data.field;
-  
+
     //access the appropriate document in the profiles collection
     return db.collection("UserData").doc(`${id}`).get().then((docSnap) => {
       if (docSnap.exists) {
@@ -128,12 +150,12 @@ exports.getUser = functions.https.onCall((data, context) => {
       const id = docSnap.data()["id"];
 
       return db.collection("UserData").doc(`${id}`).get().then((userDoc) => {
-        if(userDoc.exists){
+        if (userDoc.exists) {
           const user = userDoc.data();
-          return { code: 0, userData: { id: user["id"], username: user["username"], pfp: user["pfpURL"] }};
+          return { code: 0, userData: { id: user["id"], username: user["username"], pfp: user["pfpURL"] } };
         }
-        else{
-          return {code: 1, body: "Error when fetching user data"};
+        else {
+          return { code: 1, body: "Error when fetching user data" };
         }
       });
     }
@@ -148,8 +170,8 @@ exports.addListener = functions.https.onCall((data, context) => {
   //get variables
   const userID = context.auth.uid;
   const friendID = data.id;
-  
-  if(typeof context.auth !== 'undefined'){
+
+  if (typeof context.auth !== 'undefined') {
     return db.collection("UserData").doc(`${userID}`).update({
       listeningTo: admin.firestore.FieldValue.arrayUnion(friendID)
     }).then(() => {
@@ -161,7 +183,7 @@ exports.addListener = functions.https.onCall((data, context) => {
       });
     });
   }
-  else{
+  else {
     return "Not Authorised";
   }
 });
@@ -172,7 +194,7 @@ exports.removeListener = functions.https.onCall((data, context) => {
   const userID = context.auth.uid;
   const friendID = data.id;
 
-  if(typeof context.auth !== 'undefined'){
+  if (typeof context.auth !== 'undefined') {
     return db.collection("UserData").doc(`${userID}`).update({
       listeningTo: admin.firestore.FieldValue.arrayRemove(friendID)
     }).then(() => {
@@ -184,13 +206,13 @@ exports.removeListener = functions.https.onCall((data, context) => {
       });
     });
   }
-  else{
+  else {
     return "Not Authorised";
   }
 });
 
 exports.getListeningTo = functions.https.onCall((data, context) => {
-  if(typeof context.auth !== 'undefined'){
+  if (typeof context.auth !== 'undefined') {
     const ID = context.auth.uid;
 
     let friendData = [];
@@ -199,11 +221,42 @@ exports.getListeningTo = functions.https.onCall((data, context) => {
       users.forEach((user) => {
         friendData.push({
           username: user.data()["username"],
-          pfpURL: user.data()["pfpURL"]
+          pfpURL: user.data()["pfpURL"],
+          id: user.data()["id"]
         });
       });
 
       return friendData;
+    });
+  }
+  else {
+    return "Not Authorised";
+  }
+});
+
+//recommend an artists to everyone who is listening to your recommendations
+exports.broadcastToListeners = functions.https.onCall((data, context) => {
+  if(typeof context.auth !== 'undefined'){
+    const id = context.auth.uid; 
+    const artist = data.artist;
+
+    return db.collection("UserData").doc(`${id}`).get().then((docSnap) => {
+      docSnap.data()["listeners"].forEach((userID) => {
+        let docRef = db.collection("UserData").doc(`${userID}`);
+        
+        docRef.get().then((userData) => {
+          let recArts = userData.data()["recommendedArtists"];  //this is the users currents recommended artists
+          recArts.push(artist);
+
+          //update the users profile with the new artist
+          docRef.update({
+            recommendedArtists: recArts
+          });
+        })
+        
+      });
+
+      return "Broadcasted to Listeners";
     });
   }
   else{
@@ -464,8 +517,8 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
       //return first result
       let potentialArtist = result.data.artists.items[0];
 
-      if(user.likedArtists.includes(potentialArtist) || user.suggestedArtists.includes(potentialArtist)){
-        res.send({data: {result: "Failure - Artist already liked", artist: potentialArtist, code: 1 }});
+      if (user.likedArtists.includes(potentialArtist) || user.suggestedArtists.includes(potentialArtist)) {
+        res.send({ data: { result: "Failure - Artist already liked", artist: potentialArtist, code: 1 } });
         return;
       }
 
@@ -485,13 +538,13 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
 
             dbSnap.forEach((user) => {
               let liked = user.data().likedArtists;
-              if(liked.find(entry => entry.id == artist.id)){
+              if (liked.find(entry => entry.id == artist.id)) {
                 countEither++;
-                if(liked.find(entry => entry.id == potentialArtist.id)){
+                if (liked.find(entry => entry.id == potentialArtist.id)) {
                   countBoth++;
                 }
               }
-              else if(liked.find(entry => entry.id == potentialArtist.id)){
+              else if (liked.find(entry => entry.id == potentialArtist.id)) {
                 countEither++;
               }
             });
@@ -503,13 +556,13 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
 
             dbSnap.forEach((user) => {
               let seen = user.data().suggestedArtists;
-              if(seen.find(entry => entry.id == artist.id)){
+              if (seen.find(entry => entry.id == artist.id)) {
                 countEither++;
-                if(seen.find(entry => entry.id == potentialArtist.id)){
+                if (seen.find(entry => entry.id == potentialArtist.id)) {
                   countBoth++;
                 }
               }
-              else if(seen.find(entry => entry.id == potentialArtist.id)){
+              else if (seen.find(entry => entry.id == potentialArtist.id)) {
                 countEither++;
               }
             })
@@ -519,8 +572,8 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
             // console.log(probPos - (probNeg *0.5));
           });
         });
-        
-        finalProb = probPos - (probNeg *0.5);
+
+        finalProb = probPos - (probNeg * 0.5);
 
         if (finalProb > 0.45) {
           res.send({ data: { result: "Success", artist: potentialArtist, prob: finalProb, code: 0 } });

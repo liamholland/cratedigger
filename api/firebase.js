@@ -40,10 +40,6 @@ export function isLoggedIn(){
 //this is local - even when logged in - it is written to the server whenever the rest of the profile info is
 export function updateSuggestedArtists(artist){
   if(isLoggedIn()){
-    //backwards compatability for accounts made before this was saved to the users profile
-    if(!profileInfo.hasOwnProperty('suggestedArtists')){
-      profileInfo.suggestedArtists = [];
-    }
     
     if(profileInfo.suggestedArtists.length >= max){
       do{
