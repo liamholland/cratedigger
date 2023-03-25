@@ -44,24 +44,6 @@ exports.registerAccount = functions.https.onCall((data, context) => {
   });
 });
 
-//reset for the friends data in the database
-exports.updateProfiles = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {
-    db.collection("UserData").get().then((dbSnap) => {
-      dbSnap.forEach((doc) => {
-        doc.ref.update({
-          listeners: [],
-          listeningTo: [],
-          listenerCount: 0,
-          recommendedArtists: [], //artists recommended by people you are listening to
-        }).then(() => {
-          console.log(`Updated User ${doc.data()["username"]}`);
-        })
-      });
-    });
-  });
-});
-
 //update any part of a profile with a provided id, field and value
 exports.updateProfile = functions.https.onCall((data, context) => {
   if (typeof context.auth !== 'undefined') {
@@ -97,6 +79,12 @@ exports.getEmail = functions.https.onCall((data, context) => {
 exports.checkUniqueUsername = functions.https.onRequest((req, res) => {
   cors(req, res, () => {
     const username = req.body.data.username;
+
+    //stop attempts at making an invalid username
+    if(username === null){
+      res.send({data: {isTaken: true, message: "Invalid Username"}});
+      return;
+    }
 
     //try and find the user document
     db.collection("UserIDs").doc(`${username}`).get().then((docSnap) => {
@@ -311,6 +299,11 @@ exports.searchArtist = functions.https.onRequest((req, res) => {
     const term = req.body.data.term;
     const limit = req.body.data.limit;
 
+    if(token === null){
+      res.send({data: "No Token Provided"});
+      return;
+    }
+
     let options = {
       method: 'GET',
       url: `https://api.spotify.com/v1/search?q=${term}&type=artist&limit=${limit}`,
@@ -333,6 +326,16 @@ exports.getRelatedArtists = functions.https.onRequest((req, res) => {
     // get the variables
     const token = req.body.data.token;
     const id = req.body.data.id;
+
+    if(token === null){
+      res.send({data: "No Token Provided"});
+      return;
+    }
+
+    if(id === null){
+      res.send({data: "No ID Provided"});
+      return;
+    }
 
     // specify the options
     let options = {
@@ -358,7 +361,11 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
     const limit = req.body.data.limit;
     const genres = req.body.data.genres;  //should be an array
     const backupGenre = req.body.data.backup; //the last successful genre
-    console.log(backupGenre);
+
+    if(token === null){
+      res.send({data: "No Token Provided"});
+      return;
+    }
 
     //genres sorted by their similarity to each other
     //Thanks to ChatGPT for this
@@ -425,6 +432,16 @@ exports.getArtist = functions.https.onRequest((req, res) => {
     const token = req.body.data.token;
     const id = req.body.data.id;
 
+    if(token === null){
+      res.send({data: "No Token Provided"});
+      return;
+    }
+
+    if(id === null){
+      res.send({data: "No ID Provided"});
+      return;
+    }
+
     // specify the options
     let options = {
       method: 'GET',
@@ -446,6 +463,11 @@ exports.getArtist = functions.https.onRequest((req, res) => {
 exports.getWeezer = functions.https.onRequest((req, res) => {
   cors(req, res, () => {
     const token = req.body.data.token;
+
+    if(token === null){
+      res.send({data: "No Token Provided"});
+      return;
+    }
 
     let options = {
       method: 'GET',
@@ -469,6 +491,16 @@ exports.getAlbums = functions.https.onRequest((req, res) => {
     const token = req.body.data.token;
     const id = req.body.data.id;
 
+    if(token === null){
+      res.send({data: "No Token Provided"});
+      return;
+    }
+
+    if(id === null){
+      res.send({data: "No ID Provided"});
+      return;
+    }
+
     // specify the options
     let options = {
       method: 'GET',
@@ -489,6 +521,16 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
   cors(req, res, () => {
     const token = req.body.data.token;
     const user = req.body.data.user;
+
+    if(token === null){
+      res.send({data: "No Token Provided"});
+      return;
+    }
+
+    if(user === null || JSON.stringify(user) === '{}'){
+      res.send({data: "No Token Provided"});
+      return;
+    }
 
     let genres = [];
 
