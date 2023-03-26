@@ -75,8 +75,6 @@ export default {
                 getAlbums({ token: this.token, id: artistID }).then((albums) => {
                     this.albums = albums.data.items.sort(this.compareDates);
 
-                    console.log(this.albums);
-
                     //dont refresh the suggestions unless its a full page refresh
                     if (!onlyLikes) {
                         //get the most related artist to this artist
@@ -340,11 +338,11 @@ export default {
 
         <div class="col-lg-6 mx-auto">
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label class="btn btn-secondary active">
-                    <input type="radio" name="options" id="option1" autocomplete="off" checked @click="sortBy(true)"> Newest
+                <label class="btn btn-secondary" :class="{active: this.sortByNewest}">
+                    <input type="radio" style="display: none;" id="Newest" autocomplete="off" checked @click="sortBy(true)"> Newest
                 </label>
-                <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="option2" autocomplete="off" @click="sortBy(false)"> Oldest
+                <label class="btn btn-secondary"  :class="{active: !this.sortByNewest}">
+                    <input type="radio" style="display: none;" id="Oldest" autocomplete="off" @click="sortBy(false)"> Oldest
                 </label>
             </div>
         </div>
@@ -413,6 +411,22 @@ export default {
 .body {
     background-color: black;
     text-align: center;
+}
+
+.btn-secondary {
+    color: #1DB954;
+    --bs-btn-border-color: black;
+    --bs-btn-hover-color: #1DB954;
+    --bs-btn-hover-bg: black;
+    --bs-btn-hover-border-color: black;
+    --bs-btn-focus-shadow-rgb: 130,138,145;
+    --bs-btn-active-color: black;
+    --bs-btn-active-bg: #1DB954;
+    --bs-btn-active-border-color: none;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #1DB954;
+    --bs-btn-disabled-bg: #6c757d;
+    --bs-btn-disabled-border-color: #6c757d;
 }
 
 .btn-get-started {
