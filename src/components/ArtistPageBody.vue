@@ -414,10 +414,11 @@ export default {
 }
 
 .btn-secondary {
-    color: #1DB954;
+    --bs-btn-color: #1DB954;
+    --bs-btn-bg: black;
     --bs-btn-border-color: black;
-    --bs-btn-hover-color: #1DB954;
-    --bs-btn-hover-bg: black;
+    --bs-btn-hover-color: black;
+    --bs-btn-hover-bg: #137234;
     --bs-btn-hover-border-color: black;
     --bs-btn-focus-shadow-rgb: 130,138,145;
     --bs-btn-active-color: black;
@@ -425,8 +426,8 @@ export default {
     --bs-btn-active-border-color: none;
     --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
     --bs-btn-disabled-color: #1DB954;
-    --bs-btn-disabled-bg: #6c757d;
-    --bs-btn-disabled-border-color: #6c757d;
+    --bs-btn-disabled-bg: black;
+    --bs-btn-disabled-border-color: none;
 }
 
 .btn-get-started {
