@@ -16,9 +16,10 @@ const getRelated = httpsCallable(functions, "getRelatedArtists");
 const getUnrelated = httpsCallable(functions, "getUnrelatedArtists");
 const updateProfile = httpsCallable(functions, "updateProfile");
 const broadcast = httpsCallable(functions, "broadcastToListeners");
+const getInfo = httpsCallable(functions, "getArtistInfo");
 
 //TODO: remove emulator connection on prod
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -33,6 +34,7 @@ export default {
             loggedIn: false,
             token: "",
             sortByNewest: true,
+            info: "",
         }
     },
     created() {
@@ -77,49 +79,62 @@ export default {
 
                     //dont refresh the suggestions unless its a full page refresh
                     if (!onlyLikes) {
-                        //get the most related artist to this artist
-                        getRelated({ token: this.token, id: artistID }).then((relatedArtist) => {
-                            let i = 0;
-                            //while the most related was recently suggested to the user
-                            do {
-                                if (i == 20) {
-                                    getRelated({ token: this.token, id: relatedArtist.data.artists[19].id }).then((fallbackartists) => {
-                                        i = 0;
 
-                                        do {
-                                            if (i == 20) {
-                                                this.mostRelated = fallbackartists.data.artists[19];
-                                                return;
-                                            }
-                                            this.mostRelated = fallbackartists.data.artists[i];
-                                            i++;
-                                        } while (recentlySuggested(this.mostRelated))
-
-                                    });
-                                    return;
-                                }
-                                this.mostRelated = relatedArtist.data.artists[i];
-                                i++;
-                            } while (recentlySuggested(this.mostRelated))
-
-                            updateSuggestedArtists(this.mostRelated);
-
-                            //get artists different to the current artist
-                            getUnrelated({ token: this.token, limit: 20, genres: artist.data.genres, backup: this.lastSuggestedGenre }).then((unrelatedArtist) => {
-                                console.log(unrelatedArtist.data);
-
-                                this.lastSuggestedGenre = unrelatedArtist.data.genre;
-
+                        getInfo({artist: this.artist.name, sentences: 2}).then((artistInfo) => {
+                            if(artistInfo.data.code === 0){
+                                this.info = artistInfo.data.info;
+                            }
+                            else{
+                                this.info = "";
+                            }
+                            
+                            //get the most related artist to this artist
+                            getRelated({ token: this.token, id: artistID }).then((relatedArtist) => {
                                 let i = 0;
+                                //while the most related was recently suggested to the user
                                 do {
-                                    this.leastRelated = unrelatedArtist.data.artists[i];
+                                    if (i == 20) {
+                                        getRelated({ token: this.token, id: relatedArtist.data.artists[19].id }).then((fallbackartists) => {
+                                            i = 0;
+    
+                                            do {
+                                                if (i == 20) {
+                                                    this.mostRelated = fallbackartists.data.artists[19];
+                                                    return;
+                                                }
+                                                this.mostRelated = fallbackartists.data.artists[i];
+                                                i++;
+                                            } while (recentlySuggested(this.mostRelated))
+    
+                                        });
+                                        return;
+                                    }
+                                    this.mostRelated = relatedArtist.data.artists[i];
                                     i++;
-                                } while (recentlySuggested(this.leastRelated));
-
-                                updateSuggestedArtists(this.leastRelated);
-
-                                endLoad();
-
+                                } while (recentlySuggested(this.mostRelated))
+    
+                                updateSuggestedArtists(this.mostRelated);
+    
+                                //get artists different to the current artist
+                                getUnrelated({ token: this.token, limit: 20, genres: artist.data.genres, backup: this.lastSuggestedGenre }).then((unrelatedArtist) => {
+                                    console.log(unrelatedArtist.data);
+    
+                                    this.lastSuggestedGenre = unrelatedArtist.data.genre;
+    
+                                    let i = 0;
+                                    do {
+                                        this.leastRelated = unrelatedArtist.data.artists[i];
+                                        i++;
+                                    } while (recentlySuggested(this.leastRelated));
+    
+                                    updateSuggestedArtists(this.leastRelated);
+    
+                                    endLoad();
+    
+                                }).catch((error) => {
+                                    console.log(error);
+                                    endLoad();
+                                });
                             }).catch((error) => {
                                 console.log(error);
                                 endLoad();
@@ -128,6 +143,7 @@ export default {
                             console.log(error);
                             endLoad();
                         });
+
                     }
 
 
@@ -321,8 +337,8 @@ export default {
 
 
         <div class="col-lg-6 mx-auto">
-            <p class="artistGenre">{{ this.genres }}</p>
-
+            <p class="artistGenre">{{ this.genres }}</p><br>
+            <p class="artistGenre">{{ this.info }}</p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                 <button type="button" class="btn btn-lg px-4 gap-3 btn-get-started"
                     @click="goToNewArtist(this.mostRelated.id)">Related Artist: {{ this.mostRelated.name

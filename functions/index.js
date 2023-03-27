@@ -648,3 +648,33 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
     });
   });
 });
+
+
+/* WIKIPEDIA API CALLS */
+
+exports.getArtistInfo = functions.https.onRequest((req, res) => {
+  cors(req, res, () => {
+    const artist = req.body.data.artist;
+    const numSentences = req.body.data.sentences
+
+    const options = {
+      method: 'GET',
+      url: `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exsentences=${numSentences}&exlimit=1&explaintext=1&formatversion=2&titles=${artist}&utf8=1&origin=*`,
+    };
+
+    axios(options).then((ret) => {
+      let text = ret.data.query.pages[0].extract;
+      console.log(text.length);
+
+      if(text.length > 0){
+        res.send({data: { code: 0, info: text}});
+      }
+      else{
+        res.send({data: {code: 1, errorMessage: "No info on artist"}});
+      }
+      
+    }).catch((error) => {
+      res.send({data: { code: 1, errorMessage: error}});
+    });
+  });
+});
