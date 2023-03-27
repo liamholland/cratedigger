@@ -2,7 +2,7 @@
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous" /> -->
 <script>
-import { app, getProfileInfo, setProfileInfo, setUID, isLoggedIn } from "../../api/firebase";
+import { app, getProfileInfo, setProfileInfo, isLoggedIn } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
@@ -98,6 +98,14 @@ export default {
 }
 </script>
 <template>
+  <body style="background-color: black; color:white; padding-top:10%">
+<div class="px-4 pt-5 text-center">
+    <h1 class="display-4 fw-bold">Change how you discover music with Crate Digger</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4"><strong> <h4 style="display:inline"><a @click="opensignin()">Sign in</a></h4> </strong> or <strong><h4 style="display:inline"><a @click="opensignup()">register</a></h4></strong> to get started. We’re your home for logging your favourite artists and albums. We also recommend you artists based on your favourite artists and albums</p>
+    </div>
+  </div>
+
   <div class="container col-xxl-8 px-4 py-5">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
       <div class="col-10 col-sm-8 col-lg-6">
@@ -209,7 +217,7 @@ export default {
       </div>
     </div>
   </div>
-
+</body>
 </template>
 
 <style scoped>

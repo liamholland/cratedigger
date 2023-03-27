@@ -81,8 +81,8 @@ exports.checkUniqueUsername = functions.https.onRequest((req, res) => {
     const username = req.body.data.username;
 
     //stop attempts at making an invalid username
-    if(username === null){
-      res.send({data: {isTaken: true, message: "Invalid Username"}});
+    if (username === null) {
+      res.send({ data: { isTaken: true, message: "Invalid Username" } });
       return;
     }
 
@@ -224,14 +224,14 @@ exports.getListeningTo = functions.https.onCall((data, context) => {
 
 //recommend an artists to everyone who is listening to your recommendations
 exports.broadcastToListeners = functions.https.onCall((data, context) => {
-  if(typeof context.auth !== 'undefined'){
-    const id = context.auth.uid; 
+  if (typeof context.auth !== 'undefined') {
+    const id = context.auth.uid;
     const artist = data.artist;
 
     return db.collection("UserData").doc(`${id}`).get().then((docSnap) => {
       docSnap.data()["listeners"].forEach((userID) => {
         let docRef = db.collection("UserData").doc(`${userID}`);
-        
+
         docRef.get().then((userData) => {
           let recArts = userData.data()["recommendedArtists"];  //this is the users currents recommended artists
           recArts.push(artist);
@@ -241,13 +241,13 @@ exports.broadcastToListeners = functions.https.onCall((data, context) => {
             recommendedArtists: recArts
           });
         })
-        
+
       });
 
       return "Broadcasted to Listeners";
     });
   }
-  else{
+  else {
     return "Not Authorised";
   }
 });
@@ -299,8 +299,8 @@ exports.searchArtist = functions.https.onRequest((req, res) => {
     const term = req.body.data.term;
     const limit = req.body.data.limit;
 
-    if(token === null){
-      res.send({data: "No Token Provided"});
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
       return;
     }
 
@@ -327,13 +327,13 @@ exports.getRelatedArtists = functions.https.onRequest((req, res) => {
     const token = req.body.data.token;
     const id = req.body.data.id;
 
-    if(token === null){
-      res.send({data: "No Token Provided"});
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
       return;
     }
 
-    if(id === null){
-      res.send({data: "No ID Provided"});
+    if (id === null) {
+      res.send({ data: "No ID Provided" });
       return;
     }
 
@@ -362,8 +362,8 @@ exports.getUnrelatedArtists = functions.https.onRequest((req, res) => {
     const genres = req.body.data.genres;  //should be an array
     const backupGenre = req.body.data.backup; //the last successful genre
 
-    if(token === null){
-      res.send({data: "No Token Provided"});
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
       return;
     }
 
@@ -432,13 +432,13 @@ exports.getArtist = functions.https.onRequest((req, res) => {
     const token = req.body.data.token;
     const id = req.body.data.id;
 
-    if(token === null){
-      res.send({data: "No Token Provided"});
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
       return;
     }
 
-    if(id === null){
-      res.send({data: "No ID Provided"});
+    if (id === null) {
+      res.send({ data: "No ID Provided" });
       return;
     }
 
@@ -464,8 +464,8 @@ exports.getWeezer = functions.https.onRequest((req, res) => {
   cors(req, res, () => {
     const token = req.body.data.token;
 
-    if(token === null){
-      res.send({data: "No Token Provided"});
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
       return;
     }
 
@@ -491,13 +491,13 @@ exports.getAlbums = functions.https.onRequest((req, res) => {
     const token = req.body.data.token;
     const id = req.body.data.id;
 
-    if(token === null){
-      res.send({data: "No Token Provided"});
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
       return;
     }
 
-    if(id === null){
-      res.send({data: "No ID Provided"});
+    if (id === null) {
+      res.send({ data: "No ID Provided" });
       return;
     }
 
@@ -518,129 +518,129 @@ exports.getAlbums = functions.https.onRequest((req, res) => {
 });
 
 exports.recommendArtists = functions.https.onRequest((req, res) => {
-    cors(req, res, () => {
-        const token = req.body.data.token;
-        const user = req.body.data.user;
-        const threshold = req.body.data.threshold;  // this is new too
+  cors(req, res, () => {
+    const token = req.body.data.token;
+    const user = req.body.data.user;
+    const threshold = req.body.data.threshold;  // this is new too
 
 
-        let genres = [];
+    let genres = [];
 
-        user.likedArtists.forEach((artist) => {
-            artist.genres.forEach((genre) => {
-                genres.push(genre);
+    user.likedArtists.forEach((artist) => {
+      artist.genres.forEach((genre) => {
+        genres.push(genre);
+      });
+    });
+
+
+    //get a random search query
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    const randomSearch = alphabet.charAt(Math.floor(Math.random() * 25));
+    const randomUserGenre = genres.length > 0 ? genres[Math.floor(Math.random() * genres.length)] : "";
+    const randomOffset = Math.floor(Math.random(12345)) % 90;
+    //search the spotify API for a random artist
+
+    //specify request options
+    let options = {
+      method: 'GET',
+      url: `https://api.spotify.com/v1/search?q="${randomSearch}"genre:${randomUserGenre}&type=artist&limit=5&offset=${randomOffset}`,
+      headers: { 'Authorization': `Bearer ${token}` },
+    };
+
+    //make request
+    axios(options).then((result) => {
+      //return first result
+      let potentialArtist = result.data.artists.items[0];
+
+      if (user.likedArtists.includes(potentialArtist) || user.suggestedArtists.includes(potentialArtist)) {
+        res.send({ data: { result: "Failure - Artist already liked", artist: potentialArtist, code: 1 } });
+        return;
+      }
+
+      let probPos = 1;
+      let probNeg = 1;
+      let currProb = 0;
+      let finalProb = 0;
+
+      let countSugg = 0;  // the suggested new artist
+      let countComp = 0;  // the artist being compared
+      let countBoth = 0;  // instances of the intersection
+
+      let similarArtists = [];        // array of the most similar artists     
+      let sim_prob = [];              // their associated probability         
+      let dis_prob = [];              // same again for negative
+
+      const dbRef = db.collection("UserData");
+      let n = dbRef.length;
+
+      //get the probability that a user will like this album
+      dbRef.get().then((dbSnap) => {
+        dbSnap.forEach((doc) => {
+          doc.data().suggestedArtists.forEach((artist) => {    //for each of each users liked artists
+
+            dbSnap.forEach((user) => {
+              let liked = user.data().likedArtists;
+              if (liked.find(entry => entry.id == artist.id)) {
+                countComp++;
+                if (liked.find(entry => entry.id == potentialArtist.id)) {
+                  countBoth++;
+                }
+              }
+              else if (liked.find(entry => entry.id == potentialArtist.id)) {
+                countSugg++;
+              }
             });
-        });
 
-
-        //get a random search query
-        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-        const randomSearch = alphabet.charAt(Math.floor(Math.random() * 25));
-        const randomUserGenre = genres.length > 0 ? genres[Math.floor(Math.random() * genres.length)] : "";
-        const randomOffset = Math.floor(Math.random(12345)) % 90;
-        //search the spotify API for a random artist
-
-        //specify request options
-        let options = {
-            method: 'GET',
-            url: `https://api.spotify.com/v1/search?q="${randomSearch}"genre:${randomUserGenre}&type=artist&limit=5&offset=${randomOffset}`,
-            headers: { 'Authorization': `Bearer ${token}` },
-        };
-
-        //make request
-        axios(options).then((result) => {
-            //return first result
-            let potentialArtist = result.data.artists.items[0];
-
-            if (user.likedArtists.includes(potentialArtist) || user.suggestedArtists.includes(potentialArtist)) {
-                res.send({ data: { result: "Failure - Artist already liked", artist: potentialArtist, code: 1 } });
-                return;
+            currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
+            if (currProb > 0.5 && sim_prob.length < 11) {
+              similarArtists.push(artist.id);
+              sim_pos.push(currProb);
             }
 
-            let probPos = 1;
-            let probNeg = 1;
-            let currProb = 0;
-            let finalProb = 0;
+            countSugg = 0;
+            countComp = 0;
+            countEither = 0;
 
-            let countSugg = 0;  // the suggested new artist
-            let countComp = 0;  // the artist being compared
-            let countBoth = 0;  // instances of the intersection
-
-            let similarArtists = [];        // array of the most similar artists     
-            let sim_prob = [];              // their associated probability         
-            let dis_prob = [];              // same again for negative
-
-            const dbRef = db.collection("UserData");
-            let n = dbRef.length;
-
-            //get the probability that a user will like this album
-            dbRef.get().then((dbSnap) => {
-                dbSnap.forEach((doc) => {
-                    doc.data().suggestedArtists.forEach((artist) => {    //for each of each users liked artists
-
-                        dbSnap.forEach((user) => {
-                            let liked = user.data().likedArtists;
-                            if (liked.find(entry => entry.id == artist.id)) {
-                                countComp++;
-                                if (liked.find(entry => entry.id == potentialArtist.id)) {
-                                    countBoth++;
-                                }
-                            }
-                            else if (liked.find(entry => entry.id == potentialArtist.id)) {
-                                countSugg++;
-                            }
-                        });
-
-                        currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
-                        if (currprob > 0.5 && sim_prob.length < 11) {
-                            similarArtists.push(artist.id);
-                            sim_pos.push(currProb);
-                        }
-
-                        countSugg = 0;
-                        countComp = 0;
-                        countEither = 0;
-
-                        dbSnap.forEach((user) => {
-                            let seen = user.data().suggestedArtists;
-                            if (seen.find(entry => entry.id == artist.id)) {
-                                countComp++;
-                                if (seen.find(entry => entry.id == potentialArtist.id)) {
-                                    countBoth++;
-                                }
-                            }
-                            else if (seen.find(entry => entry.id == potentialArtist.id)) {
-                                countSugg++;
-                            }
-                        })
-
-                        currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
-                        if (currprob > 0.5 && sim_prob.length < 11) {
-                            dis_prob.push(currProb);
-                        }
-
-                        // console.log(probPos - (probNeg *0.5));
-                    });
-                });
-
-                for (let i = 0; i < sim_prob.length; i++) {
-                    probPos *= sim_prob[i];
+            dbSnap.forEach((user) => {
+              let seen = user.data().suggestedArtists;
+              if (seen.find(entry => entry.id == artist.id)) {
+                countComp++;
+                if (seen.find(entry => entry.id == potentialArtist.id)) {
+                  countBoth++;
                 }
+              }
+              else if (seen.find(entry => entry.id == potentialArtist.id)) {
+                countSugg++;
+              }
+            })
 
-                for (let i = 0; i < sim_neg.length; i++) {
-                    probNeg *= dis_prob[i];
-                }
+            currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
+            if (currProb > 0.5 && sim_prob.length < 11) {
+              dis_prob.push(currProb);
+            }
 
-                finalProb = probPos - (probNeg * 0.5);
-
-                // also adding the "because you liked" array
-                if (finalProb > 0.45 || finalProb === 0) {
-                    res.send({ data: { result: "Success", artist: potentialArtist, prob: finalProb, similar: similarArtists, code: 0 } });
-                }
-                else {
-                    res.send({ data: { result: "Failure", artist: potentialArtist, prob: finalProb, code: 1 } });
-                }
-            });
+            // console.log(probPos - (probNeg *0.5));
+          });
         });
+
+        for (let i = 0; i < sim_prob.length; i++) {
+          probPos *= sim_prob[i];
+        }
+
+        for (let i = 0; i < dis_prob.length; i++) {
+          probNeg *= dis_prob[i];
+        }
+
+        finalProb = probPos - (probNeg * 0.5);
+
+        // also adding the "because you liked" array
+        if (finalProb > 0.45 || finalProb === 0) {
+          res.send({ data: { result: "Success", artist: potentialArtist, prob: finalProb, similar: similarArtists, code: 0 } });
+        }
+        else {
+          res.send({ data: { result: "Failure", artist: potentialArtist, prob: finalProb, code: 1 } });
+        }
+      });
     });
+  });
 });

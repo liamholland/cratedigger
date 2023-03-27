@@ -14,7 +14,7 @@ const recommend = httpsCallable(functions, "recommendArtists");
 const update = httpsCallable(functions, "updateProfile");
 
 //TODO: remove emulator connection on prod
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -123,21 +123,43 @@ export default {
 </script>
 
 <template >
+
+
     <div v-if="loggedIn">
-        <meta charset="utf-8">
-        <section class="hero">
-            <p class="artistName">{{ this.currentSuggestion.name }}</p><br>
-            <p class="artistGenre">{{ this.genres }}</p>
-        </section>
+        <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+    <h1 class="display-5 fw-bold" style="padding-top:10%">Artist: {{ this.currentSuggestion.name }}</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Genres: {{ this.genres }}</p>
+
         
-        <section id="hero" class="hero">
-            <button @click="likeArtist" class="btn-get-started">Like</button>
-            <img :src="artistImage" :alt="this.currentSuggestion.name">
-            <button @click="skipArtist" class="btn-get-started">Don't Like</button>
-        </section>
+      <div class="container px-1">
+          <button style="background-color:black; padding-left:15px; border: none; font-size:150%"   @click="skipArtist">&#10060;</button>
+            <img :src="artistImage" :alt="this.currentSuggestion.name" class="img-fluid rounded-3 " width="180" height="180" loading="lazy">
+<button style="background-color:black; padding-right:15px; border: none; font-size:150%" @click="likeArtist">&#9989;</button>
+          
+      </div>
+
+
+
+      
+      
+    </div>
+  </section>
+    
     </div>
     <div v-else>
-        <p>Not Logged In</p>
+        <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+
+      <div class="col-lg-6 mx-auto" style="padding-top:10%">
+        <h4 class="lead mb-4" style="color:white; ">You are not logged into your account. To login click <h3
+            style="display:inline"><strong><a @click="opensignin()">here</a></strong></h3> or to create an account click
+          <h3 style="display:inline"><strong><a @click="opensignup()">here</a></strong></h3>
+        </h4>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+
+        </div>
+      </div>
+    </section>
     </div>
 </template>
 
@@ -147,7 +169,6 @@ export default {
     background-color: black;
     padding-top: 12.5%;
 }
-
 .btn-get-started {
     font-weight: 500;
     font-size: 16px;
@@ -161,18 +182,15 @@ export default {
     text-decoration: none;
     border: 2px solid #1DB954;
 }
-
 .btn-get-started:hover {
     background: #1DB954;
     color: black;
 }
-
 .artistName {
     color: white;
     font-size: 100px;
     text-align: center;
 }
-
 .artistGenre {
     color: white;
     font-size: 20px;
