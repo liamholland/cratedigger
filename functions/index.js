@@ -627,7 +627,7 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
                     probPos *= sim_prob[i];
                 }
 
-                for (let i = 0; i < sim_neg.length; i++) {
+                for (let i = 0; i < dis_prob.length; i++) {
                     probNeg *= dis_prob[i];
                 }
 
