@@ -32,6 +32,7 @@ export default {
             lastSuggestedGenre: "",
             loggedIn: false,
             token: "",
+            sortByNewest: true,
         }
     },
     created() {
@@ -58,7 +59,7 @@ export default {
     methods: {
         //refreshes the data on the page
         refresh(artistID, onlyLikes) {
-            if(!onlyLikes){
+            if (!onlyLikes) {
                 startLoad(this);
             }
 
@@ -132,13 +133,13 @@ export default {
 
                 }).catch((error) => {
                     console.log(error);
-                    if(!onlyLikes){
+                    if (!onlyLikes) {
                         endLoad();
                     }
                 });
             }).catch((error) => {
                 console.log(error);
-                if(!onlyLikes){
+                if (!onlyLikes) {
                     endLoad();
                 }
             });
@@ -216,18 +217,29 @@ export default {
         },
 
         compareDates(d1, d2) {
+            //convert text to dates
             let date1 = new Date(d1.release_date);
             let date2 = new Date(d2.release_date);
 
-            if (date1 > date2) {
+            let sortingOrder = date1 < date2;   //default is oldest first
+            if(this.sortByNewest){
+                sortingOrder = date1 > date2;   //switch to newest first    
+            }
+
+            if (sortingOrder) { //dependent on the sorting order
                 return -1;
             }
-            else if (date1 > date2) {
-                return 1;
-            }
-            else {
+            else if (date1 === date2) {
                 return 0;
             }
+            else {
+                return 1;
+            }
+        },
+
+        sortBy(value){
+            this.sortByNewest = value;
+            this.refresh(this.$route.params.aid, true);
         },
 
         goToNewArtist(id) {
@@ -259,10 +271,10 @@ export default {
             }
         },
 
-        recommendArtist(){
-            if(this.loggedIn){
+        recommendArtist() {
+            if (this.loggedIn) {
                 startLoad(this);
-                broadcast({artist: this.artist}).then((result) => {
+                broadcast({ artist: this.artist }).then((result) => {
                     console.log(result.data);
                     endLoad();
                 }).catch((error) => {
@@ -270,7 +282,7 @@ export default {
                     endLoad();
                 });
             }
-            else{
+            else {
                 console.log("Not Logged In");
             }
         },
@@ -301,7 +313,8 @@ export default {
                 </svg>
             </button>
 
-            <button @click="recommendArtist" type="button" class="btn btn" style=" border-color:black;">Recommended To Listeners</button>
+            <button @click="recommendArtist" type="button" class="btn btn" style=" border-color:black;">Recommended To
+                Listeners</button>
         </h1>
 
 
@@ -323,8 +336,17 @@ export default {
         <br><br><br>
 
 
-
-
+        <div class="col-lg-6 mx-auto">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-secondary" :class="{active: this.sortByNewest}">
+                    <input type="radio" style="display: none;" id="Newest" autocomplete="off" checked @click="sortBy(true)"> Newest
+                </label>
+                <label class="btn btn-secondary"  :class="{active: !this.sortByNewest}">
+                    <input type="radio" style="display: none;" id="Oldest" autocomplete="off" @click="sortBy(false)"> Oldest
+                </label>
+            </div>
+        </div>
+        <br><br><br>
 
         <ul style="background-color:black">
             <li v-for="album in this.albums">
@@ -389,6 +411,23 @@ export default {
 .body {
     background-color: black;
     text-align: center;
+}
+
+.btn-secondary {
+    --bs-btn-color: #1DB954;
+    --bs-btn-bg: black;
+    --bs-btn-border-color: black;
+    --bs-btn-hover-color: black;
+    --bs-btn-hover-bg: #137234;
+    --bs-btn-hover-border-color: black;
+    --bs-btn-focus-shadow-rgb: 130,138,145;
+    --bs-btn-active-color: black;
+    --bs-btn-active-bg: #1DB954;
+    --bs-btn-active-border-color: none;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #1DB954;
+    --bs-btn-disabled-bg: black;
+    --bs-btn-disabled-border-color: none;
 }
 
 .btn-get-started {
