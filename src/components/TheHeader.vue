@@ -311,7 +311,7 @@ export default {
       integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <meta charset="utf-8">
     <nav class="navbar navbar-expand-lg " aria-label="Offcanvas navbar large" style="background-color:black">
-      <div  style="margin-left: 25%" class="container-fluid" >
+      <div class="container-fluid" >
          <router-link to="/">
           
           <img style= "object-fit: contain" src="../assets/img/updated_cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
