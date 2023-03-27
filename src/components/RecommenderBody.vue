@@ -1,7 +1,7 @@
 <script>
 import { app, isLoggedIn, getProfileInfo, setProfileInfo, updateSuggestedArtists, recentlySuggested } from "../../api/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { startLoad, endLoad } from "../assets/js/frontendFunctions"
+import { startLoad, endLoad, openModal } from "../assets/js/frontendFunctions"
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 //get componenets
@@ -14,7 +14,7 @@ const recommend = httpsCallable(functions, "recommendArtists");
 const update = httpsCallable(functions, "updateProfile");
 
 //TODO: remove emulator connection on prod
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
@@ -112,6 +112,14 @@ export default {
                 }
             }
         },
+
+        opensignin(){
+            openModal(0);
+        },
+
+        opensignup(){
+            openModal(1);
+        }
     },
     computed: {
         artistImage(){

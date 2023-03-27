@@ -234,12 +234,17 @@ exports.broadcastToListeners = functions.https.onCall((data, context) => {
 
         docRef.get().then((userData) => {
           let recArts = userData.data()["recommendedArtists"];  //this is the users currents recommended artists
-          recArts.push(artist);
 
-          //update the users profile with the new artist
-          docRef.update({
-            recommendedArtists: recArts
-          });
+          //if they havent been recommended it before
+          if(!(recArts.find(entry => entry.id === artist.id))){
+            recArts.push(artist);
+
+            //update the users profile with the new artist
+            docRef.update({
+              recommendedArtists: recArts
+            });
+          }
+
         })
 
       });
