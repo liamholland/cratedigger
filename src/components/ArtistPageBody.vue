@@ -19,7 +19,7 @@ const broadcast = httpsCallable(functions, "broadcastToListeners");
 const getInfo = httpsCallable(functions, "getArtistInfo");
 
 //TODO: remove emulator connection on prod
-connectFunctionsEmulator(functions, "localhost", 5001);
+// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default {
     data() {
