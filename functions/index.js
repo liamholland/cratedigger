@@ -236,7 +236,7 @@ exports.broadcastToListeners = functions.https.onCall((data, context) => {
           let recArts = userData.data()["recommendedArtists"];  //this is the users currents recommended artists
 
           //if they havent been recommended it before
-          if(!(recArts.find(entry => entry.id === artist.id))){
+          if (!(recArts.find(entry => entry.id === artist.id))) {
             recArts.push(artist);
 
             //update the users profile with the new artist
@@ -619,9 +619,8 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
               }
             })
 
-            currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
-            if (currProb > 0.5 && sim_prob.length < 11) {
-              dis_prob.push(currProb);
+            for (let i = 0; i < dis_prob.length; i++) {
+              probNeg *= dis_prob[i];
             }
 
             // console.log(probPos - (probNeg *0.5));
