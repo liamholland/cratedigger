@@ -311,10 +311,10 @@ export default {
       integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <meta charset="utf-8">
     <nav class="navbar navbar-expand-lg " aria-label="Offcanvas navbar large" style="background-color:black">
-      <div class="container-fluid" >
+      <div  style="margin-left: 25%" class="container-fluid" >
          <router-link to="/">
-  
-          <img src="../assets/img/updated_cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
+          
+          <img style= "object-fit: contain" src="../assets/img/updated_cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
         </router-link>
   
         <button style="background-color: grey" class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -325,12 +325,15 @@ export default {
   
         <div class="collapse navbar-collapse" id="navbarsExample03">
           <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-          
-            <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/">Home</router-link>
+
+        
+          <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed" rel="stylesheet">
+
+            <li class="nav-item" style="margin-right: 10px;">
+            <router-link to="/">Home</router-link>
             </li>
-            <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a
-                class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
+            <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px"><a
+                 class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
             <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a class="myBtn"
                 id="myBtn" @click="opensignin()">Login</a></li>
             <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;" ><a class="myBtn"
