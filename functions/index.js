@@ -626,7 +626,6 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
 
               currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
               if (currProb > 0.5) {
-                similarArtists.push(artist.id);
                 dis_prob.push(currProb);
               } 
             }
