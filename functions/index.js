@@ -528,6 +528,16 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
     const user = req.body.data.user;
     const threshold = req.body.data.threshold;  // this is new too
 
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
+      return;
+    }
+
+    if (user === null || JSON.stringify(user) == '{}') {
+      res.send({ data: "Invalid User" });
+      return;
+    }
+
 
     let genres = [];
 
