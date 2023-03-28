@@ -332,25 +332,27 @@ export default {
             <li class="nav-item" style="margin-right: 10px;">
             <router-link to="/">Home</router-link>
             </li>
+            <li class="nav-item " style=" margin-right: 10px;">
+              <router-link to="/AboutUs">About</router-link>
+            </li>
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/Recommend">Recommender</router-link>
+            </li>
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/Search">Search</router-link>
+            </li>
+            
+            <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
+              <router-link to="">Account</router-link>
+            </li>
+
+            <!-- login and logout buttons -->
             <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px"><a
                  class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
             <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a class="myBtn"
                 id="myBtn" @click="opensignin()">Login</a></li>
             <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;" ><a class="myBtn"
                 id="myBtn" @click="logout()">Log Out</a></li>
-            <li class="nav-item " style=" margin-right: 10px;">
-              <router-link to="/AboutUs">About Us</router-link>
-            </li>
-            <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/New">What's New?</router-link>
-            </li>
-            <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/Search">Search</router-link>
-            </li>
-  
-            <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
-              <router-link to="">Account</router-link>
-            </li>
   
           </ul>
   
