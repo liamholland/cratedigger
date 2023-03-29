@@ -6,7 +6,7 @@ const expect = chai.expect;
 
 //spotify token used to do tests
 //paste https://us-central1-test-project-3d277.cloudfunctions.net/getSpotifyToken into the browser url bar for this
-const testToken = 'BQDDP2MtDAlt3yc5LTdzHSfk4E1ERh8qkfA5TJ0hb_bIdQ6V9j00OQeC_ox5C-dBM4PTM1hJ2tfEtjV4LUd5VTADZa9Gsw8GQU5n3vm-F7nmQHA1xLs9';
+const testToken = 'BQBKo6YgpB18T0dBmNkdGLGzbdXp7octt5MQYWSCIx8I_6nTdFsJUoP177Fx_Pt2EoBIiv6KkpbzyzR7fCmryrPjl8KJF0tIQuCXQsanC9MGXMvedUG3';
 
 /* ON REQUEST FUNCTION TESTS */
 
