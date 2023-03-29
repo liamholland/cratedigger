@@ -127,10 +127,10 @@ export default {
     },
 
     showRecommendations() {
-      console.log(this.accountInfo.recommendedArtists);
       this.displayAlbums = false;
       this.displayRecs = true;
     },
+    
     updateProfile() {
       startLoad(this);
       //update both

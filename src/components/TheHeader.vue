@@ -333,6 +333,7 @@ export default {
             <li class="nav-item " style="margin-right: 10px;">
             <router-link to="/" active-class="active" class="nav-item">Home</router-link>
             </li>
+
             <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px"><a
                  class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
             <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a class="myBtn"
@@ -340,19 +341,28 @@ export default {
             <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;" ><a class="myBtn"
                 id="myBtn" @click="logout()">Log Out</a></li>
             <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/AboutUs" active-class="active" class="nav-item">About Us</router-link>
-              
-            </li>
-            <li class="nav-item"  style=" margin-right: 10px;">
-              <router-link to="/New" active-class="active" class="nav-item">What's New?</router-link>
+              <router-link to="/AboutUs" active-class="active" class="nav-item">About</router-link>
+             </li>
+            
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/Recommend" active-class="active" class="nav-item">Recommender</router-link>
+
             </li>
             <li class="nav-item" style=" margin-right: 10px;">
               <router-link to="/Search" active-class="active" class="nav-item">Search</router-link>
             </li>
-  
+            
             <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
               <router-link to="/Account" active-class="active" class="nav-item">Account</router-link>
             </li>
+
+            <!-- login and logout buttons -->
+            <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px"><a
+                 class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
+            <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a class="myBtn"
+                id="myBtn" @click="opensignin()">Login</a></li>
+            <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;" ><a class="myBtn"
+                id="myBtn" @click="logout()">Log Out</a></li>
   
           </ul>
   

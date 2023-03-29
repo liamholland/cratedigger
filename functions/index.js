@@ -528,6 +528,16 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
     const user = req.body.data.user;
     const threshold = req.body.data.threshold;  // this is new too
 
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
+      return;
+    }
+
+    if (user === null || JSON.stringify(user) == '{}') {
+      res.send({ data: "Invalid User" });
+      return;
+    }
+
 
     let genres = [];
 
@@ -574,6 +584,9 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
       let similarArtists = [];        // array of the most similar artists     
       let sim_prob = [];              // their associated probability         
       let dis_prob = [];              // same again for negative
+      
+      const sim_threshold = 16;       // max amount of "similar" artists being checked
+
 
       const dbRef = db.collection("UserData");
       let n = dbRef.length;
@@ -582,48 +595,51 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
       dbRef.get().then((dbSnap) => {
         dbSnap.forEach((doc) => {
           doc.data().suggestedArtists.forEach((artist) => {    //for each of each users liked artists
-
-            dbSnap.forEach((user) => {
-              let liked = user.data().likedArtists;
-              if (liked.find(entry => entry.id == artist.id)) {
-                countComp++;
-                if (liked.find(entry => entry.id == potentialArtist.id)) {
-                  countBoth++;
+            if (sim_prob.length < sim_threshold) {
+                dbSnap.forEach((user) => {
+                let liked = user.data().likedArtists;
+                if (liked.find(entry => entry.id == artist.id)) {
+                  countComp++;
+                  if (liked.find(entry => entry.id == potentialArtist.id)) {
+                    countBoth++;
+                  }
                 }
-              }
-              else if (liked.find(entry => entry.id == potentialArtist.id)) {
-                countSugg++;
-              }
-            });
+                else if (liked.find(entry => entry.id == potentialArtist.id)) {
+                  countSugg++;
+                }
+              });
 
-            currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
-            if (currProb > 0.5 && sim_prob.length < 11) {
-              similarArtists.push(artist.id);
-              sim_pos.push(currProb);
+              currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
+              if (currProb > 0.5) {
+                similarArtists.push(artist.id);
+                sim_prob.push(currProb);
+              }
             }
 
             countSugg = 0;
             countComp = 0;
-            countEither = 0;
+            countBoth = 0;
 
-            dbSnap.forEach((user) => {
-              let seen = user.data().suggestedArtists;
-              if (seen.find(entry => entry.id == artist.id)) {
-                countComp++;
-                if (seen.find(entry => entry.id == potentialArtist.id)) {
-                  countBoth++;
+            if (dis_prob.length < sim_threshold) {
+                dbSnap.forEach((user) => {
+                let seen = user.data().suggestedArtists;
+                if (seen.find(entry => entry.id == artist.id)) {
+                  countComp++;
+                  if (seen.find(entry => entry.id == potentialArtist.id)) {
+                    countBoth++;
+                  }
                 }
-              }
-              else if (seen.find(entry => entry.id == potentialArtist.id)) {
-                countSugg++;
-              }
-            })
+                else if (seen.find(entry => entry.id == potentialArtist.id)) {
+                  countSugg++;
+                }
+              })
 
-            for (let i = 0; i < dis_prob.length; i++) {
-              probNeg *= dis_prob[i];
+              currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
+              if (currProb > 0.5) {
+                dis_prob.push(currProb);
+              } 
             }
-
-            // console.log(probPos - (probNeg *0.5));
+            
           });
         });
 
