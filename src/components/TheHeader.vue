@@ -334,7 +334,7 @@ export default {
             <router-link to="/" active-class="active" class="nav-item">Home</router-link>
             </li>
             <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/AboutUs" active-class="active" class="nav-item">About Us</router-link>
+              <router-link to="/About" active-class="active" class="nav-item">About Us</router-link>
               
             </li>
             <li class="nav-item"  style=" margin-right: 10px;">
@@ -343,7 +343,7 @@ export default {
             <li class="nav-item" style=" margin-right: 10px;">
               <router-link to="/Search" active-class="active" class="nav-item">Search</router-link>
             </li>
-  
+            
             <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
               <router-link to="/Account" active-class="active" class="nav-item">Account</router-link>
             </li>

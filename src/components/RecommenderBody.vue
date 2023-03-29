@@ -131,7 +131,6 @@ export default {
 
 <template >
     <div v-if="loggedIn">
-
         <section class="px-4 py-5 text-center backg" style="width: 100vw; height: 100vh; color:white">
     <h1 class="display-5 fw-bold" style="padding-top:10%">Artist: {{ this.currentSuggestion.name }}</h1>
     <div class="col-lg-6 mx-auto">
@@ -204,6 +203,7 @@ export default {
     background-color: black;
     padding-top: 12.5%;
 }
+
 
 .backg{
     background-image:linear-gradient(to top,#8C3E3E,black);
