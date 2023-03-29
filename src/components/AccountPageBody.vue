@@ -332,20 +332,20 @@ export default {
 
       
       <div class="header__wrapper" style="background-color:black">
-        <div class="rounded-top text-white cols__container" style=" background-color: #151515;">
+        <div class="rounded-top text-white cols__container backg">
           <div class="left__col">
             <!-- profile information -->
             <div class="right__col">
               <div class="row">
                 <div class="col d-flex flex-row">
-                  <div class="pfpBio" style="background-color:#151515;">
+                  <div class="pfpBio" style="background-color:transparent;">
                     <div class="pfp">
                       <img v-bind:src="this.pfpURL" alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
                         style="height: 150px; width: 150px; z-index: 1">
-                      <button type="button"
-                        style="z-index: 1; background-color:white; border-radius:4px; border:none; width: 150px; "
+                      <button type="button" class="btn-get-started"
+                       
                         @click="openProfileEdit()">
-                        Edit profile
+                        Edit
                       </button>
                     </div>
                     <div class="bio">
@@ -386,14 +386,14 @@ export default {
             <br>
             <!-- sorting albums -->
             <div class="row">
-              <div class="col">
+              <div class="col d-flex justify-content-center">
                 <nav>
-                  <ul>
-                    <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(true)">Liked Albums</a></li>
+                  <ul >
+                    <li class="list" style="text-indent: 20px; cursor: pointer;"><a class="text" @click="showAlbums(true)">Liked Albums</a></li>
     
-                    <li style="text-indent: 20px; cursor: pointer;"><a @click="showAlbums(false)">Liked Artists</a></li>
+                    <li class="list" style="text-indent: 20px; cursor: pointer;"><a class="text" @click="showAlbums(false)">Liked Artists</a></li>
     
-                    <li style="text-indent: 20px; cursor: pointer;"><a @click="showRecommendations">Recommended
+                    <li class="list" style="text-indent: 20px; cursor: pointer;"><a class="text" @click="showRecommendations">Recommended
                         Artists</a></li>
     
                   </ul>
@@ -401,6 +401,7 @@ export default {
                 </nav>
               </div>
             </div>
+            
             <div class="row">
               <div class="col">
                 <div class="photos" v-if="this.displayAlbums">
@@ -426,7 +427,7 @@ export default {
         
       </div>
 
-      <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:#151515">
+      <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:#8C3E3E">
       </div>
 
     </body>
@@ -434,12 +435,12 @@ export default {
 
   <div v-else>
 
-    <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+    <section class="px-4 py-5 text-center backg">
 
       <div class="col-lg-6 mx-auto" style="padding-top:10%">
-        <h4 class="lead mb-4" style="color:white; ">You are not logged into your account. To login click <h3
-            style="display:inline"><strong><a @click="opensignin()">here</a></strong></h3> or to create an account click
-          <h3 style="display:inline"><strong><a @click="opensignup()">here</a></strong></h3>
+        <h4 class="lead mb-4" style="color:white; ">You are not logged into your account.<br> To login click <h3
+            style="display:inline"><strong><a class="here" @click="opensignin()">HERE</a></strong></h3><br> or to create an account click
+          <h3 style="display:inline"><strong><a class="here" @click="opensignup()">HERE</a></strong></h3>.
         </h4>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
 
@@ -448,11 +449,20 @@ export default {
     </section>
 
   </div>
+  <div class="col-lg-6 mx-auto gap" style="padding-top:10%; width: 100vw;height: 60vh;">
+  </div>
 </template>
 
 <style scoped>
 .display-artists {
   display: none;
+}
+
+.backg{
+  background-image:linear-gradient(to top, #8C3E3E , black);
+}
+.gap{
+  background-color:#8C3E3E;
 }
 
 .hero {
@@ -470,15 +480,17 @@ export default {
   border-radius: 50px;
   transition: 0.5s;
   margin: 10px;
-  color: white;
+  color: #d9d9d9;
   text-decoration: none;
-  border: 2px solid #1DB954;
+  border: 2px solid #8C3E3E;
 }
 
 .btn-get-started:hover {
-  background: #1DB954;
+  background: #8C3E3E;
   color: black
 }
+
+
 
 .modal {
   display: none;
@@ -519,17 +531,21 @@ export default {
   font-size: 32px;
   font-weight: bold;
 }
+h4{
+  color:#d9d9d9;
+  font-family:"IBM Plex Sans Condensed", sans serif;
+}
 
 .close:hover,
 .close:focus {
-  color: #1DB954;
+  color: #8C3E3E;
   text-decoration: none;
   cursor: pointer;
 }
 
 .close1:hover,
 .close1:focus {
-  color: #1DB954;
+  color: #8C3E3E;
   text-decoration: none;
 }
 
@@ -552,22 +568,25 @@ ul {
 }
 
 a {
-  text-decoration: none;
+ text-transform: uppercase;
+  color: #d9d9d9;
+  text-decoration:none;
 }
 
 /* scrollbar */
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
+  background-color:#BFB1A4;
     border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    -webkit-box-shadow: inset 0 0 6px rgba(38,38,38,0); 
 }
 
 .listeningTo {
@@ -603,6 +622,25 @@ a {
   left: 50%;
   transform: translatex(-50%);
 }
+.btn-get-started {
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 12px 40px;
+  border-radius: 50px;
+  transition: 0.5s;
+  margin: 10px;
+  color: white;
+  text-decoration: none;
+  border: 3.5px solid #BFB1A4;
+  background: transparent;
+}
+
+.btn-get-started:hover {
+  background: #BFB1A4;
+  color: #D9D9D9;
+}
 
 .header__wrapper .cols__container .right__col .img__container img {
   width: 130px;
@@ -629,9 +667,25 @@ a {
 }
 
 /* "Liked albums" color and uppercase */
-.header__wrapper .cols__container .left__col nav ul li a {
+.header__wrapper .cols__container .left__col nav ul li {
+  display:block;
   text-transform: uppercase;
-  color: #818181;
+  color:#BFB1A4;
+}
+ul li a:hover, ul li a:focus {
+color:#d9d9d9;
+}
+.text{
+   display:block;
+  text-transform: uppercase;
+  color: #BFB1A4;
+}
+.text:hover{
+  color:#d9d9d9;
+}
+
+.here:hover{
+  color: #BFB1A4;
 }
 
 img {

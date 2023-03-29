@@ -1,6 +1,6 @@
 <template >
   <meta charset="utf-8">
-  <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+  <section class="px-4 py-5 text-center backg" style="width: 100vw; height: 100vh; color:white">
     <h1 class="display-5 fw-bold" style="padding-top:10%">Welcome to Crate Digger</h1>
     <div class="col-lg-6 mx-auto">
       <p class="lead mb-4">Search for your favourite artists, like your favourite artists and your favourite albums by
@@ -17,16 +17,22 @@
     
 <style scoped>
 .boxes {
-  color: white
+  color: white;
+  
 }
 
 .boxes:hover {
-  color: #1DB954;
+  color: #8C3E3E;
+}
+
+.backg{
+  background: linear-gradient(to top, #8C3E3E 1%, transparent,transparent, transparent,transparent, transparent, black), url("../assets/img/home-image.jpg");
+  background-size: cover;
 }
 
 .hero {
   text-align: center;
-  background-color: black;
+  background-color: #262626;
   padding-top: 12.5%;
 }
 
@@ -41,26 +47,26 @@
   margin: 10px;
   color: white;
   text-decoration: none;
-  border: 2px solid #1DB954;
+  border: 3.5px solid #BFB1A4;
+  background: transparent;
 }
 
 .btn-get-started:hover {
-  background: #1DB954;
-  color: black;
+  background: #BFB1A4;
+  color: #D9D9D9;
 }
 
 .heading:hover {
-  color: #1DB954;
+  color: #8C3E3E;
   width: 100px;
-  background-color: blueviolet;
+
 }
 
 .services {
   text-align: center;
-
+  background-color:#262626;
+  background-size:cover;
   color: white;
-  background-color: black;
-  background-size: cover;
   font-size: 14px;
   padding: 80px 0 60px 0;
   position: relative;
@@ -91,8 +97,9 @@
   /* Full height */
   overflow: auto;
   /* Enable scroll if needed */
+  
   /* background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: #262626;
   /* Black w/ opacity */
 }
 
@@ -153,7 +160,7 @@
 
   width: 350px;
   height: 535px;
-  background-color: #1a1a1a;
+  background-color: #262626;
   border-radius: 10px;
   margin: auto;
   padding: 15px;
@@ -180,7 +187,7 @@
   align-items: center;
   width: 350px;
   height: 450px;
-  background-color: #1a1a1a;
+  background-color: #262626;
   margin: auto;
   padding: 10px;
 

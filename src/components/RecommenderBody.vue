@@ -131,6 +131,20 @@ export default {
 
 <template >
     <div v-if="loggedIn">
+        <section class="px-4 py-5 text-center backg" style="width: 100vw; height: 100vh; color:white">
+    <h1 class="display-5 fw-bold" style="padding-top:10%">Artist: {{ this.currentSuggestion.name }}</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Genres: {{ this.genres }}</p>
+
+        
+      <div class="container px-1">
+          <button style="background-color:transparent; padding-left:15px; border: none; font-size:150%"   @click="skipArtist">&#10060;</button>
+            <img :src="artistImage" :alt="this.currentSuggestion.name" class="img-fluid rounded-3 " width="180" height="180" loading="lazy">
+            <button style="background-color:transparent; padding-right:15px; border: none; font-size:150%" @click="likeArtist">&#9989;</button>
+          
+        </div>
+        </div>
+</section>
         <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
             <h1 class="display-5 fw-bold" style="padding-top:10%">Artist: {{ this.currentSuggestion.name }}</h1>
             <div class="col-lg-6 mx-auto">
@@ -153,7 +167,6 @@ export default {
 
             </div>
         </section>
-
     </div>
     <div v-else-if="noProfile">
         <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
@@ -167,20 +180,21 @@ export default {
         </section>
     </div>
     <div v-else>
-        <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+        <section class="px-4 py-5 text-center backg" style="font-family: IBM Plex Sans Condensed, Sans Serif; width: 100vw; height: 100vh; color:white">
 
-            <div class="col-lg-6 mx-auto" style="padding-top:10%">
-                <h4 class="lead mb-4" style="color:white; ">You are not logged into your account. To login click <h3
-                        style="display:inline"><strong><a @click="opensignin()">here</a></strong></h3> or to create an
-                    account click
-                    <h3 style="display:inline"><strong><a @click="opensignup()">here</a></strong></h3>
-                </h4>
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <div class="col-lg-6 mx-auto" style="padding-top:10%">
+            <h4 class="lead mb-4" style="color:white; ">You are not logged into your account.<br> To login click <h3
+            style="display:inline"><strong><a class="here" @click="opensignin()">HERE</a></strong></h3><br> or to create an account click
+            <h3 style="display:inline"><strong><a class="here" @click="opensignup()">HERE</a></strong></h3>.
+            </h4>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
 
                 </div>
-            </div>
-        </section>
+        </div>
+         </section>
     </div>
+    <div class="col-lg-6 mx-auto gap" style="padding-top:10%; width: 100vw;height: 60vh;">
+  </div>
 </template>
 
 <style scoped>
@@ -190,6 +204,18 @@ export default {
     padding-top: 12.5%;
 }
 
+
+.backg{
+    background-image:linear-gradient(to top,#8C3E3E,black);
+}
+a {
+ text-transform: uppercase;
+  color: #d9d9d9;
+  text-decoration:none;
+}
+.here:hover{
+  color: #BFB1A4;
+}
 .btn-get-started {
     font-weight: 500;
     font-size: 16px;
@@ -219,4 +245,8 @@ export default {
     color: white;
     font-size: 20px;
     text-align: center;
-}</style>
+}
+.gap{
+    background-color:#8C3E3E;
+}
+</style>

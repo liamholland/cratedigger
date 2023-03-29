@@ -67,7 +67,7 @@ export default {
 </script>
 
 <template>
-  <section class="py-5 text-center" style=" color:white; background-color:black">
+  <section class="py-5 text-center backg" style="color:white">
 
 
     <div class="col-lg-6 mx-auto" style="padding-top:10%;">
@@ -79,7 +79,7 @@ export default {
         <li v-for="artist in results">
           <div class="photos" @click="this.$router.push({ name: 'ArtistPage', params: { aid: artist.id } })">
             <img :src="this.setImage(artist.images)" :alt="artist.name">
-            <h1 style="font-size:30px">{{ artist.name }}</h1>
+            <h1 style="font-size:30px; color:white">{{ artist.name }}</h1>
             <br>
 
           </div>
@@ -87,7 +87,7 @@ export default {
       </ul>
     </div>
   </section>
-  <div class="col-lg-6 mx-auto" style="padding-top:10%; width: 100vw;height: 60vh; background-color:black">
+  <div class="col-lg-6 mx-auto gap" style="padding-top:10%; width: 100vw;height: 60vh;">
   </div>
 </template>
   
@@ -127,7 +127,15 @@ body {
   transition: all .5s ease-in-out;
   background-color: white;
   padding-right: 40px;
-  color: gray;
+  color: grey;
+}
+
+.backg{
+  background-color:#0d0d0d;
+}
+
+.gap{
+  background-image:linear-gradient(to bottom, #0d0d0d, #0d0d0d, #0d0d0d, #0d0d0d, #0d0d0d, #8C3E3E );
 }
 
 .input-search::placeholder {
@@ -159,8 +167,8 @@ body {
 }
 
 .SearchPage {
-  font-family: "Roboto", sans-serif;
-  background-color: black;
+  font-family: "IBM Plex Sans Condensed", sans-serif;
+  
   color: white;
 }
 
@@ -173,4 +181,9 @@ img {
   position: relative;
   height: 180px;
   width: 180px;
-}</style>
+}
+img:hover {
+  transform: scale(1.05);
+  transition: 0.5s;
+}
+</style>

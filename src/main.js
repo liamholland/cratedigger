@@ -22,7 +22,7 @@ app.use(router);
 app.use(LoadingPlugin, {
     container : null,
     canCancel: false,
-    color: '#32B506',
+    color: '#ffff99',
     height: 40,
     width: 40,
     loader: 'bars',

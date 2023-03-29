@@ -98,9 +98,9 @@ export default {
 }
 </script>
 <template>
-  <body style="background-color: black; color:white; padding-top:10%">
+  <body>
 <div class="px-4 pt-5 text-center">
-    <h1 class="display-4 fw-bold">Change how you discover music with Crate Digger</h1>
+    <h1 class="display-4 fw-bold">Making the world a better place,<br> one recommendation at a time</h1>
     <div class="col-lg-6 mx-auto">
       <p class="lead mb-4"><strong> <h4 style="display:inline"><a @click="opensignin()">Sign in</a></h4> </strong> or <strong><h4 style="display:inline"><a @click="opensignup()">register</a></h4></strong> to get started. We’re your home for logging your favourite artists and albums. We also recommend you artists based on your favourite artists and albums</p>
     </div>
@@ -205,7 +205,7 @@ export default {
   </div>
 
   <div class="px-4 pt-5 text-center">
-    <h1 class="display-4 fw-bold">Most importantly we reccomend you artists!</h1>
+    <h1 class="display-4 fw-bold">Most importantly we recommend you artists!</h1>
     <div class="col-lg-6 mx-auto">
       <p class="lead mb-4">Go to recommedations and start liking and disliking artists as they appear on the screen</p>
 
@@ -221,8 +221,14 @@ export default {
 </template>
 
 <style scoped>
-.body {
-  background-color: black;
+body {
+  background-image:linear-gradient(to top,#8C3E3E,black);
+  color:white; 
+  padding-top:10%;
+}
+img{
+  border-radius:1.5em;
+  border:2px solid #262626;
 }
 
 .hero {
