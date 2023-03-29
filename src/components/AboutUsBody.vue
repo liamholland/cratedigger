@@ -98,7 +98,7 @@ export default {
 }
 </script>
 <template>
-  <body style="background-color: black; color:white; padding-top:10%">
+  <body>
 <div class="px-4 pt-5 text-center">
     <h1 class="display-4 fw-bold">Change how you discover music with Crate Digger</h1>
     <div class="col-lg-6 mx-auto">
@@ -221,8 +221,14 @@ export default {
 </template>
 
 <style scoped>
-.body {
-  background-color: black;
+body {
+  background-image:linear-gradient(to top,#8C3E3E,black);
+  color:white; 
+  padding-top:10%;
+}
+img{
+  border-radius:1.5em;
+  border:2px solid #262626;
 }
 
 .hero {

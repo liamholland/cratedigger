@@ -134,16 +134,16 @@ export default {
 
 
     <div v-if="loggedIn">
-        <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+        <section class="px-4 py-5 text-center backg" style="width: 100vw; height: 100vh; color:white">
     <h1 class="display-5 fw-bold" style="padding-top:10%">Artist: {{ this.currentSuggestion.name }}</h1>
     <div class="col-lg-6 mx-auto">
       <p class="lead mb-4">Genres: {{ this.genres }}</p>
 
         
       <div class="container px-1">
-          <button style="background-color:black; padding-left:15px; border: none; font-size:150%"   @click="skipArtist">&#10060;</button>
+          <button style="background-color:transparent; padding-left:15px; border: none; font-size:150%"   @click="skipArtist">&#10060;</button>
             <img :src="artistImage" :alt="this.currentSuggestion.name" class="img-fluid rounded-3 " width="180" height="180" loading="lazy">
-<button style="background-color:black; padding-right:15px; border: none; font-size:150%" @click="likeArtist">&#9989;</button>
+<button style="background-color:transparent; padding-right:15px; border: none; font-size:150%" @click="likeArtist">&#9989;</button>
           
       </div>
 
@@ -156,7 +156,7 @@ export default {
     
     </div>
     <div v-else>
-        <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
+        <section class="px-4 py-5 text-center backg" style="width: 100vw; height: 100vh; color:white">
 
       <div class="col-lg-6 mx-auto" style="padding-top:10%">
         <h4 class="lead mb-4" style="color:white; ">You are not logged into your account. To login click <h3
@@ -176,6 +176,9 @@ export default {
     text-align: center;
     background-color: black;
     padding-top: 12.5%;
+}
+.backg{
+    background-image:linear-gradient(to top,#8C3E3E,black);
 }
 .btn-get-started {
     font-weight: 500;
