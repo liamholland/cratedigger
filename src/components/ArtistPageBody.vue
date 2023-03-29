@@ -319,7 +319,7 @@ export default {
 
 
                 <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5"
-                    fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:#8C3E3E">
+                    fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:#ffff99">
                     <path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                 </svg>
                 <svg v-else xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5" fill="currentColor"
@@ -381,7 +381,7 @@ export default {
                         <button @click="toggleLikeAlbum(album)" type="button" class="btn btn" style="position:absolute; ">
 
                             <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5"
-                                fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:#8C3E3E; border-color:transparent">
+                                fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:#ffff99; border-color:transparent">
                                 <path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                             </svg>
 
@@ -426,11 +426,11 @@ export default {
     text-align: left;
 }
 .backg{
-    background-image:linear-gradient(to top, #D9D9D9, black );
+    background-image:linear-gradient(to top, #8C3E3E, black);
 }
 
 .gap{
-    background-image:linear-gradient(to top, #8C3E3E, #d9d9d9)
+    background-color:#8C3E3E;
 }
 
 .albumInfo {

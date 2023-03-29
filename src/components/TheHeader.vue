@@ -318,7 +318,7 @@ export default {
           <img style= "object-fit: contain" src="../assets/img/updated_cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
         </router-link>
   
-        <button style="background-color: #8C3E3E" class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        <button style="background-color: #BFB1A4" class="navbar-toggler" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false"
           aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -344,13 +344,13 @@ export default {
               
             </li>
             <li class="nav-item"  style=" margin-right: 10px;">
-              <router-link to="/New" active-class="active" class="nav-item">What's New?</router-link>
+              <router-link to="/Recommend" active-class="active" class="nav-item">Recommender</router-link>
             </li>
             <li class="nav-item" style=" margin-right: 10px;">
               <router-link to="/Search" active-class="active" class="nav-item">Search</router-link>
             </li>
   
-            <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
+            <li class="nav-item" active-class="active" style=" margin-right: 10px;" @click="routeToAccount">
               <router-link to="/Account" active-class="active" class="nav-item">Account</router-link>
             </li>
   

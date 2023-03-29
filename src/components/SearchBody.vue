@@ -131,11 +131,11 @@ body {
 }
 
 .backg{
-  background-color:#0d0d0d
-
+  background-color:#0d0d0d;
 }
+
 .gap{
-  background-image:linear-gradient(to bottom, #0d0d0d , #8C3E3E 90%);
+  background-image:linear-gradient(to bottom, #0d0d0d, #0d0d0d, #0d0d0d, #0d0d0d, #0d0d0d, #8C3E3E );
 }
 
 .input-search::placeholder {

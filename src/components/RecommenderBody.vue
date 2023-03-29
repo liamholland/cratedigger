@@ -156,12 +156,12 @@ export default {
     
     </div>
     <div v-else>
-        <section class="px-4 py-5 text-center backg" style="width: 100vw; height: 100vh; color:white">
+        <section class="px-4 py-5 text-center backg" style="font-family: IBM Plex Sans Condensed, Sans Serif; width: 100vw; height: 100vh; color:white">
 
       <div class="col-lg-6 mx-auto" style="padding-top:10%">
-        <h4 class="lead mb-4" style="color:white; ">You are not logged into your account. To login click <h3
-            style="display:inline"><strong><a @click="opensignin()">here</a></strong></h3> or to create an account click
-          <h3 style="display:inline"><strong><a @click="opensignup()">here</a></strong></h3>
+        <h4 class="lead mb-4" style="color:white; ">You are not logged into your account.<br> To login click <h3
+            style="display:inline"><strong><a class="here" @click="opensignin()">HERE</a></strong></h3><br> or to create an account click
+          <h3 style="display:inline"><strong><a class="here" @click="opensignup()">HERE</a></strong></h3>.
         </h4>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
 
@@ -169,6 +169,8 @@ export default {
       </div>
     </section>
     </div>
+    <div class="col-lg-6 mx-auto gap" style="padding-top:10%; width: 100vw;height: 60vh;">
+  </div>
 </template>
 
 <style scoped>
@@ -179,6 +181,14 @@ export default {
 }
 .backg{
     background-image:linear-gradient(to top,#8C3E3E,black);
+}
+a {
+ text-transform: uppercase;
+  color: #d9d9d9;
+  text-decoration:none;
+}
+.here:hover{
+  color: #BFB1A4;
 }
 .btn-get-started {
     font-weight: 500;
@@ -206,5 +216,8 @@ export default {
     color: white;
     font-size: 20px;
     text-align: center;
+}
+.gap{
+    background-color:#8C3E3E;
 }
 </style>

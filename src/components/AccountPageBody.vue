@@ -449,6 +449,8 @@ export default {
     </section>
 
   </div>
+  <div class="col-lg-6 mx-auto gap" style="padding-top:10%; width: 100vw;height: 60vh;">
+  </div>
 </template>
 
 <style scoped>
@@ -458,6 +460,9 @@ export default {
 
 .backg{
   background-image:linear-gradient(to top, #8C3E3E , black);
+}
+.gap{
+  background-color:#8C3E3E;
 }
 
 .hero {
@@ -564,7 +569,7 @@ ul {
 
 a {
  text-transform: uppercase;
-  color: #BFB1A4;
+  color: #d9d9d9;
   text-decoration:none;
 }
 
@@ -665,10 +670,22 @@ a {
 .header__wrapper .cols__container .left__col nav ul li {
   display:block;
   text-transform: uppercase;
-  color: #BFB1A4;
+  color:#BFB1A4;
 }
 ul li a:hover, ul li a:focus {
 color:#d9d9d9;
+}
+.text{
+   display:block;
+  text-transform: uppercase;
+  color: #BFB1A4;
+}
+.text:hover{
+  color:#d9d9d9;
+}
+
+.here:hover{
+  color: #BFB1A4;
 }
 
 img {
