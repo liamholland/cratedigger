@@ -144,28 +144,6 @@ export default {
           
         </div>
         </div>
-</section>
-        <section class="px-4 py-5 text-center" style="width: 100vw; height: 100vh; color:white; background-color:black">
-            <h1 class="display-5 fw-bold" style="padding-top:10%">Artist: {{ this.currentSuggestion.name }}</h1>
-            <div class="col-lg-6 mx-auto">
-                <p class="lead mb-4">Genres: {{ this.genres }}</p>
-
-
-                <div class="container px-1">
-                    <button style="background-color:black; padding-left:15px; border: none; font-size:150%"
-                        @click="skipArtist">&#10060;</button>
-                    <img :src="artistImage" :alt="this.currentSuggestion.name" class="img-fluid rounded-3 " width="180"
-                        height="180" loading="lazy">
-                    <button style="background-color:black; padding-right:15px; border: none; font-size:150%"
-                        @click="likeArtist">&#9989;</button>
-
-                </div>
-
-
-
-
-
-            </div>
         </section>
     </div>
     <div v-else-if="noProfile">

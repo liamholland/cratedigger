@@ -109,10 +109,17 @@ export default {
                                         });
                                         return;
                                     }
-                                    this.mostRelated = relatedArtist.data.artists[i];
-                                    i++;
+                                    
+                                    if(relatedArtist.data.artists.length > 0){
+                                        this.mostRelated = relatedArtist.data.artists[i];
+                                        i++;
+                                    }
+                                    else{
+                                        this.mostRelated = {name: "None :(", id: -1};   //avoids an error if there are no related artists - fix made at 21.30 night before demo thats why its a hack
+                                        break;
+                                    }
                                 } while (recentlySuggested(this.mostRelated))
-    
+                                
                                 updateSuggestedArtists(this.mostRelated);
     
                                 //get artists different to the current artist
@@ -259,14 +266,16 @@ export default {
         },
 
         goToNewArtist(id) {
-            if (this.loggedIn) {
-                updateProfile({ field: 'suggestedArtists', value: getProfileInfo().suggestedArtists }).catch((error) => {
-                    console.log(error);
-                });
+            if(id !== -1){
+                if (this.loggedIn) {
+                    updateProfile({ field: 'suggestedArtists', value: getProfileInfo().suggestedArtists }).catch((error) => {
+                        console.log(error);
+                    });
+                }
+    
+                this.$router.push({ name: "ArtistPage", params: { aid: id } });
+                this.refresh(id, false);
             }
-
-            this.$router.push({ name: "ArtistPage", params: { aid: id } });
-            this.refresh(id, false);
         },
 
         isLikedAlbum(album) {

@@ -334,7 +334,7 @@ export default {
             <router-link to="/" active-class="active" class="nav-item">Home</router-link>
             </li>
             <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/About" active-class="active" class="nav-item">About Us</router-link>
+              <router-link to="/AboutUs" active-class="active" class="nav-item">About</router-link>
               
             </li>
             <li class="nav-item"  style=" margin-right: 10px;">
@@ -362,10 +362,11 @@ export default {
       </div>
     </nav>
     
+    <!-- <href="https://fonts.googleapis.com/css?family=IBM Plex Sans Condensed" rel="stylesheet"> -->
   </template>
   <style scoped>
-  <href="https://fonts.googleapis.com/css?family=IBM Plex Sans Condensed" rel="stylesheet">
-   
+
+  @import url('https://fonts.googleapis.com/css2?family=IBM Plex Sans Condensed&display=swap');
 
   .myBtn1 {
     list-style-type: none;
@@ -379,9 +380,7 @@ export default {
     background-color: #262626;
     list-style-type: none;
   }
-  .navbar-nav .nav-link {
-  /* Add any other styles that you want for the links */
-}
+
   .navbar {
     padding: 20px 0;
   }

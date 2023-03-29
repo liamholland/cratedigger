@@ -64,7 +64,10 @@ export function recentlySuggested(artist){
   if(isLoggedIn()){
     return profileInfo.suggestedArtists.find(entry => entry.id == artist.id);
   }
-  else{
+  else if(localSuggestedArtists.length > 0){
     return localSuggestedArtists.find(entry => entry.id == artist.id);
+  }
+  else{
+    return false;
   }
 }
