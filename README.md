@@ -1,29 +1,9 @@
-# VueDemo
+### ireallylikedogs presents...
 
-This template should help get you started developing with Vue 3 in Vite.
+#The Crate Digger
 
-## Recommended IDE Setup
+An application designed using VueJS and Firebase to recommend you artists in a variety of different ways including:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
+- Recommender Algorithm
+- Related and Unrelated Artists
+- User-driven recommendations provided by our Listener system
