@@ -589,81 +589,82 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
 
 
       const dbRef = db.collection("UserData");
-      let n = dbRef.length;
-
-      //get the probability that a user will like this album
-      dbRef.get().then((dbSnap) => {
-        dbSnap.forEach((doc) => {
-          doc.data().suggestedArtists.forEach((artist) => {    //for each of each users liked artists
-            if (sim_prob.length < sim_threshold) {
-                dbSnap.forEach((user) => {
-                let liked = user.data().likedArtists;
-                if (liked.find(entry => entry.id == artist.id)) {
-                  countComp++;
-                  if (liked.find(entry => entry.id == potentialArtist.id)) {
-                    countBoth++;
+            dbRef.get().then((snap) => {
+        let n = snap.size;
+        //get the probability that a user will like this album
+        dbRef.get().then((dbSnap) => {
+          dbSnap.forEach((doc) => {
+            doc.data().suggestedArtists.forEach((artist) => {    //for each of each users liked artists
+              if (sim_prob.length < sim_threshold) {
+                  dbSnap.forEach((user) => {
+                  let liked = user.data().likedArtists;
+                  if (liked.find(entry => entry.id == artist.id)) {
+                    countComp++;
+                    if (liked.find(entry => entry.id == potentialArtist.id)) {
+                      countBoth++;
+                    }
                   }
+                  else if (liked.find(entry => entry.id == potentialArtist.id)) {
+                    countSugg++;
+                  }
+                });
+  
+                currProb = (countComp / n) * ((countBoth / countComp) / ((countSugg === 0 ? n : countSugg) / n));
+                if (currProb > 0.05) {
+                  similarArtists.push(artist.id);
+                  console.log(similarArtists);
+                  sim_prob.push(currProb);
                 }
-                else if (liked.find(entry => entry.id == potentialArtist.id)) {
-                  countSugg++;
-                }
-              });
-
-              currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
-              if (currProb > 0.5) {
-                similarArtists.push(artist.id);
-                sim_prob.push(currProb);
               }
-            }
-
-            countSugg = 0;
-            countComp = 0;
-            countBoth = 0;
-
-            if (dis_prob.length < sim_threshold) {
-                dbSnap.forEach((user) => {
-                let seen = user.data().suggestedArtists;
-                if (seen.find(entry => entry.id == artist.id)) {
-                  countComp++;
-                  if (seen.find(entry => entry.id == potentialArtist.id)) {
-                    countBoth++;
+  
+              countSugg = 0;
+              countComp = 0;
+              countBoth = 0;
+  
+              if (dis_prob.length < sim_threshold) {
+                  dbSnap.forEach((user) => {
+                  let seen = user.data().suggestedArtists;
+                  if (seen.find(entry => entry.id == artist.id)) {
+                    countComp++;
+                    if (seen.find(entry => entry.id == potentialArtist.id)) {
+                      countBoth++;
+                    }
                   }
-                }
-                else if (seen.find(entry => entry.id == potentialArtist.id)) {
-                  countSugg++;
-                }
-              })
-
-              currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
-              if (currProb > 0.5) {
-                dis_prob.push(currProb);
-              } 
-            }
-            
+                  else if (seen.find(entry => entry.id == potentialArtist.id)) {
+                    countSugg++;
+                  }
+                })
+  
+                currProb = (countComp / n) * (countBoth / countComp) / (countSugg / n);
+                if (currProb > 0.5) {
+                  dis_prob.push(currProb);
+                } 
+              }
+              
+            });
           });
+  
+          for (let i = 0; i < sim_prob.length; i++) {
+            probPos *= sim_prob[i];
+          }
+  
+          for (let i = 0; i < dis_prob.length; i++) {
+            probNeg *= dis_prob[i];
+          }
+  
+          finalProb = probPos - (probNeg * 0.5);
+  
+          // also adding the "because you liked" array
+          if (finalProb > 0.45 || finalProb === 0) {
+            res.send({ data: { result: "Success", artist: potentialArtist, prob: finalProb, similar: similarArtists, code: 0 } });
+          }
+          else {
+            res.send({ data: { result: "Failure", artist: potentialArtist, prob: finalProb, code: 1 } });
+          }
         });
-
-        for (let i = 0; i < sim_prob.length; i++) {
-          probPos *= sim_prob[i];
-        }
-
-        for (let i = 0; i < dis_prob.length; i++) {
-          probNeg *= dis_prob[i];
-        }
-
-        finalProb = probPos - (probNeg * 0.5);
-
-        // also adding the "because you liked" array
-        if (finalProb > 0.45 || finalProb === 0) {
-          res.send({ data: { result: "Success", artist: potentialArtist, prob: finalProb, similar: similarArtists, code: 0 } });
-        }
-        else {
-          res.send({ data: { result: "Failure", artist: potentialArtist, prob: finalProb, code: 1 } });
-        }
       });
     });
   });
-});
 
 
 /* WIKIPEDIA API CALLS */

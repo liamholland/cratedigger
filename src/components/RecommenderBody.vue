@@ -64,6 +64,7 @@ export default {
                 else {
                     this.currentSuggestion = recommendation.data.artist;
                     this.genres = "";
+                    this.similarArtist = recommendation.data.similar[Math.floor(Math.random() * 12345) % recommendation.similar.length];
                     this.currentSuggestion.genres.forEach((genre) => {
                         this.genres += genre + ' , ';
                     });
@@ -194,6 +195,7 @@ a {
 .here:hover{
   color: #BFB1A4;
 }
+
 .btn-get-started {
     font-weight: 500;
     font-size: 16px;
