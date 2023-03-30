@@ -177,7 +177,7 @@ export default {
     search(input) {
       if (!this.typing) {
         this.typing = true;
-        setTimeout(() => this.sendSearchRequest(input), 150);
+        setTimeout(() => this.sendSearchRequest(input), 400);
       }
     },
 
@@ -188,19 +188,23 @@ export default {
           if (result.data.code === 1) {
             console.log(result.data.body);
             this.hasResult = false;
+            this.message = "No Such User";
             this.searchedUser == {};
             return;
           }
           else if (result.data.code === 0) {
-            console.log(result.data.userData);
             this.searchedUser = result.data.userData;
             if (this.accountInfo.listeningTo.find(addedID => addedID == this.searchedUser.id)) {
               this.message = `Already Listening to ${this.searchedUser.username}`;
               this.hasResult = false;
             }
+            else if(this.accountInfo.id === this.searchedUser.id){
+              this.hasResult = false;
+              this.message = "Cannot Listen to Yourself!";
+            }
             else {
               this.hasResult = true;
-              this.message = "No Such User";
+              this.message = "";
             }
           }
         }).catch((error) => {
