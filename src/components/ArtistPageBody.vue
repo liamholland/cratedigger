@@ -109,10 +109,17 @@ export default {
                                         });
                                         return;
                                     }
-                                    this.mostRelated = relatedArtist.data.artists[i];
-                                    i++;
+                                    
+                                    if(relatedArtist.data.artists.length > 0){
+                                        this.mostRelated = relatedArtist.data.artists[i];
+                                        i++;
+                                    }
+                                    else{
+                                        this.mostRelated = {name: "None :(", id: -1};   //avoids an error if there are no related artists - fix made at 21.30 night before demo thats why its a hack
+                                        break;
+                                    }
                                 } while (recentlySuggested(this.mostRelated))
-    
+                                
                                 updateSuggestedArtists(this.mostRelated);
     
                                 //get artists different to the current artist
@@ -259,14 +266,16 @@ export default {
         },
 
         goToNewArtist(id) {
-            if (this.loggedIn) {
-                updateProfile({ field: 'suggestedArtists', value: getProfileInfo().suggestedArtists }).catch((error) => {
-                    console.log(error);
-                });
+            if(id !== -1){
+                if (this.loggedIn) {
+                    updateProfile({ field: 'suggestedArtists', value: getProfileInfo().suggestedArtists }).catch((error) => {
+                        console.log(error);
+                    });
+                }
+    
+                this.$router.push({ name: "ArtistPage", params: { aid: id } });
+                this.refresh(id, false);
             }
-
-            this.$router.push({ name: "ArtistPage", params: { aid: id } });
-            this.refresh(id, false);
         },
 
         isLikedAlbum(album) {
@@ -307,19 +316,19 @@ export default {
 </script>
 
 <template class="body">
-    <section class="px-4 py-5 text-center" style="color:white; background-color:black">
+    <section class="px-4 py-5 text-center backg" style="color:white">
         <h1 class="display-5 fw-bold artistName" style="padding-top:10%; font-size:55px">
             <link rel="stylesheet"
                 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
             <router-link type="button" class="fa fa-angle-double-left"
-                style="font-size:48px;color:white; background-color:black; text-decoration: none; text-indent:20px"
+                style="font-size:48px;color:white; background-color:transparent; text-decoration: none; text-indent:20px"
                 to="/Search"></router-link> {{ this.artist.name }}
             <button @click="toggleLikeArtist(this.artist)" type="button" class="btn btn" style=" border-color:black;">
 
 
 
                 <svg v-if="isLikedArtist(this.artist)" xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5"
-                    fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:1DB954">
+                    fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:#ffff99">
                     <path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                 </svg>
                 <svg v-else xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5" fill="currentColor"
@@ -328,7 +337,7 @@ export default {
                         d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                 </svg>
             </button>
-<button @click="recommendArtist" type="button" class="btn btn" style=" border-color:black;">
+<button @click="recommendArtist" type="button" class="btn btn" style=" border-color:transparent;">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
 <g id="surface1">
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;" d="M 8.640625 12 C 8.640625 13.855469 10.144531 15.359375 12 15.359375 C 13.855469 15.359375 15.359375 13.855469 15.359375 12 C 15.359375 10.144531 13.855469 8.640625 12 8.640625 C 10.144531 8.640625 8.640625 10.144531 8.640625 12 Z M 8.640625 12 "/>
@@ -372,7 +381,7 @@ export default {
         </div>
         <br><br><br>
 
-        <ul style="background-color:black">
+        <ul style="background-color:transparent">
             <li v-for="album in this.albums">
                 <div class="row">
                     <div v-if="!this.isRepeat(album)">
@@ -381,12 +390,12 @@ export default {
                         <button @click="toggleLikeAlbum(album)" type="button" class="btn btn" style="position:absolute; ">
 
                             <svg v-if="isLikedAlbum(album)" xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5"
-                                fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:1DB954">
+                                fill="currentColor" class="fa fa-heart" viewBox="0 0 16 16" style="color:#ffff99; border-color:transparent">
                                 <path d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                             </svg>
 
                             <svg v-else xmlns="http://www.w3.org/2000/svg" width="22.5" height="22.5" fill="currentColor"
-                                class="fa fa-heart" viewBox="0 0 16 16" style="color:white">
+                                class="fa fa-heart" viewBox="0 0 16 16" style="color:white; border-color:transparent;">
                                 <path fill-rule="evenodd"
                                     d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
                             </svg>
@@ -416,12 +425,21 @@ export default {
         </ul>
 
     </section>
+    <div class="col-lg-6 mx-auto gap" style="padding-top:10%; width: 100vw;height: 60vh;">
+  </div>
 </template>
       
 <style scoped>
 .albumResult {
-    background-color: #151515;
+    background-color: transparent;
     text-align: left;
+}
+.backg{
+    background-image:linear-gradient(to top, #8C3E3E, black);
+}
+
+.gap{
+    background-color:#8C3E3E;
 }
 
 .albumInfo {
@@ -438,24 +456,24 @@ export default {
 }
 
 .btn-secondary {
-    --bs-btn-color: #1DB954;
-    --bs-btn-bg: black;
-    --bs-btn-border-color: black;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #BFB1A4;
     --bs-btn-hover-color: black;
-    --bs-btn-hover-bg: #137234;
-    --bs-btn-hover-border-color: black;
+    --bs-btn-hover-bg: #D9d9d9;
+    --bs-btn-hover-border-color: #BFB1A4;
     --bs-btn-focus-shadow-rgb: 130,138,145;
-    --bs-btn-active-color: black;
-    --bs-btn-active-bg: #1DB954;
-    --bs-btn-active-border-color: none;
+    --bs-btn-active-color: white;
+    --bs-btn-color: white;
+    --bs-btn-active-bg: #BFB1A4;
+    --bs-btn-active-border-color: #BFB1A4;
     --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-    --bs-btn-disabled-color: #1DB954;
-    --bs-btn-disabled-bg: black;
+    --bs-btn-disabled-color: white;
+    --bs-btn-disabled-bg: grey;
     --bs-btn-disabled-border-color: none;
 }
 
 .btn-get-started {
-    background-color: black;
+    background-color: transparent;
     font-weight: 500;
     font-size: 16px;
     letter-spacing: 1px;
@@ -466,12 +484,12 @@ export default {
     margin: 10px;
     color: white;
     text-decoration: none;
-    border: 2px solid #1DB954;
+    border: 2px solid #BFB1A4;
 }
 
 .btn-get-started:hover {
-    background: #1DB954;
-    color: black
+    background: #BFB1A4;
+    color: #d9d9d9;
 }
 
 .artistName {

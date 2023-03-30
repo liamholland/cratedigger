@@ -25,7 +25,7 @@
  
  text-align: center;
   color: white;
-  background-color: #151515;
+  background-image:linear-gradient(to bottom, #8C3E3E, #151515);
   background-size: cover;
   font-size: 14px;
   padding: 80px 0 60px 0;

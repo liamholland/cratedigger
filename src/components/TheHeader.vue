@@ -4,6 +4,7 @@ import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { openModal, closeModal, startLoad, endLoad } from "../assets/js/frontendFunctions"
 
+
 //get components
 const auth = getAuth(app);
 const functions = getFunctions(app);
@@ -261,7 +262,7 @@ export default {
       <!-- Modal content -->
       <div style="align-items: center" class="modal-content">
         <span class="close" @click="closesignin()">&times;</span>
-        <p style="font-size: 40px; color: white">Sign in</p>
+        <p style="font-family: IBM Plex Sans Condensed, sans serif; font-size: 30px; color: white">Sign in</p>
   
         <p style="color:red">{{errorMessage1}}</p>
         <div class="form-floating">
@@ -283,7 +284,7 @@ export default {
       <!-- Modal content -->
       <div style="align-items: center" class="modal-content">
         <span class="close" @click="closesignup()">&times;</span>
-        <p style="font-size: 40px; text-align: center; color: white">Create account</p>
+        <p style="font-family: IBM Plex Sans Condensed, sans serif; font-size: 30px; text-align: center; color: white ">Create Account</p>
   
         <p style="color:red">{{errorMessage3}}{{errorMessage5}}</p>
         <div class="form-floating">
@@ -317,7 +318,7 @@ export default {
           <img style= "object-fit: contain" src="../assets/img/updated_cratedigger_banner.png" alt="Crate Digger" width="120" height="60"><!--Logo-->
         </router-link>
   
-        <button style="background-color: grey" class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        <button style="background-color: #BFB1A4" class="navbar-toggler" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false"
           aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -329,28 +330,31 @@ export default {
         
           <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans+Condensed" rel="stylesheet">
 
-            <li class="nav-item" style="margin-right: 10px;">
-            <router-link to="/">Home</router-link>
+            <li class="nav-item " style="margin-right: 10px;">
+            <router-link to="/" active-class="active" class="nav-item">Home</router-link>
             </li>
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/AboutUs" active-class="active" class="nav-item">About</router-link>
+              
+            </li>
+            <li class="nav-item"  style=" margin-right: 10px;">
+              <router-link to="/Recommend" active-class="active" class="nav-item">Recommender</router-link>
+            </li>
+            <li class="nav-item" style=" margin-right: 10px;">
+              <router-link to="/Search" active-class="active" class="nav-item">Search</router-link>
+            </li>
+            
+            <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
+              <router-link to="/Account" active-class="active" class="nav-item">Account</router-link>
+            </li>
+
+            <!-- login and logout buttons -->
             <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px"><a
                  class="myBtn1" id="myBtn1" @click="opensignup()">Sign Up</a></li>
             <li v-if="!this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;"><a class="myBtn"
                 id="myBtn" @click="opensignin()">Login</a></li>
             <li v-if="this.loggedIn" class="nav-item" style="list-style-type: none; margin-right: 10px;" ><a class="myBtn"
                 id="myBtn" @click="logout()">Log Out</a></li>
-            <li class="nav-item " style=" margin-right: 10px;">
-              <router-link to="/AboutUs">About Us</router-link>
-            </li>
-            <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/New">What's New?</router-link>
-            </li>
-            <li class="nav-item" style=" margin-right: 10px;">
-              <router-link to="/Search">Search</router-link>
-            </li>
-  
-            <li class="nav-item" style=" margin-right: 10px;" @click="routeToAccount">
-              <router-link to="">Account</router-link>
-            </li>
   
           </ul>
   
@@ -358,11 +362,12 @@ export default {
       </div>
     </nav>
     
+    <!-- <href="https://fonts.googleapis.com/css?family=IBM Plex Sans Condensed" rel="stylesheet"> -->
   </template>
   <style scoped>
-  .nav-item {
-    color: rebeccapurple;
-  }
+
+  @import url('https://fonts.googleapis.com/css2?family=IBM Plex Sans Condensed&display=swap');
+
   .myBtn1 {
     list-style-type: none;
   }
@@ -372,9 +377,10 @@ export default {
     top: 0;
     left: 0;
     right: 0;
-    background-color: black;
+    background-color: #262626;
     list-style-type: none;
   }
+
   .navbar {
     padding: 20px 0;
   }
@@ -382,19 +388,22 @@ export default {
   .navbar a:focus {
     display: flex;
     padding: 0 3px;
-    font-family: "Roboto", sans-serif;
-    font-size: 20px;
+    font-family: 'IBM Plex Sans Condensed', sans-serif;
+    font-size: 25px;
     font-weight: 500;
     text-decoration: none;
-    color: #1DB954;
+    color: #ffe7b3;
     text-transform: uppercase;
     transition: 0.3s;
   }
+ 
+  
+  
   .navbar a:hover {
-    color: white;
+    color: #ffff99;
   }
   .hero {
-    background-color: black;
+    background-color: #262626;
     padding-top: 12.5%;
   }
   .btn-get-started {
@@ -408,32 +417,33 @@ export default {
     margin: 10px;
     color: white;
     text-decoration: none;
-    border: 2px solid #1DB954;
+    border: 2px solid #BFB1A4;
   }
   .btn-get-started:hover {
-    background: #1DB954;
-    color: black
+    background: #BFB1A4;
+    color: #d9d9d9;
   }
   .heading:hover {
-    color: #1DB954;
+    color: #8C3E3E;
   }
   .services {
     color: white;
-    background-color: black;
+    background-color: #0D0D0D;
     background-size: cover;
     font-size: 14px;
     padding: 80px 0 60px 0;
     position: relative;
   }
+  
   .section-header {
     padding-bottom: 7.5%;
     color: white;
   }
   .service-item {
-    background-color: #262626;
+    background-color: #0D0D0D;
   }
   .service-item:hover {
-    color: #1DB954;
+    color: #8C3E3E;
   }
   /* The Modal (background) */
   .modal {
@@ -451,8 +461,8 @@ export default {
     /*height: 100%; /* Full height */
     overflow: auto;
     /* Enable scroll if needed */
-    /* background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.6);
+    /* background-color: #0D0D0D; /* Fallback color */
+    background-image:linear-gradient(to top, #8C3E3E,black);
     /* Black w/ opacity */
   }
   /* Modal Content */
@@ -460,7 +470,8 @@ export default {
     align-items: left;
     width: 325px;
     height: 500px;
-    background-color: #1a1a1a;
+    color:lightgrey;
+    background-color: #262626;
     margin: auto;
     padding: 5px;
   }
@@ -475,23 +486,20 @@ export default {
   }
   .close:hover,
   .close:focus {
-    color: #1DB954;
+    color: #8C3E3E;
     text-decoration: none;
     cursor: pointer;
   }
   .close1:hover,
   .close1:focus {
-    color: #1DB954;
+    color: #8C3E3E;
     text-decoration: none;
     cursor: pointer;
   }
-  /* .modal-content {
-  align-items: center;
-  width: 350px;
-  height: 450px;
-  background-color: #1a1a1a;
-  margin: auto;
-  padding: 10px;
-  } */
+  .nav-item.active{
+    color: #ffe7b3;
+    text-decoration:underline;
+  }
+
   </style>
   

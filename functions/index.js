@@ -528,6 +528,16 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
     const user = req.body.data.user;
     const threshold = req.body.data.threshold;  // this is new too
 
+    if (token === null) {
+      res.send({ data: "No Token Provided" });
+      return;
+    }
+
+    if (user === null || JSON.stringify(user) == '{}') {
+      res.send({ data: "Invalid User" });
+      return;
+    }
+
 
     let genres = [];
 
@@ -574,6 +584,9 @@ exports.recommendArtists = functions.https.onRequest((req, res) => {
       let similarArtists = [];        // array of the most similar artists     
       let sim_prob = [];              // their associated probability         
       let dis_prob = [];              // same again for negative
+      
+      const sim_threshold = 16;       // max amount of "similar" artists being checked
+
 
       const dbRef = db.collection("UserData");
             dbRef.get().then((snap) => {
